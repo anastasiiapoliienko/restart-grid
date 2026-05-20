@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="Interactive digital twin of a Vinnytsia 35/10 kV substation — watch cold-load pickup emerge and see how restoration sequencing avoids transformer overload." />
+<title>Twin · Vinnytsia 35/10 kV substation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf8f3;
+    --bg2:#f3efe5;
+    --paper:#ffffff;
+    --ink:#0b1320;
+    --ink2:#46546a;
+    --mute:#8a94a6;
+    --line:#e6e1d5;
+    --line2:#efeadd;
+    --navy:#0b3a78;
+    --navy-2:#1a56ad;
+    --yel:#f5c518;
+    --yel-2:#fff3b8;
+    --grn:#0f9d6b;
+    --red:#c0392b;
+    --orange:#e67e22;
+    --radius:14px;
+    --radius-lg:20px;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+    --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --shadow:0 4px 14px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  nav.top{position:sticky;top:0;background:rgba(250,248,243,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:50}
+  nav.top .row{max-width:1200px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:18px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink)}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--yel);box-shadow:0 0 0 3px var(--yel-2),0 0 14px rgba(245,197,24,.5)}
+  .brand .slash{color:var(--mute);font-weight:400;margin:0 2px}
+  .brand a{color:inherit;text-decoration:none}
+  .brand .sub{color:var(--ink2);font-weight:500}
+  nav.top ul{display:flex;gap:4px;list-style:none;margin:0;padding:0;flex:1;justify-content:center}
+  nav.top ul a{font-family:var(--mono);font-size:12px;color:var(--ink2);padding:6px 10px;border-radius:8px;text-decoration:none;letter-spacing:.02em}
+  nav.top ul a:hover{background:var(--bg2);color:var(--ink)}
+  nav.top ul a[aria-current="page"]{background:var(--ink);color:#fff}
+
+  main{max-width:1200px;margin:0 auto;padding:28px}
+  h1{font-family:var(--serif);font-size:42px;line-height:1.1;margin:14px 0 6px;letter-spacing:-.01em}
+  h1 em{font-style:italic;color:var(--navy)}
+  .lede{font-size:17px;color:var(--ink2);max-width:780px;margin:0 0 28px}
+  .lede code{background:var(--bg2);padding:1px 6px;border-radius:6px;font-family:var(--mono);font-size:14px}
+
+  .layout{display:grid;grid-template-columns:1fr 360px;gap:24px}
+  @media (max-width:980px){.layout{grid-template-columns:1fr}}
+
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+  .panel h3{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink2);letter-spacing:.08em;text-transform:uppercase;margin:0 0 12px}
+
+  .scenario-list{display:flex;flex-direction:column;gap:6px}
+  .scenario-card{border:1px solid var(--line);border-radius:10px;padding:11px 13px;cursor:pointer;transition:all .15s;background:transparent}
+  .scenario-card:hover{border-color:var(--navy);background:#fafcff}
+  .scenario-card[aria-selected="true"]{border-color:var(--navy);background:#f4f8ff;box-shadow:inset 3px 0 0 var(--navy)}
+  .scenario-card .label{font-weight:600;font-size:14px;color:var(--ink);margin-bottom:2px}
+  .scenario-card .desc{font-size:12.5px;color:var(--ink2);line-height:1.4}
+  .scenario-card .outcome{display:flex;gap:6px;margin-top:8px}
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.02em}
+  .pill.ok{background:#e7f5ee;color:var(--grn)}
+  .pill.bad{background:#fdecec;color:var(--red)}
+  .pill.warn{background:#fff3e1;color:var(--orange)}
+  .pill.info{background:var(--bg2);color:var(--ink2)}
+
+  .controls{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:12.5px;cursor:pointer;transition:all .15s}
+  .btn:hover{border-color:var(--navy);color:var(--navy)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{background:var(--navy);border-color:var(--navy);color:#fff}
+  .time{font-family:var(--mono);font-size:12.5px;color:var(--ink2);min-width:90px}
+  .speed-pill{display:inline-flex;background:var(--bg2);border-radius:999px;padding:3px;gap:2px}
+  .speed-pill button{background:transparent;border:none;font-family:var(--mono);font-size:11px;color:var(--ink2);padding:4px 9px;border-radius:999px;cursor:pointer}
+  .speed-pill button[aria-current="true"]{background:var(--ink);color:#fff}
+
+  .scrub{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+  input[type=range]{flex:1;accent-color:var(--navy)}
+
+  /* Network SVG */
+  #network{width:100%;height:340px;display:block}
+  .net-bg{fill:var(--bg2)}
+  .net-sub-rect{fill:#fff;stroke:var(--ink);stroke-width:1.5}
+  .net-sub-rect.tripped{fill:#fdecec;stroke:var(--red)}
+  .net-sub-label{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+  .net-feeder-line{stroke:var(--mute);stroke-width:2.5;fill:none;transition:stroke .25s}
+  .net-feeder-line.on{stroke:var(--grn)}
+  .net-feeder-line.tripped{stroke:var(--red);stroke-dasharray:6,4}
+  .net-feeder-node{fill:#fff;stroke:var(--mute);stroke-width:1.5;transition:fill .25s,stroke .25s}
+  .net-feeder-node.on{fill:#dff5e9;stroke:var(--grn)}
+  .net-feeder-node.tripped{fill:#fdecec;stroke:var(--red)}
+  .net-feeder-label{font-family:var(--mono);font-size:11px;fill:var(--ink2);text-anchor:middle}
+  .net-feeder-zone{font-family:var(--mono);font-size:9.5px;fill:var(--mute);text-anchor:middle}
+  .net-feeder-load{font-family:var(--mono);font-size:10.5px;fill:var(--ink);text-anchor:middle;font-weight:500}
+
+  /* Chart */
+  #chart{width:100%;height:230px;display:block}
+  #temp-chart{width:100%;height:120px;display:block}
+  .chart-axis-label{font-family:var(--mono);font-size:10px;fill:var(--mute);letter-spacing:.04em}
+  .chart-grid{stroke:var(--line2);stroke-width:1}
+  .chart-line{fill:none;stroke:var(--navy);stroke-width:1.8}
+  .chart-line.warn{stroke:var(--orange)}
+  .chart-line.temp{stroke:var(--ink2);stroke-width:1.4}
+  .chart-area{fill:rgba(11,58,120,.08)}
+  .chart-threshold{stroke:var(--red);stroke-width:1;stroke-dasharray:4,3;fill:none}
+  .chart-threshold-label{font-family:var(--mono);font-size:9.5px;fill:var(--red)}
+  .chart-cursor{stroke:var(--ink);stroke-width:1;stroke-dasharray:2,3;opacity:.5}
+  .chart-outage{fill:rgba(192,57,43,.06)}
+
+  /* Metrics grid */
+  .metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .metric{background:var(--bg2);border-radius:10px;padding:10px 12px}
+  .metric .k{font-family:var(--mono);font-size:10px;color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+  .metric .v{font-family:var(--serif);font-size:24px;color:var(--ink);line-height:1.1}
+  .metric .u{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-left:2px}
+  .metric.bad .v{color:var(--red)}
+  .metric.ok .v{color:var(--grn)}
+
+  .footer-note{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink2)}
+  .footer-note code{background:var(--bg2);padding:1px 5px;border-radius:5px;font-family:var(--mono);font-size:11px}
+  .footer-note a{color:var(--navy);text-decoration:none;border-bottom:1px solid transparent}
+  .footer-note a:hover{border-bottom-color:var(--navy)}
+  .backend-status{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;color:var(--ink2);padding:3px 9px;border-radius:999px;background:var(--bg2);margin-left:8px}
+  .backend-status .led{width:7px;height:7px;border-radius:50%;background:var(--mute)}
+  .backend-status.live .led{background:var(--grn);box-shadow:0 0 6px rgba(15,157,107,.7)}
+  .backend-status.replay .led{background:var(--yel)}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="row">
+    <span class="brand">
+      <span class="dot"></span>
+      <a href="/restart-grid/">restart</a>
+      <span class="slash">/</span>
+      <span class="sub">twin</span>
+    </span>
+    <ul>
+      <li><a href="/restart-grid/pitch/">Pitch</a></li>
+      <li><a href="/restart-grid/technical/">Technical</a></li>
+      <li><a href="/restart-grid/twin/" aria-current="page">Twin</a></li>
+    </ul>
+    <a class="btn primary" href="https://github.com/anastasiiapoliienko/vinnytsia-twin" target="_blank" rel="noopener">Source ↗</a>
+  </div>
+</nav>
+
+<main>
+  <h1>Watch <em>cold-load pickup</em> emerge.</h1>
+  <p class="lede">
+    A 35/10&nbsp;kV Vinnytsia-stand-in substation, calibrated against synthetic SCADA traces, with loads modelled as a population of thermostatic-house equivalents. No CLPU multiplier is hard-coded anywhere — the spike on re-energization comes purely from <code>n</code>&nbsp;houses turning their heaters on at the same moment. Pick a scenario, hit play.
+    <span id="backend-status" class="backend-status"><span class="led"></span><span class="lbl">connecting…</span></span>
+  </p>
+
+  <div class="layout">
+    <!-- Left column: main viz -->
+    <div>
+      <div class="panel">
+        <h3>Substation network</h3>
+        <svg id="network" viewBox="0 0 800 340" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h3>Substation load &amp; outdoor temperature</h3>
+        <div class="controls">
+          <button id="play" class="btn primary">▶ Play</button>
+          <div class="time" id="time-label">t = 0 min</div>
+          <div class="scrub"><input type="range" id="scrub" min="0" max="100" value="0" step="1" /></div>
+          <div class="speed-pill" id="speed-pill">
+            <button data-speed="30"  aria-current="true">1×</button>
+            <button data-speed="120">4×</button>
+            <button data-speed="600">20×</button>
+            <button data-speed="2400">80×</button>
+          </div>
+        </div>
+        <svg id="chart" viewBox="0 0 800 230" xmlns="http://www.w3.org/2000/svg"></svg>
+        <svg id="temp-chart" viewBox="0 0 800 120" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+    </div>
+
+    <!-- Right column: scenarios + metrics -->
+    <div>
+      <div class="panel">
+        <h3>Scenarios</h3>
+        <div class="scenario-list" id="scenario-list"></div>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h3>This scenario's metrics</h3>
+        <div class="metrics-grid" id="metrics"></div>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h3>Indoor temperature (mean)</h3>
+        <div id="indoor-now" style="font-family:var(--serif);font-size:32px;line-height:1.1">— <span class="u" style="font-family:var(--mono);font-size:13px;color:var(--ink2)">°C</span></div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.5">
+          Population-average across all ETP houses. During outages this drifts toward the outdoor temperature; on re-energization heaters turn on coincidentally.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <strong>How this works.</strong>
+    The page first tries a live Python backend (FastAPI on Hugging Face Spaces) at <code id="backend-url">—</code>. If it's asleep or unreachable, it falls back to pre-computed scenarios bundled under <code>/twin/data/scenarios/</code>. The simulation stack — OpenDSS, NumPy-vectorised ETP populations, scipy Nelder-Mead calibration — lives in <a href="https://github.com/anastasiiapoliienko/vinnytsia-twin">anastasiiapoliienko/vinnytsia-twin</a>. The RL restoration env that consumes the calibrated population is in <a href="https://github.com/anastasiiapoliienko/restart-grid-rl">restart-grid-rl</a>.
+  </div>
+</main>
+
+<script>
+// ============================================================
+// Config
+// ============================================================
+// Set this to your deployed HF Space URL once it's live, e.g.
+//   https://anastasiiapoliienko-vinnytsia-twin.hf.space
+// While empty or unreachable, the page uses bundled pre-computed scenarios.
+const BACKEND_URL = ""; // populate after deploy
+document.getElementById("backend-url").textContent = BACKEND_URL || "(not configured)";
+
+const ZONE_COLORS = { urban: "#0b3a78", peri: "#1a56ad", rural: "#0f9d6b" };
+const SUB_TRIP_KW = 25000;
+const CAPACITY_KW = 32000;
+const SCENARIO_IDS = ["baseline-day", "outage-naive", "outage-smart", "cold-snap"];
+
+// ============================================================
+// State
+// ============================================================
+let current = null;     // ScadaTrace-like object
+let frameIdx = 0;
+let playing = false;
+let speed = 30;         // model-minutes per real-second
+let lastTick = null;
+let backendOk = false;
+
+// ============================================================
+// Loading
+// ============================================================
+async function loadScenarioBundled(id) {
+  const res = await fetch(`data/scenarios/${id}.json`);
+  if (!res.ok) throw new Error(`failed to fetch ${id}.json`);
+  return res.json();
+}
+async function pingBackend() {
+  if (!BACKEND_URL) return false;
+  try {
+    const r = await fetch(`${BACKEND_URL}/api/health`, { signal: AbortSignal.timeout(5000) });
+    return r.ok;
+  } catch { return false; }
+}
+async function loadScenarioBackend(id) {
+  const r = await fetch(`${BACKEND_URL}/api/run`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+  if (!r.ok) throw new Error("backend failure");
+  return r.json();
+}
+async function selectScenario(id) {
+  const card = document.querySelector(`[data-scenario-id="${id}"]`);
+  document.querySelectorAll('.scenario-card').forEach(c => c.setAttribute('aria-selected','false'));
+  if (card) card.setAttribute('aria-selected','true');
+  try {
+    current = backendOk ? await loadScenarioBackend(id) : await loadScenarioBundled(id);
+  } catch (e) {
+    current = await loadScenarioBundled(id);
+  }
+  frameIdx = 0;
+  document.getElementById('scrub').max = current.frames.length - 1;
+  document.getElementById('scrub').value = 0;
+  drawNetwork(current);
+  drawChart(current);
+  drawTempChart(current);
+  updateMetrics(current);
+  renderFrame();
+}
+
+// ============================================================
+// Network SVG
+// ============================================================
+function drawNetwork(s) {
+  const svg = document.getElementById('network');
+  svg.innerHTML = '';
+  // Background grid
+  const bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  bg.setAttribute('x',0); bg.setAttribute('y',0); bg.setAttribute('width',800); bg.setAttribute('height',340);
+  bg.setAttribute('class','net-bg');
+  svg.appendChild(bg);
+
+  // Substation box (35 kV bus + 10 kV bus)
+  const cx = 400, cy = 170;
+  const sub = document.createElementNS('http://www.w3.org/2000/svg','g');
+  sub.setAttribute('id','sub-group');
+  const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  rect.setAttribute('x', cx - 65); rect.setAttribute('y', cy - 32);
+  rect.setAttribute('width', 130); rect.setAttribute('height', 64);
+  rect.setAttribute('rx', 10);
+  rect.setAttribute('class','net-sub-rect');
+  rect.setAttribute('id','sub-rect');
+  sub.appendChild(rect);
+  const label1 = document.createElementNS('http://www.w3.org/2000/svg','text');
+  label1.setAttribute('x', cx); label1.setAttribute('y', cy - 9);
+  label1.setAttribute('text-anchor','middle');
+  label1.setAttribute('font-family','var(--mono)');
+  label1.setAttribute('font-size','11.5'); label1.setAttribute('font-weight','600');
+  label1.setAttribute('fill','var(--ink)');
+  label1.textContent = '35 / 10 kV';
+  sub.appendChild(label1);
+  const label2 = document.createElementNS('http://www.w3.org/2000/svg','text');
+  label2.setAttribute('x', cx); label2.setAttribute('y', cy + 9);
+  label2.setAttribute('text-anchor','middle');
+  label2.setAttribute('class','net-sub-label');
+  label2.textContent = '2 × 16 MVA';
+  sub.appendChild(label2);
+  const loadText = document.createElementNS('http://www.w3.org/2000/svg','text');
+  loadText.setAttribute('x', cx); loadText.setAttribute('y', cy + 24);
+  loadText.setAttribute('text-anchor','middle');
+  loadText.setAttribute('class','net-sub-label');
+  loadText.setAttribute('id','sub-load-text');
+  loadText.textContent = '0 kW';
+  sub.appendChild(loadText);
+  svg.appendChild(sub);
+
+  // Feeder branches: 3 on each side
+  const sides = [
+    { x: 90,  yStart: 60, yEnd: 280, side: 'left'  },
+    { x: 710, yStart: 60, yEnd: 280, side: 'right' },
+  ];
+  // feeders order in SVG: left top->bottom = f1,f3,f5; right top->bottom = f2,f4,f6
+  const placement = [
+    { name: 'f1', x: 90,  y: 80  },
+    { name: 'f2', x: 710, y: 80  },
+    { name: 'f3', x: 90,  y: 170 },
+    { name: 'f4', x: 710, y: 170 },
+    { name: 'f5', x: 90,  y: 260 },
+    { name: 'f6', x: 710, y: 260 },
+  ];
+  placement.forEach((p, idx) => {
+    const zone = s.feeder_zones[s.feeder_names.indexOf(p.name)];
+    // Line from substation edge to feeder node
+    const subEdgeX = p.side === 'left' || p.x < cx ? cx - 65 : cx + 65;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','path');
+    const midx = (subEdgeX + p.x) / 2;
+    line.setAttribute('d', `M ${subEdgeX} ${cy} C ${midx} ${cy}, ${midx} ${p.y}, ${p.x} ${p.y}`);
+    line.setAttribute('class','net-feeder-line');
+    line.setAttribute('id', `line-${p.name}`);
+    svg.appendChild(line);
+    // Node
+    const node = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    node.setAttribute('cx', p.x); node.setAttribute('cy', p.y);
+    node.setAttribute('r', 26);
+    node.setAttribute('class','net-feeder-node');
+    node.setAttribute('id', `node-${p.name}`);
+    svg.appendChild(node);
+    // Label
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x', p.x); lbl.setAttribute('y', p.y - 2);
+    lbl.setAttribute('class','net-feeder-label');
+    lbl.textContent = p.name.toUpperCase();
+    svg.appendChild(lbl);
+    const zlbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    zlbl.setAttribute('x', p.x); zlbl.setAttribute('y', p.y + 10);
+    zlbl.setAttribute('class','net-feeder-zone');
+    zlbl.setAttribute('fill', ZONE_COLORS[zone]);
+    zlbl.textContent = zone;
+    svg.appendChild(zlbl);
+    // Load value (below)
+    const loadLbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    loadLbl.setAttribute('x', p.x); loadLbl.setAttribute('y', p.y + 44);
+    loadLbl.setAttribute('class','net-feeder-load');
+    loadLbl.setAttribute('id', `load-${p.name}`);
+    loadLbl.textContent = '— kW';
+    svg.appendChild(loadLbl);
+  });
+}
+
+function updateNetwork(frame) {
+  const subRect = document.getElementById('sub-rect');
+  const subTripped = current.events.some(e => e.kind === 'substation_trip' && e.t_min <= frame.t_min)
+                  && frame.sub_p_kw === 0
+                  && frame.feeder_energized.every(x => x === 0);
+  subRect.setAttribute('class', subTripped ? 'net-sub-rect tripped' : 'net-sub-rect');
+  document.getElementById('sub-load-text').textContent = Math.round(frame.sub_p_kw).toLocaleString() + ' kW';
+  current.feeder_names.forEach((name, i) => {
+    const line = document.getElementById(`line-${name}`);
+    const node = document.getElementById(`node-${name}`);
+    const loadLbl = document.getElementById(`load-${name}`);
+    const isTripped = current.events.some(e =>
+      (e.kind === 'trip' && e.feeder === name && e.t_min <= frame.t_min)
+      || (e.kind === 'substation_trip' && e.t_min <= frame.t_min)
+    ) && frame.feeder_energized[i] === 0
+       && !current.events.some(e => e.kind === 'feeder_close' && e.feeder === name && e.t_min > frame.t_min - 1);
+    let cls = 'net-feeder-line', nodeCls = 'net-feeder-node';
+    if (frame.feeder_energized[i]) { cls += ' on'; nodeCls += ' on'; }
+    else if (isTripped)            { cls += ' tripped'; nodeCls += ' tripped'; }
+    line.setAttribute('class', cls);
+    node.setAttribute('class', nodeCls);
+    loadLbl.textContent = Math.round(frame.feeder_load_kw[i]).toLocaleString() + ' kW';
+  });
+}
+
+// ============================================================
+// Time-series charts
+// ============================================================
+function chartScales(s) {
+  const w = 800, h = 230, padL = 50, padR = 20, padT = 20, padB = 30;
+  const tMax = s.frames[s.frames.length - 1].t_min;
+  const pMax = Math.max(SUB_TRIP_KW * 1.1, Math.max(...s.frames.map(f => f.sub_p_kw)) * 1.05, 22000);
+  const xOf = t => padL + (t / tMax) * (w - padL - padR);
+  const yOf = p => h - padB - (p / pMax) * (h - padT - padB);
+  return { w, h, padL, padR, padT, padB, tMax, pMax, xOf, yOf };
+}
+function drawChart(s) {
+  const svg = document.getElementById('chart');
+  svg.innerHTML = '';
+  const { w, h, padL, padR, padT, padB, tMax, pMax, xOf, yOf } = chartScales(s);
+
+  // Outage shading
+  let outageStart = null;
+  for (const e of s.events) {
+    if (e.kind === 'feeder_open' && outageStart === null) outageStart = e.t_min;
+    if (e.kind === 'feeder_close' && outageStart !== null) {
+      const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      r.setAttribute('x', xOf(outageStart));
+      r.setAttribute('y', padT);
+      r.setAttribute('width', Math.max(2, xOf(e.t_min) - xOf(outageStart)));
+      r.setAttribute('height', h - padT - padB);
+      r.setAttribute('class','chart-outage');
+      svg.appendChild(r);
+      outageStart = null;
+      break;
+    }
+  }
+
+  // Gridlines + Y labels
+  for (let p = 0; p <= pMax; p += 5000) {
+    const y = yOf(p);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', padL); line.setAttribute('x2', w - padR);
+    line.setAttribute('y1', y); line.setAttribute('y2', y);
+    line.setAttribute('class','chart-grid');
+    svg.appendChild(line);
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x', padL - 6); t.setAttribute('y', y + 3);
+    t.setAttribute('text-anchor','end');
+    t.setAttribute('class','chart-axis-label');
+    t.textContent = (p / 1000).toFixed(0);
+    svg.appendChild(t);
+  }
+  // Y axis label
+  const yLab = document.createElementNS('http://www.w3.org/2000/svg','text');
+  yLab.setAttribute('x', padL - 6); yLab.setAttribute('y', padT - 6);
+  yLab.setAttribute('text-anchor','end');
+  yLab.setAttribute('class','chart-axis-label');
+  yLab.textContent = 'MW';
+  svg.appendChild(yLab);
+
+  // X gridlines (every hour)
+  for (let t = 0; t <= tMax; t += 60) {
+    const x = xOf(t);
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x', x); lbl.setAttribute('y', h - padB + 14);
+    lbl.setAttribute('text-anchor','middle');
+    lbl.setAttribute('class','chart-axis-label');
+    lbl.textContent = (t / 60).toFixed(0) + 'h';
+    svg.appendChild(lbl);
+  }
+
+  // Threshold line
+  const thr = document.createElementNS('http://www.w3.org/2000/svg','line');
+  thr.setAttribute('x1', padL); thr.setAttribute('x2', w - padR);
+  thr.setAttribute('y1', yOf(SUB_TRIP_KW)); thr.setAttribute('y2', yOf(SUB_TRIP_KW));
+  thr.setAttribute('class','chart-threshold');
+  svg.appendChild(thr);
+  const thrLab = document.createElementNS('http://www.w3.org/2000/svg','text');
+  thrLab.setAttribute('x', w - padR); thrLab.setAttribute('y', yOf(SUB_TRIP_KW) - 4);
+  thrLab.setAttribute('text-anchor','end');
+  thrLab.setAttribute('class','chart-threshold-label');
+  thrLab.textContent = `trip threshold ${(SUB_TRIP_KW/1000).toFixed(0)} MW`;
+  svg.appendChild(thrLab);
+
+  // Area under curve
+  const areaPts = s.frames.map(f => `${xOf(f.t_min)},${yOf(f.sub_p_kw)}`);
+  const area = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  area.setAttribute('points',
+    `${xOf(0)},${yOf(0)} ${areaPts.join(' ')} ${xOf(tMax)},${yOf(0)}`);
+  area.setAttribute('class','chart-area');
+  svg.appendChild(area);
+
+  // Curve
+  const path = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  path.setAttribute('points', areaPts.join(' '));
+  path.setAttribute('class','chart-line');
+  svg.appendChild(path);
+
+  // Cursor (vertical line at current time)
+  const cursor = document.createElementNS('http://www.w3.org/2000/svg','line');
+  cursor.setAttribute('id','chart-cursor');
+  cursor.setAttribute('class','chart-cursor');
+  cursor.setAttribute('y1', padT); cursor.setAttribute('y2', h - padB);
+  cursor.setAttribute('x1', xOf(0)); cursor.setAttribute('x2', xOf(0));
+  svg.appendChild(cursor);
+}
+function drawTempChart(s) {
+  const svg = document.getElementById('temp-chart');
+  svg.innerHTML = '';
+  const w = 800, h = 120, padL = 50, padR = 20, padT = 14, padB = 22;
+  const tMax = s.frames[s.frames.length - 1].t_min;
+  const tempMin = Math.min(...s.frames.map(f => f.ambient_C), ...s.frames.map(f => f.indoor_mean_C)) - 1;
+  const tempMax = Math.max(...s.frames.map(f => f.ambient_C), ...s.frames.map(f => f.indoor_mean_C)) + 1;
+  const xOf = t => padL + (t / tMax) * (w - padL - padR);
+  const yOf = T => h - padB - ((T - tempMin) / (tempMax - tempMin)) * (h - padT - padB);
+
+  // Gridlines
+  for (let T = Math.ceil(tempMin / 5) * 5; T <= tempMax; T += 5) {
+    const y = yOf(T);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', padL); line.setAttribute('x2', w - padR);
+    line.setAttribute('y1', y); line.setAttribute('y2', y);
+    line.setAttribute('class','chart-grid');
+    svg.appendChild(line);
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x', padL - 6); lbl.setAttribute('y', y + 3);
+    lbl.setAttribute('text-anchor','end');
+    lbl.setAttribute('class','chart-axis-label');
+    lbl.textContent = T.toFixed(0);
+    svg.appendChild(lbl);
+  }
+  const yLab = document.createElementNS('http://www.w3.org/2000/svg','text');
+  yLab.setAttribute('x', padL - 6); yLab.setAttribute('y', padT - 4);
+  yLab.setAttribute('text-anchor','end');
+  yLab.setAttribute('class','chart-axis-label');
+  yLab.textContent = '°C';
+  svg.appendChild(yLab);
+
+  // Outdoor temp line
+  const outdoor = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  outdoor.setAttribute('points', s.frames.map(f => `${xOf(f.t_min)},${yOf(f.ambient_C)}`).join(' '));
+  outdoor.setAttribute('class','chart-line temp');
+  outdoor.setAttribute('stroke','#7a8190');
+  outdoor.setAttribute('stroke-dasharray','3,3');
+  svg.appendChild(outdoor);
+
+  // Indoor temp line
+  const indoor = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  indoor.setAttribute('points', s.frames.map(f => `${xOf(f.t_min)},${yOf(f.indoor_mean_C)}`).join(' '));
+  indoor.setAttribute('class','chart-line temp');
+  indoor.setAttribute('stroke','#0b3a78');
+  svg.appendChild(indoor);
+
+  // Legend
+  const legend = document.createElementNS('http://www.w3.org/2000/svg','g');
+  legend.innerHTML = `
+    <line x1="${padL}" y1="${padT - 2}" x2="${padL + 18}" y2="${padT - 2}" stroke="#0b3a78" stroke-width="1.4"/>
+    <text x="${padL + 22}" y="${padT + 1}" font-family="var(--mono)" font-size="10" fill="#46546a">indoor mean</text>
+    <line x1="${padL + 120}" y1="${padT - 2}" x2="${padL + 138}" y2="${padT - 2}" stroke="#7a8190" stroke-width="1.4" stroke-dasharray="3,3"/>
+    <text x="${padL + 142}" y="${padT + 1}" font-family="var(--mono)" font-size="10" fill="#46546a">outdoor</text>
+  `;
+  svg.appendChild(legend);
+
+  // Cursor
+  const cursor = document.createElementNS('http://www.w3.org/2000/svg','line');
+  cursor.setAttribute('id','temp-cursor');
+  cursor.setAttribute('class','chart-cursor');
+  cursor.setAttribute('y1', padT); cursor.setAttribute('y2', h - padB);
+  cursor.setAttribute('x1', xOf(0)); cursor.setAttribute('x2', xOf(0));
+  svg.appendChild(cursor);
+}
+
+function updateMetrics(s) {
+  const grid = document.getElementById('metrics');
+  const m = s.metrics;
+  const cards = [
+    { k: "Peak load",       v: (m.peak_kw / 1000).toFixed(1), u: "MW",
+      cls: m.peak_kw > SUB_TRIP_KW ? "bad" : (m.peak_kw > 22000 ? "warn" : "ok") },
+    { k: "Trips",           v: m.n_trips, u: "events",
+      cls: m.n_trips > 0 ? "bad" : "ok" },
+    { k: "Restored",        v: Math.round(m.frac_restored_final * 6) + "/6", u: "feeders",
+      cls: m.frac_restored_final === 1 ? "ok" : (m.frac_restored_final >= 0.5 ? "warn" : "bad") },
+    { k: "Restoration",     v: m.restoration_minutes ? m.restoration_minutes.toFixed(0) : "—",
+      u: "min", cls: "" },
+  ];
+  grid.innerHTML = cards.map(c =>
+    `<div class="metric ${c.cls}"><div class="k">${c.k}</div><div class="v">${c.v} <span class="u">${c.u}</span></div></div>`
+  ).join('');
+}
+
+function renderFrame() {
+  if (!current) return;
+  const f = current.frames[frameIdx];
+  document.getElementById('time-label').textContent = `t = ${f.t_min.toFixed(0)} min`;
+  document.getElementById('scrub').value = frameIdx;
+  document.getElementById('indoor-now').innerHTML = `${f.indoor_mean_C.toFixed(1)} <span class="u" style="font-family:var(--mono);font-size:13px;color:var(--ink2)">°C</span>`;
+  const { xOf } = chartScales(current);
+  const cursor = document.getElementById('chart-cursor');
+  if (cursor) { cursor.setAttribute('x1', xOf(f.t_min)); cursor.setAttribute('x2', xOf(f.t_min)); }
+  const tempCursor = document.getElementById('temp-cursor');
+  if (tempCursor) {
+    const tw = 800, tpadL = 50, tpadR = 20;
+    const txOf = t => tpadL + (t / current.frames[current.frames.length-1].t_min) * (tw - tpadL - tpadR);
+    tempCursor.setAttribute('x1', txOf(f.t_min)); tempCursor.setAttribute('x2', txOf(f.t_min));
+  }
+  updateNetwork(f);
+}
+
+// ============================================================
+// Animation loop
+// ============================================================
+function tick(now) {
+  if (!playing) return;
+  if (lastTick == null) lastTick = now;
+  const elapsedSec = (now - lastTick) / 1000;
+  lastTick = now;
+  const dtModelMin = elapsedSec * speed;
+  const dtModelSec = dtModelMin * 60;
+  const stepSeconds = current.dt_seconds;
+  frameIdx = Math.min(current.frames.length - 1, frameIdx + Math.max(1, Math.round(dtModelSec / stepSeconds)));
+  renderFrame();
+  if (frameIdx >= current.frames.length - 1) {
+    playing = false;
+    document.getElementById('play').textContent = '▶ Play';
+    return;
+  }
+  requestAnimationFrame(tick);
+}
+
+document.getElementById('play').addEventListener('click', () => {
+  playing = !playing;
+  document.getElementById('play').textContent = playing ? '❚❚ Pause' : '▶ Play';
+  if (playing) {
+    if (frameIdx >= current.frames.length - 1) frameIdx = 0;
+    lastTick = null;
+    requestAnimationFrame(tick);
+  }
+});
+document.getElementById('scrub').addEventListener('input', e => {
+  frameIdx = parseInt(e.target.value, 10);
+  renderFrame();
+});
+document.getElementById('speed-pill').addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  speed = parseInt(e.target.dataset.speed, 10);
+  document.querySelectorAll('#speed-pill button').forEach(b => b.removeAttribute('aria-current'));
+  e.target.setAttribute('aria-current','true');
+});
+
+// ============================================================
+// Init
+// ============================================================
+async function init() {
+  const manifestRes = await fetch('data/scenarios/manifest.json');
+  const manifest = await manifestRes.json();
+  const list = document.getElementById('scenario-list');
+  list.innerHTML = manifest.map(m => {
+    const tripsPill = m.metrics.n_trips > 0
+      ? `<span class="pill bad">${m.metrics.n_trips} trip</span>`
+      : `<span class="pill ok">no trips</span>`;
+    const restPill = m.metrics.frac_restored_final === 1
+      ? `<span class="pill ok">6/6 restored</span>`
+      : m.metrics.frac_restored_final === 0
+        ? `<span class="pill bad">substation out</span>`
+        : `<span class="pill warn">${Math.round(m.metrics.frac_restored_final*6)}/6 restored</span>`;
+    return `<div class="scenario-card" data-scenario-id="${m.id}" tabindex="0">
+        <div class="label">${m.label}</div>
+        <div class="desc">${m.description}</div>
+        <div class="outcome">${tripsPill}${restPill}</div>
+      </div>`;
+  }).join('');
+  document.querySelectorAll('.scenario-card').forEach(c => {
+    c.addEventListener('click', () => selectScenario(c.dataset.scenarioId));
+    c.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectScenario(c.dataset.scenarioId); }
+    });
+  });
+
+  // Backend health
+  const status = document.getElementById('backend-status');
+  const lbl = status.querySelector('.lbl');
+  backendOk = await pingBackend();
+  if (backendOk) {
+    status.classList.add('live');
+    lbl.textContent = 'live backend';
+  } else {
+    status.classList.add('replay');
+    lbl.textContent = BACKEND_URL ? 'backend asleep · replay mode' : 'replay mode';
+  }
+
+  // Load first scenario.
+  await selectScenario(manifest[0].id);
+}
+
+init().catch(err => {
+  console.error(err);
+  document.querySelector('main').innerHTML += `<div style="color:var(--red);padding:20px">Failed to load: ${err.message}</div>`;
+});
+</script>
+
+</body>
+</html>
