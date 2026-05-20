@@ -8,6 +8,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  // Set lang before render to avoid flash
+  (function(){
+    try{
+      var saved = localStorage.getItem('lang');
+      if(!saved){ saved = (navigator.language || 'en').toLowerCase().startsWith('uk') ? 'uk' : 'en'; }
+      document.documentElement.lang = saved;
+    }catch(e){}
+  })();
+</script>
 <style>
   :root{
     --bg:#faf8f3;
@@ -46,7 +56,7 @@
 
   /* ── Top nav ─────────────────────────────────────────── */
   nav.top{position:sticky;top:0;background:rgba(250,248,243,.82);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--line);z-index:50}
-  nav.top .row{max-width:1100px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:24px}
+  nav.top .row{max-width:1100px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:18px}
   .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
   .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--yel);box-shadow:0 0 0 3px var(--yel-2),0 0 14px rgba(245,197,24,.5)}
   .brand .slash{color:var(--mute);font-weight:400;margin:0 2px}
@@ -57,7 +67,15 @@
   nav.top .cta{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:var(--mono);font-weight:500;border-bottom:none;transition:transform .15s,background .15s}
   nav.top .cta:hover{background:var(--navy);transform:translateY(-1px);color:#fff}
   nav.top .cta svg{width:12px;height:12px}
-  @media (max-width:840px){nav.top ul{display:none}}
+
+  /* Language pill */
+  .lang-toggle{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+  .lang-pill{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2);background:transparent;border:none;border-radius:999px;padding:5px 10px;cursor:pointer;font-weight:600;transition:background .15s,color .15s}
+  .lang-pill:hover{color:var(--ink)}
+  .lang-pill[aria-current="true"]{background:var(--ink);color:#fff}
+
+  @media (max-width:900px){nav.top ul{display:none}}
+  @media (max-width:520px){nav.top .cta span.long{display:none}}
 
   /* ── Layout ──────────────────────────────────────────── */
   .wrap{max-width:1100px;margin:0 auto;padding:0 28px}
@@ -262,19 +280,23 @@
       <span class="dot"></span>
       <span>restart</span>
       <span class="slash">/</span>
-      <span class="sub">the case</span>
+      <span class="sub" data-i18n="brand.sub">the case</span>
     </a>
     <ul>
-      <li><a href="#problem">Problem</a></li>
-      <li><a href="#idea">Idea</a></li>
-      <li><a href="#how">How it works</a></li>
-      <li><a href="#stages">Stages</a></li>
-      <li><a href="#risks">Risks</a></li>
-      <li><a href="#repos">Repos</a></li>
+      <li><a href="#problem" data-i18n="nav.problem">Problem</a></li>
+      <li><a href="#idea" data-i18n="nav.idea">Idea</a></li>
+      <li><a href="#how" data-i18n="nav.how">How it works</a></li>
+      <li><a href="#stages" data-i18n="nav.stages">Stages</a></li>
+      <li><a href="#risks" data-i18n="nav.risks">Risks</a></li>
+      <li><a href="#repos" data-i18n="nav.repos">Repos</a></li>
     </ul>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" class="lang-pill" data-lang="en" aria-current="true">EN</button>
+      <button type="button" class="lang-pill" data-lang="uk" aria-current="false">UA</button>
+    </div>
     <a class="cta" href="#repos">
       <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.5c-2.23.49-2.7-.95-2.7-.95-.36-.93-.89-1.18-.89-1.18-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 8 .2z"/></svg>
-      Code <span style="opacity:.55;margin:0 1px">·</span> 3 repos
+      <span class="long"><span data-i18n="nav.cta">Code</span> <span style="opacity:.55;margin:0 1px">·</span> <span data-i18n="nav.ctaCount">3 repos</span></span>
     </a>
   </div>
 </nav>
@@ -287,18 +309,18 @@
   <div class="wrap inner">
     <span class="badge">
       <span class="pill">v0.1</span>
-      Restart · a case for learned grid restoration
+      <span data-i18n="hero.badge">Restart · a case for learned grid restoration</span>
     </span>
-    <h1>Ukraine restarts its grid <span class="strike">wrong</span> every week. <em>There is a way to do it right.</em></h1>
-    <p class="lede">An AI advisor that learns the safest sequence to re-energize feeders after a blackout — trained on a digital twin of Ukraine's actual network, and presented to operators with a one-line explanation for every recommendation.</p>
+    <h1 data-i18n="hero.h1">Ukraine restarts its grid <span class="strike">wrong</span> every week. <em>There is a way to do it right.</em></h1>
+    <p class="lede" data-i18n="hero.lede">An AI advisor that learns the safest sequence to re-energize feeders after a blackout — trained on a digital twin of Ukraine's actual network, and presented to operators with a one-line explanation for every recommendation.</p>
     <div class="ctas">
       <a class="btn primary" href="#problem">
-        Read the case
+        <span data-i18n="hero.cta1">Read the case</span>
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12 L12 4 M6 4 H12 V10"/></svg>
       </a>
       <a class="btn ghost" href="#repos">
         <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.5c-2.23.49-2.7-.95-2.7-.95-.36-.93-.89-1.18-.89-1.18-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 8 .2z"/></svg>
-        Code &amp; experiments
+        <span data-i18n="hero.cta2">Code &amp; experiments</span>
         <span style="font-family:var(--mono);font-size:11.5px;padding:2px 7px;border-radius:999px;background:var(--bg2);color:var(--ink2);margin-left:4px;border:1px solid var(--line)">3</span>
       </a>
     </div>
@@ -307,17 +329,17 @@
       <div class="stat reveal">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 L4 13 H11 L10 22 L20 11 H13 Z"/></svg>
         <div class="v">3–8<em>×</em></div>
-        <div class="k">cold-load inrush vs steady-state, the moment power returns</div>
+        <div class="k" data-i18n="stat.1.k">cold-load inrush vs steady-state, the moment power returns</div>
       </div>
       <div class="stat reveal">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3 V12 L19 16"/></svg>
         <div class="v">~50<em>%</em></div>
-        <div class="k">of Ukraine's thermal generation lost or degraded since 2022</div>
+        <div class="k" data-i18n="stat.2.k">of Ukraine's thermal generation lost or degraded since 2022</div>
       </div>
       <div class="stat reveal">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12 H21 M3 6 H21 M3 18 H21"/><path d="M7 3 V21 M17 3 V21"/></svg>
-        <div class="v">weekly</div>
-        <div class="k">topology changes from strikes and repairs — paper procedures go stale</div>
+        <div class="v" data-i18n="stat.3.v">weekly</div>
+        <div class="k" data-i18n="stat.3.k">topology changes from strikes and repairs — paper procedures go stale</div>
       </div>
     </div>
   </div>
@@ -327,213 +349,213 @@
 
 <section id="tldr" style="padding-top:48px;padding-bottom:48px;border:none">
   <div class="tldr reveal">
-    <h2>In 30 seconds</h2>
+    <h2 data-i18n="tldr.title">In 30 seconds</h2>
     <ul>
-      <li><span class="b">A</span><span><b>Problem.</b> Every restart cascades a trip. Paper procedures assume a grid Ukraine no longer has.</span></li>
-      <li><span class="b">B</span><span><b>Idea.</b> An RL policy recommends <i>which feeder, what ramp, what dwell time</i> — with a one-line explanation.</span></li>
-      <li><span class="b">C</span><span><b>Twin.</b> Trained on a calibrated OpenDSS model of a real oblast, validated on Typhoon HIL hardware.</span></li>
-      <li><span class="b">D</span><span><b>Human-in-the-loop.</b> Shadow mode → advisory → one-click accept with two-person confirmation. Never autonomous.</span></li>
+      <li><span class="b">A</span><span data-i18n="tldr.1"><b>Problem.</b> Every restart cascades a trip. Paper procedures assume a grid Ukraine no longer has.</span></li>
+      <li><span class="b">B</span><span data-i18n="tldr.2"><b>Idea.</b> An RL policy recommends <i>which feeder, what ramp, what dwell time</i> — with a one-line explanation.</span></li>
+      <li><span class="b">C</span><span data-i18n="tldr.3"><b>Twin.</b> Trained on a calibrated OpenDSS model of a real oblast, validated on Typhoon HIL hardware.</span></li>
+      <li><span class="b">D</span><span data-i18n="tldr.4"><b>Human-in-the-loop.</b> Shadow mode → advisory → one-click accept with two-person confirmation. Never autonomous.</span></li>
     </ul>
   </div>
 </section>
 
 <section id="problem">
-  <div class="section-label"><span class="num">01</span><span class="eyebrow">The problem</span></div>
-  <h2>The current playbook was <em>written for a grid that no longer exists</em>.</h2>
-  <p class="kicker">After every blackout, an operator must re-energize a feeder. With every thermostat, fridge, and heater off, demand snaps back all at once and trips the upstream breaker — blackout again. Operators perform the restart under air-raid sirens, with degraded telemetry, sometimes from candlelight.</p>
+  <div class="section-label"><span class="num">01</span><span class="eyebrow" data-i18n="s01.eyebrow">The problem</span></div>
+  <h2 data-i18n="s01.h2">The current playbook was <em>written for a grid that no longer exists</em>.</h2>
+  <p class="kicker" data-i18n="s01.p">After every blackout, an operator must re-energize a feeder. With every thermostat, fridge, and heater off, demand snaps back all at once and trips the upstream breaker — blackout again. Operators perform the restart under air-raid sirens, with degraded telemetry, sometimes from candlelight.</p>
 </section>
 
 <section id="idea">
-  <div class="section-label"><span class="num">02</span><span class="eyebrow">The idea</span></div>
-  <h2>A learned policy for the question: <em>what do I energize next?</em></h2>
-  <p class="kicker">A reinforcement-learning policy that recommends <i>which segment to energize next</i>, <i>at what voltage ramp</i>, <i>after what dwell time</i>. Trained against millions of synthetic blackout scenarios on a calibrated digital twin of Ukrainian topology. Every recommendation is shown to a human operator with an explanation. Never autonomous.</p>
-  <p class="quote reveal">Restoration is the one grid problem where seconds of delay cost megawatt-hours, and where the right action depends on weather, time, and damage. That is exactly the regime where RL beats both human procedures and classical optimization.</p>
+  <div class="section-label"><span class="num">02</span><span class="eyebrow" data-i18n="s02.eyebrow">The idea</span></div>
+  <h2 data-i18n="s02.h2">A learned policy for the question: <em>what do I energize next?</em></h2>
+  <p class="kicker" data-i18n="s02.p">A reinforcement-learning policy that recommends <i>which segment to energize next</i>, <i>at what voltage ramp</i>, <i>after what dwell time</i>. Trained against millions of synthetic blackout scenarios on a calibrated digital twin of Ukrainian topology. Every recommendation is shown to a human operator with an explanation. Never autonomous.</p>
+  <p class="quote reveal" data-i18n="s02.quote">Restoration is the one grid problem where seconds of delay cost megawatt-hours, and where the right action depends on weather, time, and damage. That is exactly the regime where RL beats both human procedures and classical optimization.</p>
 </section>
 
 <section id="how">
-  <div class="section-label"><span class="num">03</span><span class="eyebrow">How it works</span></div>
-  <h2>Six concrete steps from <em>synthetic data</em> to <em>operator console</em>.</h2>
+  <div class="section-label"><span class="num">03</span><span class="eyebrow" data-i18n="s03.eyebrow">How it works</span></div>
+  <h2 data-i18n="s03.h2">Six concrete steps from <em>synthetic data</em> to <em>operator console</em>.</h2>
   <ol class="steps">
     <li class="reveal">
-      <b>Build a twin of a real Ukrainian sub-region.</b>
-      <p>One oblast's 35 / 10 kV network modeled in <code>OpenDSS</code>. Calibrated against ≥18 months of historical SCADA traces. Loads modeled as a population of equivalent-thermal-parameter houses, so cold-load behavior <i>emerges</i> rather than being hard-coded.</p>
-      <div class="meta"><span class="tag k"><span class="dot"></span>foundation</span></div>
+      <b data-i18n="step.1.title">Build a twin of a real Ukrainian sub-region.</b>
+      <p data-i18n="step.1.body">One oblast's 35 / 10 kV network modeled in <code>OpenDSS</code>. Calibrated against ≥18 months of historical SCADA traces. Loads modeled as a population of equivalent-thermal-parameter houses, so cold-load behavior <i>emerges</i> rather than being hard-coded.</p>
+      <div class="meta"><span class="tag k"><span class="dot"></span><span data-i18n="step.1.tag">foundation</span></span></div>
     </li>
     <li class="reveal">
-      <b>Generate scenarios.</b>
-      <p>Synthesize millions of blackout starting states across season, ambient temperature, outage duration, and damage pattern. This dataset — restoration under realistic adversarial damage — exists nowhere else.</p>
-      <div class="meta"><span class="tag"><span class="dot"></span>data</span></div>
+      <b data-i18n="step.2.title">Generate scenarios.</b>
+      <p data-i18n="step.2.body">Synthesize millions of blackout starting states across season, ambient temperature, outage duration, and damage pattern. This dataset — restoration under realistic adversarial damage — exists nowhere else.</p>
+      <div class="meta"><span class="tag"><span class="dot"></span><span data-i18n="step.2.tag">data</span></span></div>
     </li>
     <li class="reveal">
-      <b>Train a policy.</b>
-      <p>PPO with action masking in <code>Stable-Baselines3</code>. Curriculum from single feeder to full regional topology. Reward = load restored, penalized for trips, voltage violations, and time. An explainer is attached at training time, not bolted on after.</p>
-      <div class="meta"><span class="tag"><span class="dot"></span>training</span></div>
+      <b data-i18n="step.3.title">Train a policy.</b>
+      <p data-i18n="step.3.body">PPO with action masking in <code>Stable-Baselines3</code>. Curriculum from single feeder to full regional topology. Reward = load restored, penalized for trips, voltage violations, and time. An explainer is attached at training time, not bolted on after.</p>
+      <div class="meta"><span class="tag"><span class="dot"></span><span data-i18n="step.3.tag">training</span></span></div>
     </li>
     <li class="reveal">
-      <b>Validate in hardware.</b>
-      <p>Replay the policy on <code>Typhoon HIL</code> in real time. This is the sim-to-real check: does it still beat the baseline when load parameters drift and measurement noise is added?</p>
-      <div class="meta"><span class="tag y"><span class="dot"></span>hardware in the loop</span></div>
+      <b data-i18n="step.4.title">Validate in hardware.</b>
+      <p data-i18n="step.4.body">Replay the policy on <code>Typhoon HIL</code> in real time. This is the sim-to-real check: does it still beat the baseline when load parameters drift and measurement noise is added?</p>
+      <div class="meta"><span class="tag y"><span class="dot"></span><span data-i18n="step.4.tag">hardware in the loop</span></span></div>
     </li>
     <li class="reveal">
-      <b>Shadow-mode beside the operator.</b>
-      <p>The console shows the agent's recommendation next to the operator's intended action. The operator decides. Every disagreement becomes a training example.</p>
-      <div class="meta"><span class="tag y"><span class="dot"></span>deploy · shadow</span></div>
+      <b data-i18n="step.5.title">Shadow-mode beside the operator.</b>
+      <p data-i18n="step.5.body">The console shows the agent's recommendation next to the operator's intended action. The operator decides. Every disagreement becomes a training example.</p>
+      <div class="meta"><span class="tag y"><span class="dot"></span><span data-i18n="step.5.tag">deploy · shadow</span></span></div>
     </li>
     <li class="reveal">
-      <b>Promote to advisory.</b>
-      <p>After months of high agreement, the operator can <i>accept</i> a recommendation with one click. Two-person confirmation above a learned risk threshold. The system never becomes fully closed-loop.</p>
-      <div class="meta"><span class="tag g"><span class="dot"></span>advisory</span></div>
+      <b data-i18n="step.6.title">Promote to advisory.</b>
+      <p data-i18n="step.6.body">After months of high agreement, the operator can <i>accept</i> a recommendation with one click. Two-person confirmation above a learned risk threshold. The system never becomes fully closed-loop.</p>
+      <div class="meta"><span class="tag g"><span class="dot"></span><span data-i18n="step.6.tag">advisory</span></span></div>
     </li>
   </ol>
 </section>
 
 <section id="why">
-  <div class="section-label"><span class="num">04</span><span class="eyebrow">Why this works where the alternatives don't</span></div>
-  <h2>Two old approaches are <em>structurally wrong</em> for this regime.</h2>
+  <div class="section-label"><span class="num">04</span><span class="eyebrow" data-i18n="s04.eyebrow">Why this works where the alternatives don't</span></div>
+  <h2 data-i18n="s04.h2">Two old approaches are <em>structurally wrong</em> for this regime.</h2>
   <div class="grid cols-3">
     <div class="card alt-card fail reveal">
-      <span class="verdict">stale</span>
-      <span class="tag r"><span class="dot"></span>option a</span>
-      <h3>Paper procedures</h3>
-      <p>Assume seasonal averages and stable topology. Ukraine in 2026 has neither.</p>
+      <span class="verdict" data-i18n="alt.1.verdict">stale</span>
+      <span class="tag r"><span class="dot"></span><span data-i18n="alt.1.tag">option a</span></span>
+      <h3 data-i18n="alt.1.h3">Paper procedures</h3>
+      <p data-i18n="alt.1.p">Assume seasonal averages and stable topology. Ukraine in 2026 has neither.</p>
     </div>
     <div class="card alt-card fail reveal">
-      <span class="verdict">brittle</span>
-      <span class="tag r"><span class="dot"></span>option b</span>
-      <h3>Classical optimization</h3>
-      <p>Requires re-formulating every time the grid changes shape. The grid changes shape every week.</p>
+      <span class="verdict" data-i18n="alt.2.verdict">brittle</span>
+      <span class="tag r"><span class="dot"></span><span data-i18n="alt.2.tag">option b</span></span>
+      <h3 data-i18n="alt.2.h3">Classical optimization</h3>
+      <p data-i18n="alt.2.p">Requires re-formulating every time the grid changes shape. The grid changes shape every week.</p>
     </div>
     <div class="card alt-card win reveal">
-      <span class="verdict">adapts</span>
-      <span class="tag g"><span class="dot"></span>proposal</span>
-      <h3>Learned policy</h3>
-      <p>Maps state → next action. Topology and damage are inputs, not assumptions. Retrains on its own disagreements.</p>
+      <span class="verdict" data-i18n="alt.3.verdict">adapts</span>
+      <span class="tag g"><span class="dot"></span><span data-i18n="alt.3.tag">proposal</span></span>
+      <h3 data-i18n="alt.3.h3">Learned policy</h3>
+      <p data-i18n="alt.3.p">Maps state → next action. Topology and damage are inputs, not assumptions. Retrains on its own disagreements.</p>
     </div>
   </div>
 </section>
 
 <section id="stages">
-  <div class="section-label"><span class="num">05</span><span class="eyebrow">Stages</span></div>
-  <h2>A staged path that <em>never goes autonomous</em>.</h2>
+  <div class="section-label"><span class="num">05</span><span class="eyebrow" data-i18n="s05.eyebrow">Stages</span></div>
+  <h2 data-i18n="s05.h2">A staged path that <em>never goes autonomous</em>.</h2>
   <div class="road">
     <div class="stage reveal" data-status="done">
       <div class="top-bar"></div>
-      <div class="step-no"><span>Stage 01</span><span class="status">scoped</span></div>
-      <h3>Single-feeder proof</h3>
-      <p>One 10 kV feeder in OpenDSS. The trained policy beats both the greedy baseline and the paper procedure on time-to-99% restoration and on cascading trips.</p>
+      <div class="step-no"><span data-i18n="stage.1.no">Stage 01</span><span class="status" data-i18n="stage.1.status">scoped</span></div>
+      <h3 data-i18n="stage.1.h3">Single-feeder proof</h3>
+      <p data-i18n="stage.1.p">One 10 kV feeder in OpenDSS. The trained policy beats both the greedy baseline and the paper procedure on time-to-99% restoration and on cascading trips.</p>
     </div>
     <div class="stage reveal" data-status="now">
       <div class="top-bar"></div>
-      <div class="step-no"><span>Stage 02</span><span class="status">in progress</span></div>
-      <h3>Regional twin</h3>
-      <p>An entire oblast modeled and calibrated to historical SCADA. Policy curriculum-trained across seasons and damage patterns. Operator-facing explainer working.</p>
+      <div class="step-no"><span data-i18n="stage.2.no">Stage 02</span><span class="status" data-i18n="stage.2.status">in progress</span></div>
+      <h3 data-i18n="stage.2.h3">Regional twin</h3>
+      <p data-i18n="stage.2.p">An entire oblast modeled and calibrated to historical SCADA. Policy curriculum-trained across seasons and damage patterns. Operator-facing explainer working.</p>
     </div>
     <div class="stage reveal" data-status="next">
       <div class="top-bar"></div>
-      <div class="step-no"><span>Stage 03</span><span class="status">next</span></div>
-      <h3>HIL &amp; shadow</h3>
-      <p>Real-time validation on Typhoon HIL. The console runs live in a control room. Operators see recommendations, decide, and the disagreement log feeds the next training run.</p>
+      <div class="step-no"><span data-i18n="stage.3.no">Stage 03</span><span class="status" data-i18n="stage.3.status">next</span></div>
+      <h3 data-i18n="stage.3.h3">HIL &amp; shadow</h3>
+      <p data-i18n="stage.3.p">Real-time validation on Typhoon HIL. The console runs live in a control room. Operators see recommendations, decide, and the disagreement log feeds the next training run.</p>
     </div>
     <div class="stage reveal" data-status="future">
       <div class="top-bar"></div>
-      <div class="step-no"><span>Stage 04</span><span class="status">future</span></div>
-      <h3>Advisory with approval</h3>
-      <p>One-click accept becomes available where the agent's risk score is low and the operator agrees. Two-person confirmation above the threshold. Always a human in the loop.</p>
+      <div class="step-no"><span data-i18n="stage.4.no">Stage 04</span><span class="status" data-i18n="stage.4.status">future</span></div>
+      <h3 data-i18n="stage.4.h3">Advisory with approval</h3>
+      <p data-i18n="stage.4.p">One-click accept becomes available where the agent's risk score is low and the operator agrees. Two-person confirmation above the threshold. Always a human in the loop.</p>
     </div>
   </div>
 </section>
 
 <section id="prevent">
-  <div class="section-label"><span class="num">06</span><span class="eyebrow">What this prevents</span></div>
+  <div class="section-label"><span class="num">06</span><span class="eyebrow" data-i18n="s06.eyebrow">What this prevents</span></div>
   <div class="prevent reveal">
-    <p>Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — <em>it is hours of heat returned to people in February.</em></p>
+    <p data-i18n="s06.p">Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — <em>it is hours of heat returned to people in February.</em></p>
   </div>
 </section>
 
 <section id="risks">
-  <div class="section-label"><span class="num">07</span><span class="eyebrow">Risks owned up to</span></div>
-  <h2>The four ways this could fail — and how each is <em>handled</em>.</h2>
+  <div class="section-label"><span class="num">07</span><span class="eyebrow" data-i18n="s07.eyebrow">Risks owned up to</span></div>
+  <h2 data-i18n="s07.h2">The four ways this could fail — and how each is <em>handled</em>.</h2>
   <div class="grid cols-2">
     <div class="risk reveal">
       <div class="ic">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4 M12 17h.01"/><path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
       </div>
       <div>
-        <span class="tag r"><span class="dot"></span>risk 01</span>
-        <h3>Sim-to-real gap</h3>
-        <p style="font-size:14.5px;margin-top:6px">Field load won't perfectly match the population we sampled.</p>
+        <span class="tag r"><span class="dot"></span><span data-i18n="risk.1.tag">risk 01</span></span>
+        <h3 data-i18n="risk.1.h3">Sim-to-real gap</h3>
+        <p style="font-size:14.5px;margin-top:6px" data-i18n="risk.1.p">Field load won't perfectly match the population we sampled.</p>
       </div>
-      <div class="mit"><b>handled</b> Domain randomization during training and online fine-tuning from real disagreements.</div>
+      <div class="mit" data-i18n="risk.1.mit"><b>handled</b> Domain randomization during training and online fine-tuning from real disagreements.</div>
     </div>
     <div class="risk reveal">
       <div class="ic">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
       </div>
       <div>
-        <span class="tag r"><span class="dot"></span>risk 02</span>
-        <h3>Operator trust</h3>
-        <p style="font-size:14.5px;margin-top:6px">One visibly wrong recommendation costs a year of credibility.</p>
+        <span class="tag r"><span class="dot"></span><span data-i18n="risk.2.tag">risk 02</span></span>
+        <h3 data-i18n="risk.2.h3">Operator trust</h3>
+        <p style="font-size:14.5px;margin-top:6px" data-i18n="risk.2.p">One visibly wrong recommendation costs a year of credibility.</p>
       </div>
-      <div class="mit"><b>handled</b> A long shadow period, an explanation attached to every recommendation, and no autonomous mode.</div>
+      <div class="mit" data-i18n="risk.2.mit"><b>handled</b> A long shadow period, an explanation attached to every recommendation, and no autonomous mode.</div>
     </div>
     <div class="risk reveal">
       <div class="ic">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
       <div>
-        <span class="tag r"><span class="dot"></span>risk 03</span>
-        <h3>Data access</h3>
-        <p style="font-size:14.5px;margin-top:6px">SCADA history is sensitive.</p>
+        <span class="tag r"><span class="dot"></span><span data-i18n="risk.3.tag">risk 03</span></span>
+        <h3 data-i18n="risk.3.h3">Data access</h3>
+        <p style="font-size:14.5px;margin-top:6px" data-i18n="risk.3.p">SCADA history is sensitive.</p>
       </div>
-      <div class="mit"><b>handled</b> Training on-prem inside the utility perimeter; no data leaves the building.</div>
+      <div class="mit" data-i18n="risk.3.mit"><b>handled</b> Training on-prem inside the utility perimeter; no data leaves the building.</div>
     </div>
     <div class="risk reveal">
       <div class="ic">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
       </div>
       <div>
-        <span class="tag r"><span class="dot"></span>risk 04</span>
-        <h3>Topology drift</h3>
-        <p style="font-size:14.5px;margin-top:6px">A re-routed substation is a new problem.</p>
+        <span class="tag r"><span class="dot"></span><span data-i18n="risk.4.tag">risk 04</span></span>
+        <h3 data-i18n="risk.4.h3">Topology drift</h3>
+        <p style="font-size:14.5px;margin-top:6px" data-i18n="risk.4.p">A re-routed substation is a new problem.</p>
       </div>
-      <div class="mit"><b>handled</b> Conditioning the policy on a topology hash, plus meta-training across a distribution of topologies, so adaptation is fast.</div>
+      <div class="mit" data-i18n="risk.4.mit"><b>handled</b> Conditioning the policy on a topology hash, plus meta-training across a distribution of topologies, so adaptation is fast.</div>
     </div>
   </div>
 </section>
 
 <section id="repos">
-  <div class="section-label"><span class="num">08</span><span class="eyebrow">Repositories &amp; resources</span></div>
-  <h2>What's <em>already built</em> — and where to read the code.</h2>
-  <p class="kicker" style="margin-bottom:22px">The case above isn't theoretical. Three open repos already implement the foundations: a Phase 0 RL policy that beats the safe baseline, an oblast-scale digital twin where cold-load pickup emerges naturally, and a longer technical write-up of the full design.</p>
+  <div class="section-label"><span class="num">08</span><span class="eyebrow" data-i18n="s08.eyebrow">Repositories &amp; resources</span></div>
+  <h2 data-i18n="s08.h2">What's <em>already built</em> — and where to read the code.</h2>
+  <p class="kicker" style="margin-bottom:22px" data-i18n="s08.kicker">The case above isn't theoretical. Three open repos already implement the foundations: a Phase 0 RL policy that beats the safe baseline, an oblast-scale digital twin where cold-load pickup emerges naturally, and a longer technical write-up of the full design.</p>
   <div class="repos">
     <a class="repo reveal" href="https://github.com/anastasiiapoliienko/restart-grid-rl" target="_blank" rel="noopener">
       <span class="arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12 L12 4 M6 4 H12 V10"/></svg></span>
       <div class="repo-head">
         <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></span>
-        <span class="kind">Phase 0 · RL policy</span>
+        <span class="kind" data-i18n="repo.1.kind">Phase 0 · RL policy</span>
       </div>
       <h3>restart-grid-rl</h3>
-      <p>An 8-segment 10 kV feeder in OpenDSS, an ETP+CLPU load model, a Gymnasium env, two baselines, and a MaskablePPO trainer. The trained policy finishes restoration ~4× faster than the safe dwell baseline at the same zero-trip safety.</p>
+      <p data-i18n="repo.1.p">An 8-segment 10 kV feeder in OpenDSS, an ETP+CLPU load model, a Gymnasium env, two baselines, and a MaskablePPO trainer. The trained policy finishes restoration ~4× faster than the safe dwell baseline at the same zero-trip safety.</p>
       <span class="slug">github.com/anastasiiapoliienko/restart-grid-rl</span>
     </a>
     <a class="repo reveal" href="https://github.com/anastasiiapoliienko/vinnytsia-twin" target="_blank" rel="noopener">
       <span class="arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12 L12 4 M6 4 H12 V10"/></svg></span>
       <div class="repo-head">
         <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
-        <span class="kind">Digital twin · oblast scale</span>
+        <span class="kind" data-i18n="repo.2.kind">Digital twin · oblast scale</span>
       </div>
       <h3>vinnytsia-twin</h3>
-      <p>A Vinnytsia 35 / 10 kV substation in OpenDSS with six feeders and an ETP house population. Cold-load pickup emerges naturally — no CLPU multiplier. Baseline and CLPU-aware calibrations included.</p>
+      <p data-i18n="repo.2.p">A Vinnytsia 35 / 10 kV substation in OpenDSS with six feeders and an ETP house population. Cold-load pickup emerges naturally — no CLPU multiplier. Baseline and CLPU-aware calibrations included.</p>
       <span class="slug">github.com/anastasiiapoliienko/vinnytsia-twin</span>
     </a>
     <a class="repo reveal" href="../technical/" target="_self">
       <span class="arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12 L12 4 M6 4 H12 V10"/></svg></span>
       <div class="repo-head">
         <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2V4z"/><path d="M4 4v14a2 2 0 0 0 2 2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
-        <span class="kind">Deep dive · technical</span>
+        <span class="kind" data-i18n="repo.3.kind">Deep dive · technical</span>
       </div>
-      <h3>RL cold-load pickup — full design</h3>
-      <p>The longer write-up: architecture, reward function, state and action spaces, data sources, tech stack, the phased roadmap, risks, and success metrics. With an interactive naive-vs-RL restoration demo.</p>
+      <h3 data-i18n="repo.3.h3">RL cold-load pickup — full design</h3>
+      <p data-i18n="repo.3.p">The longer write-up: architecture, reward function, state and action spaces, data sources, tech stack, the phased roadmap, risks, and success metrics. With an interactive naive-vs-RL restoration demo.</p>
       <span class="slug">/technical/</span>
     </a>
   </div>
@@ -541,30 +563,285 @@
 
 <section id="case" style="border:none">
   <div class="close reveal">
-    <div class="label">The case in one line</div>
-    <div class="big">Ukraine has the world's most demanding grid-restoration problem, the world's <em>richest dataset</em> for solving it, and tooling that didn't exist five years ago. The question is no longer whether this works — <em>only whether someone builds it before the next winter.</em></div>
+    <div class="label" data-i18n="close.label">The case in one line</div>
+    <div class="big" data-i18n="close.big">Ukraine has the world's most demanding grid-restoration problem, the world's <em>richest dataset</em> for solving it, and tooling that didn't exist five years ago. The question is no longer whether this works — <em>only whether someone builds it before the next winter.</em></div>
     <div class="footer-row">
       <a href="https://github.com/anastasiiapoliienko/restart-grid" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 .2a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.5c-2.23.49-2.7-.95-2.7-.95-.36-.93-.89-1.18-.89-1.18-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 8 .2z"/></svg>
         github.com/anastasiiapoliienko/restart-grid
       </a>
       <span class="sep">·</span>
-      <a href="#top">↑ back to top</a>
+      <a href="#top" data-i18n="close.top">↑ back to top</a>
       <span class="sep">·</span>
-      <a href="javascript:window.print()">print / PDF</a>
+      <a href="javascript:window.print()" data-i18n="close.print">print / PDF</a>
     </div>
   </div>
 </section>
 
 <footer>
-  <span>Restart · the case for learned grid restoration</span>
-  <span>v0.1 · last updated 2026-05</span>
+  <span data-i18n="footer.left">Restart · the case for learned grid restoration</span>
+  <span data-i18n="footer.right">v0.1 · last updated 2026-05</span>
 </footer>
 
 </div><!-- /.wrap -->
 
 <script>
-  // Scroll progress bar
+  // ── Translations ──────────────────────────────────────
+  const i18n = {
+    en: {
+      "brand.sub": "the case",
+      "nav.problem": "Problem",
+      "nav.idea": "Idea",
+      "nav.how": "How it works",
+      "nav.stages": "Stages",
+      "nav.risks": "Risks",
+      "nav.repos": "Repos",
+      "nav.cta": "Code",
+      "nav.ctaCount": "3 repos",
+
+      "hero.badge": "Restart · a case for learned grid restoration",
+      "hero.h1": "Ukraine restarts its grid <span class=\"strike\">wrong</span> every week. <em>There is a way to do it right.</em>",
+      "hero.lede": "An AI advisor that learns the safest sequence to re-energize feeders after a blackout — trained on a digital twin of Ukraine's actual network, and presented to operators with a one-line explanation for every recommendation.",
+      "hero.cta1": "Read the case",
+      "hero.cta2": "Code &amp; experiments",
+
+      "stat.1.k": "cold-load inrush vs steady-state, the moment power returns",
+      "stat.2.k": "of Ukraine's thermal generation lost or degraded since 2022",
+      "stat.3.v": "weekly",
+      "stat.3.k": "topology changes from strikes and repairs — paper procedures go stale",
+
+      "tldr.title": "In 30 seconds",
+      "tldr.1": "<b>Problem.</b> Every restart cascades a trip. Paper procedures assume a grid Ukraine no longer has.",
+      "tldr.2": "<b>Idea.</b> An RL policy recommends <i>which feeder, what ramp, what dwell time</i> — with a one-line explanation.",
+      "tldr.3": "<b>Twin.</b> Trained on a calibrated OpenDSS model of a real oblast, validated on Typhoon HIL hardware.",
+      "tldr.4": "<b>Human-in-the-loop.</b> Shadow mode → advisory → one-click accept with two-person confirmation. Never autonomous.",
+
+      "s01.eyebrow": "The problem",
+      "s01.h2": "The current playbook was <em>written for a grid that no longer exists</em>.",
+      "s01.p": "After every blackout, an operator must re-energize a feeder. With every thermostat, fridge, and heater off, demand snaps back all at once and trips the upstream breaker — blackout again. Operators perform the restart under air-raid sirens, with degraded telemetry, sometimes from candlelight.",
+
+      "s02.eyebrow": "The idea",
+      "s02.h2": "A learned policy for the question: <em>what do I energize next?</em>",
+      "s02.p": "A reinforcement-learning policy that recommends <i>which segment to energize next</i>, <i>at what voltage ramp</i>, <i>after what dwell time</i>. Trained against millions of synthetic blackout scenarios on a calibrated digital twin of Ukrainian topology. Every recommendation is shown to a human operator with an explanation. Never autonomous.",
+      "s02.quote": "Restoration is the one grid problem where seconds of delay cost megawatt-hours, and where the right action depends on weather, time, and damage. That is exactly the regime where RL beats both human procedures and classical optimization.",
+
+      "s03.eyebrow": "How it works",
+      "s03.h2": "Six concrete steps from <em>synthetic data</em> to <em>operator console</em>.",
+      "step.1.title": "Build a twin of a real Ukrainian sub-region.",
+      "step.1.body": "One oblast's 35 / 10 kV network modeled in <code>OpenDSS</code>. Calibrated against ≥18 months of historical SCADA traces. Loads modeled as a population of equivalent-thermal-parameter houses, so cold-load behavior <i>emerges</i> rather than being hard-coded.",
+      "step.1.tag": "foundation",
+      "step.2.title": "Generate scenarios.",
+      "step.2.body": "Synthesize millions of blackout starting states across season, ambient temperature, outage duration, and damage pattern. This dataset — restoration under realistic adversarial damage — exists nowhere else.",
+      "step.2.tag": "data",
+      "step.3.title": "Train a policy.",
+      "step.3.body": "PPO with action masking in <code>Stable-Baselines3</code>. Curriculum from single feeder to full regional topology. Reward = load restored, penalized for trips, voltage violations, and time. An explainer is attached at training time, not bolted on after.",
+      "step.3.tag": "training",
+      "step.4.title": "Validate in hardware.",
+      "step.4.body": "Replay the policy on <code>Typhoon HIL</code> in real time. This is the sim-to-real check: does it still beat the baseline when load parameters drift and measurement noise is added?",
+      "step.4.tag": "hardware in the loop",
+      "step.5.title": "Shadow-mode beside the operator.",
+      "step.5.body": "The console shows the agent's recommendation next to the operator's intended action. The operator decides. Every disagreement becomes a training example.",
+      "step.5.tag": "deploy · shadow",
+      "step.6.title": "Promote to advisory.",
+      "step.6.body": "After months of high agreement, the operator can <i>accept</i> a recommendation with one click. Two-person confirmation above a learned risk threshold. The system never becomes fully closed-loop.",
+      "step.6.tag": "advisory",
+
+      "s04.eyebrow": "Why this works where the alternatives don't",
+      "s04.h2": "Two old approaches are <em>structurally wrong</em> for this regime.",
+      "alt.1.verdict": "stale", "alt.1.tag": "option a", "alt.1.h3": "Paper procedures",
+      "alt.1.p": "Assume seasonal averages and stable topology. Ukraine in 2026 has neither.",
+      "alt.2.verdict": "brittle", "alt.2.tag": "option b", "alt.2.h3": "Classical optimization",
+      "alt.2.p": "Requires re-formulating every time the grid changes shape. The grid changes shape every week.",
+      "alt.3.verdict": "adapts", "alt.3.tag": "proposal", "alt.3.h3": "Learned policy",
+      "alt.3.p": "Maps state → next action. Topology and damage are inputs, not assumptions. Retrains on its own disagreements.",
+
+      "s05.eyebrow": "Stages",
+      "s05.h2": "A staged path that <em>never goes autonomous</em>.",
+      "stage.1.no": "Stage 01", "stage.1.status": "scoped", "stage.1.h3": "Single-feeder proof",
+      "stage.1.p": "One 10 kV feeder in OpenDSS. The trained policy beats both the greedy baseline and the paper procedure on time-to-99% restoration and on cascading trips.",
+      "stage.2.no": "Stage 02", "stage.2.status": "in progress", "stage.2.h3": "Regional twin",
+      "stage.2.p": "An entire oblast modeled and calibrated to historical SCADA. Policy curriculum-trained across seasons and damage patterns. Operator-facing explainer working.",
+      "stage.3.no": "Stage 03", "stage.3.status": "next", "stage.3.h3": "HIL &amp; shadow",
+      "stage.3.p": "Real-time validation on Typhoon HIL. The console runs live in a control room. Operators see recommendations, decide, and the disagreement log feeds the next training run.",
+      "stage.4.no": "Stage 04", "stage.4.status": "future", "stage.4.h3": "Advisory with approval",
+      "stage.4.p": "One-click accept becomes available where the agent's risk score is low and the operator agrees. Two-person confirmation above the threshold. Always a human in the loop.",
+
+      "s06.eyebrow": "What this prevents",
+      "s06.p": "Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — <em>it is hours of heat returned to people in February.</em>",
+
+      "s07.eyebrow": "Risks owned up to",
+      "s07.h2": "The four ways this could fail — and how each is <em>handled</em>.",
+      "risk.1.tag": "risk 01", "risk.1.h3": "Sim-to-real gap",
+      "risk.1.p": "Field load won't perfectly match the population we sampled.",
+      "risk.1.mit": "<b>handled</b> Domain randomization during training and online fine-tuning from real disagreements.",
+      "risk.2.tag": "risk 02", "risk.2.h3": "Operator trust",
+      "risk.2.p": "One visibly wrong recommendation costs a year of credibility.",
+      "risk.2.mit": "<b>handled</b> A long shadow period, an explanation attached to every recommendation, and no autonomous mode.",
+      "risk.3.tag": "risk 03", "risk.3.h3": "Data access",
+      "risk.3.p": "SCADA history is sensitive.",
+      "risk.3.mit": "<b>handled</b> Training on-prem inside the utility perimeter; no data leaves the building.",
+      "risk.4.tag": "risk 04", "risk.4.h3": "Topology drift",
+      "risk.4.p": "A re-routed substation is a new problem.",
+      "risk.4.mit": "<b>handled</b> Conditioning the policy on a topology hash, plus meta-training across a distribution of topologies, so adaptation is fast.",
+
+      "s08.eyebrow": "Repositories &amp; resources",
+      "s08.h2": "What's <em>already built</em> — and where to read the code.",
+      "s08.kicker": "The case above isn't theoretical. Three open repos already implement the foundations: a Phase 0 RL policy that beats the safe baseline, an oblast-scale digital twin where cold-load pickup emerges naturally, and a longer technical write-up of the full design.",
+      "repo.1.kind": "Phase 0 · RL policy",
+      "repo.1.p": "An 8-segment 10 kV feeder in OpenDSS, an ETP+CLPU load model, a Gymnasium env, two baselines, and a MaskablePPO trainer. The trained policy finishes restoration ~4× faster than the safe dwell baseline at the same zero-trip safety.",
+      "repo.2.kind": "Digital twin · oblast scale",
+      "repo.2.p": "A Vinnytsia 35 / 10 kV substation in OpenDSS with six feeders and an ETP house population. Cold-load pickup emerges naturally — no CLPU multiplier. Baseline and CLPU-aware calibrations included.",
+      "repo.3.kind": "Deep dive · technical",
+      "repo.3.h3": "RL cold-load pickup — full design",
+      "repo.3.p": "The longer write-up: architecture, reward function, state and action spaces, data sources, tech stack, the phased roadmap, risks, and success metrics. With an interactive naive-vs-RL restoration demo.",
+
+      "close.label": "The case in one line",
+      "close.big": "Ukraine has the world's most demanding grid-restoration problem, the world's <em>richest dataset</em> for solving it, and tooling that didn't exist five years ago. The question is no longer whether this works — <em>only whether someone builds it before the next winter.</em>",
+      "close.top": "↑ back to top",
+      "close.print": "print / PDF",
+
+      "footer.left": "Restart · the case for learned grid restoration",
+      "footer.right": "v0.1 · last updated 2026-05"
+    },
+    uk: {
+      "brand.sub": "обґрунтування",
+      "nav.problem": "Проблема",
+      "nav.idea": "Ідея",
+      "nav.how": "Як це працює",
+      "nav.stages": "Етапи",
+      "nav.risks": "Ризики",
+      "nav.repos": "Репозиторії",
+      "nav.cta": "Код",
+      "nav.ctaCount": "3 репозиторії",
+
+      "hero.badge": "Restart · обґрунтування навчених систем відновлення мережі",
+      "hero.h1": "Україна <span class=\"strike\">помилково</span> перезапускає свою мережу щотижня. <em>Є спосіб робити це правильно.</em>",
+      "hero.lede": "ШІ-радник, що навчається найбезпечнішої послідовності повторного живлення фідерів після блекауту — тренований на цифровому двійнику реальної мережі України, з однорядковим поясненням до кожної рекомендації для диспетчера.",
+      "hero.cta1": "Читати обґрунтування",
+      "hero.cta2": "Код і експерименти",
+
+      "stat.1.k": "кидок холодного навантаження проти усталеного стану в мить повернення живлення",
+      "stat.2.k": "теплової генерації України втрачено або пошкоджено з 2022 року",
+      "stat.3.v": "щотижня",
+      "stat.3.k": "зміни топології від ударів і ремонтів — паперові інструкції застарівають",
+
+      "tldr.title": "За 30 секунд",
+      "tldr.1": "<b>Проблема.</b> Кожен перезапуск спричиняє каскадне спрацювання захисту. Паперові інструкції припускають мережу, якої Україна вже не має.",
+      "tldr.2": "<b>Ідея.</b> RL-політика рекомендує <i>який фідер, з яким нарощуванням напруги, з якою витримкою часу</i> — з однорядковим поясненням.",
+      "tldr.3": "<b>Двійник.</b> Тренована на каліброваній OpenDSS-моделі реальної області, валідована на апаратурі Typhoon HIL.",
+      "tldr.4": "<b>Людина в контурі.</b> Тіньовий режим → дорадчий → прийняття одним кліком з підтвердженням двох осіб. Ніколи не автономно.",
+
+      "s01.eyebrow": "Проблема",
+      "s01.h2": "Чинна інструкція <em>написана для мережі, якої більше не існує</em>.",
+      "s01.p": "Після кожного блекауту диспетчер має знову подати живлення на фідер. Усі термостати, холодильники й нагрівачі вимкнено — попит повертається разом і одразу спрацьовує захист на головному автоматі. Знову блекаут. Диспетчери виконують перезапуск під сиренами повітряної тривоги, з пошкодженою телеметрією, інколи — при свічці.",
+
+      "s02.eyebrow": "Ідея",
+      "s02.h2": "Навчена політика для одного питання: <em>що подавати живлення наступним?</em>",
+      "s02.p": "Політика навчання з підкріпленням, що рекомендує <i>який сегмент живити наступним</i>, <i>з яким нарощуванням напруги</i>, <i>після якої витримки часу</i>. Тренована на мільйонах синтетичних сценаріїв блекаутів на каліброваному цифровому двійнику української топології. Кожна рекомендація показується диспетчеру разом з поясненням. Ніколи не автономно.",
+      "s02.quote": "Відновлення — єдина задача в електромережі, де секунди затримки коштують мегават-годин, а правильна дія залежить від погоди, часу і характеру пошкоджень. Саме в цьому режимі RL перевершує і людські інструкції, і класичну оптимізацію.",
+
+      "s03.eyebrow": "Як це працює",
+      "s03.h2": "Шість конкретних кроків — від <em>синтетичних даних</em> до <em>пульта диспетчера</em>.",
+      "step.1.title": "Побудувати двійник реального українського субрегіону.",
+      "step.1.body": "Мережу 35 / 10 кВ однієї області змодельовано в <code>OpenDSS</code>. Калібровано на ≥18 місяцях історичних SCADA-трас. Навантаження модельовані як популяція будинків з еквівалентними тепловими параметрами, тож поведінка холодного навантаження <i>виникає</i>, а не задається жорстко.",
+      "step.1.tag": "основа",
+      "step.2.title": "Згенерувати сценарії.",
+      "step.2.body": "Синтезувати мільйони початкових станів блекаутів по сезонах, температурах довкілля, тривалостях відключень і паттернах пошкодження. Такого датасету — відновлення в умовах реалістичних бойових пошкоджень — більше ніде немає.",
+      "step.2.tag": "дані",
+      "step.3.title": "Натренувати політику.",
+      "step.3.body": "PPO з маскуванням дій у <code>Stable-Baselines3</code>. Курікулум від одного фідера до повної регіональної топології. Винагорода = відновлене навантаження, штрафи за спрацювання захисту, порушення напруги та час. Пояснювач прикріплюється на етапі навчання, а не накручується пізніше.",
+      "step.3.tag": "навчання",
+      "step.4.title": "Валідувати в апаратурі.",
+      "step.4.body": "Програти політику на <code>Typhoon HIL</code> у реальному часі. Це перевірка sim-to-real: чи перевершує вона базову лінію, коли параметри навантаження зсуваються, а вимірювальний шум додано?",
+      "step.4.tag": "апаратура в контурі",
+      "step.5.title": "Тіньовий режим поруч з диспетчером.",
+      "step.5.body": "Консоль показує рекомендацію агента поруч із наміреною дією диспетчера. Диспетчер вирішує. Кожна розбіжність стає прикладом для навчання.",
+      "step.5.tag": "розгортання · тінь",
+      "step.6.title": "Перевести в дорадчий режим.",
+      "step.6.body": "Після місяців високої згоди диспетчер може <i>прийняти</i> рекомендацію одним кліком. Підтвердження двох осіб над навченим порогом ризику. Система ніколи не стає повністю замкнутою.",
+      "step.6.tag": "дорадчий",
+
+      "s04.eyebrow": "Чому це працює там, де альтернативи не працюють",
+      "s04.h2": "Два старі підходи <em>структурно не відповідають</em> цьому режиму.",
+      "alt.1.verdict": "застаріли", "alt.1.tag": "варіант a", "alt.1.h3": "Паперові інструкції",
+      "alt.1.p": "Припускають сезонні середні й стабільну топологію. В Україні 2026 року немає ні того, ні іншого.",
+      "alt.2.verdict": "крихка", "alt.2.tag": "варіант b", "alt.2.h3": "Класична оптимізація",
+      "alt.2.p": "Потребує перепостановки щоразу, коли мережа змінює форму. Мережа змінює форму щотижня.",
+      "alt.3.verdict": "адаптується", "alt.3.tag": "пропозиція", "alt.3.h3": "Навчена політика",
+      "alt.3.p": "Стан → наступна дія. Топологія і пошкодження — це входи, а не припущення. Перенавчається на власних розбіжностях.",
+
+      "s05.eyebrow": "Етапи",
+      "s05.h2": "Поетапний шлях, що <em>ніколи не стає автономним</em>.",
+      "stage.1.no": "Етап 01", "stage.1.status": "визначено", "stage.1.h3": "Доказ на одному фідері",
+      "stage.1.p": "Один фідер 10 кВ в OpenDSS. Тренована політика перевершує і жадібну базову лінію, і паперову інструкцію за часом до 99% відновлення та за каскадними спрацюваннями захисту.",
+      "stage.2.no": "Етап 02", "stage.2.status": "у роботі", "stage.2.h3": "Регіональний двійник",
+      "stage.2.p": "Ціла область змодельована й калібрована за історичною SCADA. Політика тренована за курікулумом по сезонах і паттернах пошкодження. Працює пояснювач для диспетчера.",
+      "stage.3.no": "Етап 03", "stage.3.status": "далі", "stage.3.h3": "HIL і тінь",
+      "stage.3.p": "Валідація в реальному часі на Typhoon HIL. Консоль працює наживо в диспетчерській. Диспетчери бачать рекомендації, вирішують, а журнал розбіжностей живить наступне навчання.",
+      "stage.4.no": "Етап 04", "stage.4.status": "майбутнє", "stage.4.h3": "Дорадчий режим зі схваленням",
+      "stage.4.p": "Прийняття одним кліком стає доступним там, де оцінка ризику агента низька й диспетчер погоджується. Підтвердження двох осіб над порогом. Завжди людина в контурі.",
+
+      "s06.eyebrow": "Чому це важливо",
+      "s06.p": "Кожне каскадне спрацювання захисту під час відновлення — це ще година без електрики. Українською зимою це опалення, вимкнене для лікарень, зупинені водяні насоси, перерваний діаліз, котли в багатоквартирних будинках, що не запускаються, і генератори на розі вулиць, які виснажують дизельні запаси, яких місто не може поповнити. Вимірне скорочення каскадних спрацювань під час відновлення — це не метрика, <em>це години тепла, повернутого людям у лютому.</em>",
+
+      "s07.eyebrow": "Визнані ризики",
+      "s07.h2": "Чотири способи, якими це може не спрацювати — і як кожен з них <em>опрацьовано</em>.",
+      "risk.1.tag": "ризик 01", "risk.1.h3": "Розрив sim-to-real",
+      "risk.1.p": "Реальне навантаження не збігатиметься ідеально з популяцією, яку ми семплували.",
+      "risk.1.mit": "<b>опрацьовано</b> Доменна рандомізація під час навчання та онлайн-донавчання з реальних розбіжностей.",
+      "risk.2.tag": "ризик 02", "risk.2.h3": "Довіра диспетчерів",
+      "risk.2.p": "Одна явно хибна рекомендація коштує року довіри.",
+      "risk.2.mit": "<b>опрацьовано</b> Довгий тіньовий період, пояснення при кожній рекомендації та відсутність автономного режиму.",
+      "risk.3.tag": "ризик 03", "risk.3.h3": "Доступ до даних",
+      "risk.3.p": "Історія SCADA — чутливі дані.",
+      "risk.3.mit": "<b>опрацьовано</b> Навчання on-prem усередині периметра енергокомпанії; дані не залишають будівлю.",
+      "risk.4.tag": "ризик 04", "risk.4.h3": "Зсув топології",
+      "risk.4.p": "Перемаршрутизована підстанція — це нова задача.",
+      "risk.4.mit": "<b>опрацьовано</b> Зумовлення політики хешем топології плюс мета-навчання на розподілі топологій, тож адаптація швидка.",
+
+      "s08.eyebrow": "Репозиторії та матеріали",
+      "s08.h2": "Що <em>вже побудовано</em> — і де читати код.",
+      "s08.kicker": "Викладене вище не є теорією. Три відкриті репозиторії вже реалізують основи: RL-політика Фази 0, яка перевершує безпечну базову лінію; цифровий двійник масштабу області, де холодне навантаження виникає природно; і довший технічний опис повного дизайну.",
+      "repo.1.kind": "Фаза 0 · RL-політика",
+      "repo.1.p": "8-сегментний фідер 10 кВ в OpenDSS, ETP+CLPU модель навантаження, Gymnasium-середовище, дві базові лінії та MaskablePPO-тренер. Тренована політика завершує відновлення ~у 4× швидше за безпечну базову лінію з витримками — при тій самій нульовій ймовірності спрацювань захисту.",
+      "repo.2.kind": "Цифровий двійник · масштаб області",
+      "repo.2.p": "Підстанція Вінниця 35 / 10 кВ в OpenDSS з шістьма фідерами та ETP-популяцією будинків. Холодне навантаження виникає природно — без множника CLPU. Включено базове калібрування й калібрування з урахуванням CLPU.",
+      "repo.3.kind": "Заглиблено · технічно",
+      "repo.3.h3": "RL для холодного навантаження — повний дизайн",
+      "repo.3.p": "Довший опис: архітектура, функція винагороди, простір станів і дій, джерела даних, технологічний стек, поетапна дорожня карта, ризики й метрики успіху. З інтерактивним демо «наївний підхід проти RL».",
+
+      "close.label": "Обґрунтування одним рядком",
+      "close.big": "Україна має <em>найвимогливішу у світі</em> задачу відновлення мережі, найбагатший у світі датасет для її розв'язання та інструментарій, якого ще не існувало п'ять років тому. Питання вже не в тому, чи це працює, — <em>а лише в тому, чи хтось побудує це до наступної зими.</em>",
+      "close.top": "↑ нагору",
+      "close.print": "друк / PDF",
+
+      "footer.left": "Restart · обґрунтування навчених систем відновлення мережі",
+      "footer.right": "v0.1 · оновлено 2026-05"
+    }
+  };
+
+  function applyLang(lang){
+    if(!i18n[lang]) lang = 'en';
+    document.documentElement.lang = lang;
+    try{ localStorage.setItem('lang', lang); }catch(e){}
+    const dict = i18n[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const k = el.getAttribute('data-i18n');
+      if(dict[k] != null) el.innerHTML = dict[k];
+    });
+    document.querySelectorAll('.lang-pill').forEach(b=>{
+      b.setAttribute('aria-current', b.dataset.lang === lang ? 'true' : 'false');
+    });
+  }
+
+  document.querySelectorAll('.lang-pill').forEach(b=>{
+    b.addEventListener('click', ()=> applyLang(b.dataset.lang));
+  });
+
+  // Apply on load (respects the pre-render setting from the head script)
+  applyLang(document.documentElement.lang || 'en');
+
+  // ── Scroll progress bar ───────────────────────────────
   const bar = document.getElementById('bar');
   function onScroll(){
     const h = document.documentElement;
@@ -575,7 +852,7 @@
   document.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
 
-  // Reveal on scroll
+  // ── Reveal on scroll ──────────────────────────────────
   const io = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
   }, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
