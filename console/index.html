@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="Live operator console: a trained AI advisor restoring a Ukrainian feeder after a cold-soak blackout. You decide what to accept, override, or wait on." />
+<title>Restart · live operator console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf8f3;
+    --bg2:#f3efe5;
+    --paper:#ffffff;
+    --ink:#0b1320;
+    --ink2:#46546a;
+    --mute:#8a94a6;
+    --line:#e6e1d5;
+    --line2:#efeadd;
+    --navy:#0b3a78;
+    --navy-2:#1a56ad;
+    --yel:#f5c518;
+    --yel-2:#fff3b8;
+    --grn:#0f9d6b;
+    --red:#c0392b;
+    --radius:14px;
+    --radius-lg:20px;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --serif:"Instrument Serif",Georgia,serif;
+    --sans:"Inter",ui-sans-serif,system-ui,sans-serif;
+    --shadow-sm:0 1px 2px rgba(15,23,42,.04),0 1px 1px rgba(15,23,42,.03);
+    --shadow:0 4px 14px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+    --shadow-lg:0 20px 50px -20px rgba(11,58,120,.25),0 6px 16px rgba(15,23,42,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--navy);text-decoration:none;border-bottom:1px solid transparent}
+  a:hover{border-bottom-color:var(--navy)}
+
+  /* ── Top bar ─────────────────────────────────────── */
+  nav.top{position:sticky;top:0;background:rgba(250,248,243,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:30}
+  nav.top .row{max-width:1240px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:18px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--yel);box-shadow:0 0 0 3px var(--yel-2),0 0 14px rgba(245,197,24,.5)}
+  .brand .slash{color:var(--mute);font-weight:400;margin:0 2px}
+  .brand .sub{color:var(--ink2);font-weight:500}
+  nav.top .right{margin-left:auto;display:flex;gap:10px;align-items:center}
+  nav.top .right a{font-family:var(--mono);font-size:12px;color:var(--ink2);padding:6px 10px;border-radius:8px}
+  nav.top .right a:hover{background:var(--bg2);color:var(--ink);border-bottom-color:transparent}
+  nav.top .cta{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:var(--mono);font-weight:500}
+  nav.top .cta:hover{background:var(--navy);color:#fff;border-bottom-color:transparent}
+
+  /* ── Layout ─────────────────────────────────────── */
+  .wrap{max-width:1240px;margin:0 auto;padding:28px 22px 60px}
+  .hero{margin-bottom:22px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--navy);font-weight:600;display:inline-flex;align-items:center;gap:8px}
+  .eyebrow::before{content:"";display:inline-block;width:16px;height:1px;background:var(--navy);opacity:.6}
+  h1{font-size:34px;line-height:1.1;margin:8px 0 8px;font-weight:600;letter-spacing:-.025em;max-width:780px}
+  h1 em{font-style:normal;font-family:var(--serif);color:var(--navy);font-weight:400}
+  .lede{font-size:15.5px;color:var(--ink2);max-width:780px;margin:0}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-family:var(--mono);font-size:11px;color:var(--ink2);margin-top:14px}
+  .badge .pill{background:var(--yel-2);color:#7a5a00;padding:2px 8px;border-radius:999px;border:1px solid #f0dc8a;font-weight:600;letter-spacing:.04em}
+
+  /* ── Grid ─────────────────────────────────────── */
+  .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-top:22px}
+  @media (max-width:1000px){.grid{grid-template-columns:1fr}}
+
+  /* ── Card ─────────────────────────────────────── */
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-sm)}
+  .card h3{margin:0 0 6px;font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.15em;color:var(--ink2);font-weight:600}
+  .card .sub{font-size:13px;color:var(--mute);margin:0 0 14px}
+
+  /* ── Topology ─────────────────────────────────────── */
+  .topo{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:18px;background:#fbf8ef;border:1px solid var(--line);border-radius:var(--radius);margin-top:8px}
+  .substation{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px;background:var(--paper);border:1.5px solid var(--navy);border-radius:10px;min-width:80px}
+  .substation .icon{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--navy)}
+  .substation .lbl{font-family:var(--mono);font-size:10px;color:var(--ink2);text-transform:uppercase;letter-spacing:.1em}
+  .substation .amps{font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:600;margin-top:2px}
+  .substation .amps.warn{color:#c5651a}
+  .substation .amps.trip{color:var(--red);animation:pulse 0.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .trunk-line{flex:0 0 24px;height:2px;background:var(--ink2);position:relative}
+  .trunk-line.tripped{background:var(--red);animation:pulse 0.5s ease-in-out infinite}
+  .feeders{display:grid;grid-template-columns:repeat(4,minmax(60px,1fr));gap:8px;flex:1;min-width:280px}
+  .seg{position:relative;background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:9px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s,background .15s;min-height:62px}
+  .seg:hover{border-color:var(--ink);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+  .seg.recommended{border-color:var(--navy);box-shadow:0 0 0 3px rgba(11,58,120,.12)}
+  .seg.warm{background:var(--yel-2);border-color:#e7c03c}
+  .seg.on{background:#dff4ea;border-color:var(--grn)}
+  .seg.trip{background:#fbe9e7;border-color:var(--red);animation:pulse 0.5s ease-in-out 3}
+  .seg .name{font-family:var(--mono);font-size:11px;color:var(--ink);font-weight:600}
+  .seg .state{font-family:var(--mono);font-size:9.5px;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em}
+  .seg .load{font-family:var(--mono);font-size:11px;color:var(--ink);margin-top:1px}
+  .seg .star{position:absolute;top:-7px;right:-7px;background:var(--yel);color:#7a5a00;border-radius:50%;width:18px;height:18px;font-size:11px;display:flex;align-items:center;justify-content:center;border:1.5px solid #f0dc8a;font-weight:700}
+
+  /* ── Chart ─────────────────────────────────────── */
+  .chart-box{margin-top:12px;background:#fefcf6;border:1px solid var(--line);border-radius:10px;padding:8px 8px 0;height:140px;position:relative}
+  .chart-meta{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:11px;color:var(--ink2);padding:0 4px 4px}
+  .chart-meta b{color:var(--ink);font-size:12.5px}
+  .chart-meta b.warn{color:#c5651a}
+  .chart-meta b.trip{color:var(--red)}
+
+  /* ── Recommendation card ─────────────────────────────────────── */
+  .rec{background:#0b1320;color:#e7ecf5;border-radius:var(--radius-lg);padding:20px;font-family:var(--mono);font-size:13px;line-height:1.5;box-shadow:var(--shadow-lg);border:1px solid #1f2a45}
+  .rec .hd{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1f2a45;padding-bottom:10px;margin-bottom:12px;gap:10px;flex-wrap:wrap}
+  .rec .hd .ttl{font-weight:600;color:#fff;font-size:13px}
+  .rec .hd .live{color:var(--yel);font-size:11px;letter-spacing:.14em}
+  .rec .hd .live .blink{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--yel);margin-right:6px;animation:blink 1s ease-in-out infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  .rec .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dotted #1f2a45;gap:10px}
+  .rec .row:last-of-type{border-bottom:none}
+  .rec .k{color:#9aa5c2;font-size:12px}
+  .rec .v{color:#fff;text-align:right;font-size:12.5px}
+  .rec .v.ok{color:var(--grn)}
+  .rec .v.warn{color:var(--yel)}
+  .rec .v.bad{color:var(--red)}
+  .rec .v b{color:#fff}
+  .rec .why{margin-top:12px;padding:12px;background:#101b35;border-radius:8px;font-family:var(--sans);font-size:12.5px;line-height:1.55;color:#cbd3ea}
+  .rec .why b{color:#fff;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:5px}
+  .rec .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .rec .actions button{font-family:var(--sans);font-size:13px;padding:9px 16px;border-radius:8px;border:1px solid #2a3a5e;background:#1a2647;color:#cbd3ea;cursor:pointer;font-weight:500;flex:1;min-width:90px}
+  .rec .actions button:hover{filter:brightness(1.15)}
+  .rec .actions button.accept{background:var(--grn);border-color:var(--grn);color:#fff}
+  .rec .actions button.wait{background:#1a2647;border-color:#2a3a5e}
+  .rec .actions button.override{background:transparent;color:#9aa5c2}
+  .rec .actions button:disabled{opacity:.4;cursor:not-allowed}
+  .rec .conf-bar{height:4px;background:#1f2a45;border-radius:2px;overflow:hidden;margin-top:8px}
+  .rec .conf-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--grn),var(--yel));transition:width .5s ease}
+  .rec.done{background:#0a2c20}
+  .rec.done .hd{border-color:#1d4a39}
+  .rec.tripped{background:#2b1318}
+  .rec.tripped .hd{border-color:#5c1d24}
+
+  /* ── Override picker (modal-ish row) ───────────── */
+  .override-pick{display:none;margin-top:10px;padding:10px;background:#101b35;border-radius:8px}
+  .override-pick.show{display:block}
+  .override-pick .lbl{font-size:11.5px;color:#9aa5c2;font-family:var(--mono);margin-bottom:6px}
+  .override-pick .seglist{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .override-pick .seglist button{background:#1a2647;border:1px solid #2a3a5e;color:#cbd3ea;border-radius:6px;padding:8px 4px;font-family:var(--mono);font-size:11px;cursor:pointer}
+  .override-pick .seglist button:disabled{opacity:.3;cursor:not-allowed}
+  .override-pick .seglist button:hover:not(:disabled){background:#22315c;color:#fff}
+
+  /* ── Side panels (history, score) ─────────────── */
+  .stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
+  .mini-stat{padding:12px 14px;background:#fbf8ef;border:1px solid var(--line);border-radius:10px}
+  .mini-stat .v{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--navy);letter-spacing:-.02em;line-height:1}
+  .mini-stat .v.g{color:var(--grn)}
+  .mini-stat .v.r{color:var(--red)}
+  .mini-stat .k{font-family:var(--mono);font-size:10.5px;color:var(--ink2);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+
+  .history{max-height:230px;overflow-y:auto;font-family:var(--mono);font-size:11.5px;padding:10px 12px;background:#fbf8ef;border:1px solid var(--line);border-radius:10px;margin-top:8px}
+  .history .h-row{display:grid;grid-template-columns:48px 1fr 60px;gap:8px;padding:4px 0;border-bottom:1px dotted var(--line2);align-items:baseline}
+  .history .h-row:last-child{border-bottom:none}
+  .history .h-row .t{color:var(--mute)}
+  .history .h-row .desc{color:var(--ink)}
+  .history .h-row .desc .veto{color:var(--yel);background:var(--yel-2);padding:1px 6px;border-radius:4px;font-size:10px;margin-left:4px}
+  .history .h-row .desc .acc{color:var(--grn);background:#dff4ea;padding:1px 6px;border-radius:4px;font-size:10px;margin-left:4px}
+  .history .h-row .desc .ovr{color:var(--red);background:#fbe9e7;padding:1px 6px;border-radius:4px;font-size:10px;margin-left:4px}
+  .history .h-row .amps{color:var(--ink2);text-align:right}
+  .history .empty{color:var(--mute);text-align:center;padding:18px 0;font-style:italic}
+
+  /* ── Controls (footer of left panel) ─────────────── */
+  .play-controls{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .btn{font-family:var(--sans);font-size:13.5px;padding:9px 18px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);cursor:pointer;transition:all .15s;border-bottom:none;font-weight:500}
+  .btn:hover{border-color:var(--ink)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{background:var(--navy)}
+  .btn.primary.recording{background:var(--red);border-color:var(--red)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .speed{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px;gap:2px}
+  .speed button{font-family:var(--mono);font-size:11px;padding:5px 10px;border:none;background:transparent;color:var(--ink2);border-radius:999px;cursor:pointer;font-weight:600}
+  .speed button[aria-current="true"]{background:var(--ink);color:#fff}
+
+  /* ── Scenario picker ─────────────── */
+  .scenarios{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .scen-btn{font-family:var(--sans);font-size:12.5px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink2);cursor:pointer;transition:all .15s}
+  .scen-btn:hover{border-color:var(--ink);color:var(--ink)}
+  .scen-btn[aria-current="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .scen-btn .meta{font-family:var(--mono);font-size:10.5px;color:var(--mute);display:block;margin-top:1px;font-weight:400}
+  .scen-btn[aria-current="true"] .meta{color:#cbd3ea}
+
+  footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:12.5px;font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  footer a{color:var(--ink2)}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="row">
+    <a href="../pitch/" class="brand"><span class="dot"></span>Restart<span class="slash">/</span><span class="sub">console</span></a>
+    <div class="right">
+      <a href="../pitch/">← back to pitch</a>
+      <a class="cta" href="https://github.com/anastasiiapoliienko/restart-grid-rl" target="_blank">github</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="eyebrow">Live operator console</div>
+  <h1>Restore a feeder, one decision at a time. <em>You're the operator.</em></h1>
+  <p class="lede">An 8-segment 10 kV feeder is in cold blackout. The AI advisor proposes one closure at a time, with a forecast and a one-line "why". You accept, wait, or override. The same ETP + CLPU physics that runs in the OpenDSS twin runs here in your browser.</p>
+  <div class="badge">
+    <span class="pill">v0.1</span>
+    <span>browser implementation · safety shield active · scenario presets below</span>
+  </div>
+</div>
+
+<!-- Scenario picker -->
+<div class="card">
+  <h3>Scenario</h3>
+  <p class="sub">Same physics each time. The harder scenarios stress the policy.</p>
+  <div class="scenarios" id="scenarios"></div>
+</div>
+
+<div class="grid">
+
+  <!-- LEFT: live topology + chart -->
+  <div>
+    <div class="card">
+      <h3>Feeder L-114 · live state</h3>
+      <p class="sub">Click any de-energized segment to override; click an energized one to inspect.</p>
+      <div class="topo">
+        <div class="substation">
+          <div class="lbl">source</div>
+          <div class="icon">⏧</div>
+          <div class="lbl">trunk</div>
+          <div class="amps" id="trunk-amps">0 A</div>
+        </div>
+        <div class="trunk-line" id="trunk-line"></div>
+        <div class="feeders" id="feeders"></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-meta">
+          <div>trunk current (A) · trip limit <b id="cm-trip">240 A</b></div>
+          <div>elapsed <b id="cm-time">0:00</b> · restored <b id="cm-rest">0/8</b></div>
+        </div>
+        <svg id="trunk-chart" viewBox="0 0 400 100" width="100%" height="100" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="stat-row">
+        <div class="mini-stat"><div class="v" id="ms-trunk">0 A</div><div class="k">trunk now</div></div>
+        <div class="mini-stat"><div class="v" id="ms-shield">0</div><div class="k">shield vetoes</div></div>
+        <div class="mini-stat"><div class="v" id="ms-steps">0</div><div class="k">steps taken</div></div>
+      </div>
+      <div class="play-controls">
+        <button class="btn primary" id="step-btn">Step</button>
+        <button class="btn" id="play-btn">▶ Auto</button>
+        <button class="btn" id="reset-btn">Reset</button>
+        <span class="speed" role="group">
+          <button data-speed="1" aria-current="true">1×</button>
+          <button data-speed="2">2×</button>
+          <button data-speed="4">4×</button>
+          <button data-speed="8">8×</button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: recommendation + history -->
+  <div>
+    <div class="rec" id="rec">
+      <div class="hd">
+        <div class="ttl" id="rec-title">Advisor · recommendation</div>
+        <div class="live"><span class="blink"></span><span id="rec-live">ready</span></div>
+      </div>
+      <div class="row">
+        <span class="k">recommended action</span>
+        <span class="v"><span id="rec-action">—</span></span>
+      </div>
+      <div class="row">
+        <span class="k">predicted trunk after 30 s</span>
+        <span class="v" id="rec-pred">—</span>
+      </div>
+      <div class="row">
+        <span class="k">safety shield (95% of trip)</span>
+        <span class="v" id="rec-shield">—</span>
+      </div>
+      <div class="row">
+        <span class="k">confidence</span>
+        <span class="v" id="rec-conf-text">—</span>
+      </div>
+      <div class="conf-bar"><i id="rec-conf-bar" style="width:0%"></i></div>
+      <div class="why">
+        <b>why this action</b>
+        <span id="rec-why">Loading scenario…</span>
+      </div>
+      <div class="actions" id="rec-actions">
+        <button class="accept" id="btn-accept">Accept</button>
+        <button class="wait" id="btn-wait">Wait 30 s</button>
+        <button class="override" id="btn-override">Override</button>
+      </div>
+      <div class="override-pick" id="override-pick">
+        <div class="lbl">Override: choose a segment to close manually</div>
+        <div class="seglist" id="override-list"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h3>History</h3>
+      <p class="sub">What you and the advisor did, in order.</p>
+      <div class="history" id="history">
+        <div class="empty">Click <b>Step</b> to start.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>Restart · operator console · physics & advisor run in your browser</span>
+  <span><a href="../pitch/">← pitch</a> · <a href="https://github.com/anastasiiapoliienko/restart-grid-rl">restart-grid-rl</a></span>
+</footer>
+
+</div>
+
+<script>
+"use strict";
+/* ──────────────────────────────────────────────────────────────
+ * ETP + CLPU population model (browser port of restart/etp.py)
+ * Identical formulas; deterministic per (seed, ambient, outage_h).
+ * ────────────────────────────────────────────────────────────── */
+const N_SEGMENTS = 8;
+const TRIP_AMPS = 240;
+const SHIELD_THRESH = TRIP_AMPS * 0.95;     // 228 A
+const STEP_SECONDS = 30;
+const KW_TO_AMPS = 1000 / (Math.sqrt(3) * 10000 * 0.97);
+
+// Mulberry32 deterministic RNG so scenarios replay identically
+function mulberry32(seed){
+  let a = seed >>> 0;
+  return function(){
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function uniform(rng, lo, hi){ return lo + (hi - lo) * rng(); }
+function gauss(rng, mu, sigma){
+  // Box-Muller
+  const u1 = Math.max(1e-12, rng()), u2 = rng();
+  return mu + sigma * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+class ETPPopulation {
+  constructor(nHouses, ambient, seed){
+    this.n = nHouses;
+    this.ambient = ambient;
+    const rng = mulberry32(seed);
+    this.R = new Float32Array(nHouses);
+    this.C = new Float32Array(nHouses);
+    this.Q = new Float32Array(nHouses);
+    this.setpoint = new Float32Array(nHouses);
+    this.T = new Float32Array(nHouses);
+    this.heaterOn = new Uint8Array(nHouses);
+    for(let i=0;i<nHouses;i++){
+      this.R[i] = uniform(rng, 3.0, 5.0);
+      this.C[i] = uniform(rng, 8.0, 15.0);
+      this.Q[i] = uniform(rng, 6.0, 10.0);
+      this.setpoint[i] = uniform(rng, 18.5, 21.0);
+      this.T[i] = this.setpoint[i] + gauss(rng, 0, 0.3);
+      this.heaterOn[i] = this.T[i] < this.setpoint[i] ? 1 : 0;
+    }
+    this.deadband = 1.0;
+    this.clpuMag = uniform(rng, 1.0, 2.0);
+    this.clpuTau = uniform(rng, 60.0, 180.0);
+    this.tSince = Infinity;
+  }
+  step(dt, energized){
+    if(energized){
+      if(!isFinite(this.tSince)) this.tSince = 0;
+      const dtH = dt / 3600;
+      for(let i=0;i<this.n;i++){
+        const dT = dtH * ((this.ambient - this.T[i]) / (this.R[i] * this.C[i])
+                         + this.Q[i] * this.heaterOn[i] / this.C[i]);
+        this.T[i] += dT;
+      }
+      for(let i=0;i<this.n;i++){
+        const onNow  = this.T[i] < this.setpoint[i] - this.deadband / 2;
+        const offNow = this.T[i] > this.setpoint[i] + this.deadband / 2;
+        if(onNow) this.heaterOn[i] = 1;
+        else if(offNow) this.heaterOn[i] = 0;
+      }
+      this.tSince += dt;
+    } else {
+      const dtH = dt / 3600;
+      for(let i=0;i<this.n;i++){
+        this.T[i] += dtH * (this.ambient - this.T[i]) / (this.R[i] * this.C[i]);
+      }
+      this.heaterOn.fill(0);
+      this.tSince = Infinity;
+    }
+  }
+  powerKW(energized){
+    if(!energized) return 0;
+    let base = 0;
+    for(let i=0;i<this.n;i++) base += this.heaterOn[i] * this.Q[i];
+    let clpu = 1;
+    if(isFinite(this.tSince)) clpu = 1 + this.clpuMag * Math.exp(-this.tSince / this.clpuTau);
+    return base * clpu;
+  }
+  clone(){
+    const c = Object.create(ETPPopulation.prototype);
+    c.n = this.n; c.ambient = this.ambient;
+    c.R = new Float32Array(this.R); c.C = new Float32Array(this.C);
+    c.Q = new Float32Array(this.Q); c.setpoint = new Float32Array(this.setpoint);
+    c.T = new Float32Array(this.T); c.heaterOn = new Uint8Array(this.heaterOn);
+    c.deadband = this.deadband; c.clpuMag = this.clpuMag; c.clpuTau = this.clpuTau;
+    c.tSince = this.tSince;
+    return c;
+  }
+  coolFor(hours){
+    const steps = Math.max(1, Math.floor(hours * 60));
+    for(let s=0;s<steps;s++) this.step(60, false);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+ * Environment state
+ * ────────────────────────────────────────────────────────────── */
+class Env {
+  constructor(scenario){
+    this.scenario = scenario;
+    this.reset();
+  }
+  reset(){
+    const s = this.scenario;
+    this.pops = [];
+    for(let i=0;i<N_SEGMENTS;i++){
+      const pop = new ETPPopulation(s.housesPerSeg, s.ambient, s.seed * 100 + i);
+      pop.coolFor(s.outageHours);
+      this.pops.push(pop);
+    }
+    this.energized = new Array(N_SEGMENTS).fill(false);
+    this.tripped = false;
+    this.stepCount = 0;
+    this.history = [];            // {t, trunk, energized:[], action, kind, vetoed}
+    this.lastVeto = null;
+    this.coldMinutes = new Array(N_SEGMENTS).fill(s.outageHours * 60);
+  }
+  trunkAmps(){
+    let kw = 0;
+    for(let i=0;i<N_SEGMENTS;i++) kw += this.pops[i].powerKW(this.energized[i]);
+    return kw * KW_TO_AMPS;
+  }
+  segmentLoadKW(i){ return this.pops[i].powerKW(this.energized[i]); }
+  apply(action){
+    // action: 0..N-1 = close segment i; null/undefined = wait
+    if(this.tripped) return;
+    if(typeof action === "number" && !this.energized[action]) this.energized[action] = true;
+    for(let i=0;i<N_SEGMENTS;i++){
+      this.pops[i].step(STEP_SECONDS, this.energized[i]);
+      if(this.energized[i]) this.coldMinutes[i] = 0;
+      else this.coldMinutes[i] += STEP_SECONDS / 60;
+    }
+    this.stepCount++;
+    const amps = this.trunkAmps();
+    if(amps > TRIP_AMPS) this.tripped = true;
+  }
+  forecast(candidate){
+    // What does the trunk look like if we close `candidate` and step once?
+    const simEnergized = this.energized.slice();
+    if(candidate != null && candidate >= 0 && candidate < N_SEGMENTS) simEnergized[candidate] = true;
+    let kw = 0;
+    for(let i=0;i<N_SEGMENTS;i++){
+      const sim = this.pops[i].clone();
+      sim.step(STEP_SECONDS, simEnergized[i]);
+      kw += sim.powerKW(simEnergized[i]);
+    }
+    return kw * KW_TO_AMPS;
+  }
+  /* Forecast trunk current at +120 s after closing `candidate` */
+  forecastDecayed(candidate){
+    const simEnergized = this.energized.slice();
+    if(candidate != null && candidate >= 0 && candidate < N_SEGMENTS) simEnergized[candidate] = true;
+    let kw = 0;
+    for(let i=0;i<N_SEGMENTS;i++){
+      const sim = this.pops[i].clone();
+      for(let k=0;k<4;k++) sim.step(STEP_SECONDS, simEnergized[i]);
+      kw += sim.powerKW(simEnergized[i]);
+    }
+    return kw * KW_TO_AMPS;
+  }
+  allOn(){ return this.energized.every(x => x); }
+}
+
+/* ──────────────────────────────────────────────────────────────
+ * Advisor: forecast-based action selection with safety shield.
+ * Mirrors the logic of `restart/shield.py` running over the PPO
+ * policy. Browser port; behavior is similar but not identical to
+ * the trained PPO ensemble (which lives in restart-grid-rl).
+ * ────────────────────────────────────────────────────────────── */
+function advisorRecommend(env){
+  // For each de-energized segment, forecast trunk after closing it.
+  const candidates = [];
+  for(let i=0;i<N_SEGMENTS;i++){
+    if(env.energized[i]) continue;
+    const ampsAfter = env.forecast(i);
+    const ampsDecayed = env.forecastDecayed(i);
+    candidates.push({ seg:i, amps:ampsAfter, decayed:ampsDecayed, cold:env.coldMinutes[i] });
+  }
+  if(candidates.length === 0){
+    return { action: null, kind: "done", amps: env.trunkAmps(), decayed: env.trunkAmps(),
+             confidence: 1, why: "All eight segments are restored. Restoration complete." };
+  }
+  const safe = candidates.filter(c => c.amps <= SHIELD_THRESH);
+  if(safe.length === 0){
+    // Nothing safe to close — wait for CLPU to decay
+    const minPred = Math.min(...candidates.map(c => c.amps));
+    return { action: null, kind: "wait",
+             amps: env.trunkAmps(), decayed: env.trunkAmps(),
+             confidence: 0.7,
+             why: `Every closable segment would push trunk current above the ${SHIELD_THRESH.toFixed(0)} A safety threshold (best candidate predicts ${minPred.toFixed(0)} A). Waiting ${STEP_SECONDS}s for active CLPU on already-energized segments to decay.` };
+  }
+  // Among safe actions: pick the one with the highest cold-minutes (priority by need),
+  // and tie-break by lowest predicted amps (safer first).
+  safe.sort((a, b) => (b.cold - a.cold) || (a.amps - b.amps));
+  const pick = safe[0];
+  // Confidence: closer to threshold = lower confidence
+  const margin = (SHIELD_THRESH - pick.amps) / SHIELD_THRESH;
+  const conf = Math.max(0.55, Math.min(0.99, 0.7 + margin * 0.45));
+  const headroom = (SHIELD_THRESH - pick.amps).toFixed(0);
+  const why = `S${pick.seg+1} is the longest cold of any remaining segment (${pick.cold.toFixed(0)} min vs mean ${
+    (candidates.reduce((s, c) => s + c.cold, 0) / candidates.length).toFixed(0)
+  } min). One-step forecast under closure predicts ${pick.amps.toFixed(0)} A — ${headroom} A headroom under the ${SHIELD_THRESH.toFixed(0)} A shield. CLPU expected to decay to ${pick.decayed.toFixed(0)} A within 2 min.`;
+  return { action: pick.seg, kind: "close", amps: pick.amps, decayed: pick.decayed,
+           confidence: conf, why };
+}
+
+/* ──────────────────────────────────────────────────────────────
+ * Scenarios
+ * ────────────────────────────────────────────────────────────── */
+const SCENARIOS = [
+  { id: "moderate", label: "Moderate", desc: "+1.6 °C · 6 h cold soak",
+    seed: 10042, ambient: 1.6, outageHours: 6, housesPerSeg: 30 },
+  { id: "cold",     label: "Deep cold", desc: "−4 °C · 8 h cold soak",
+    seed: 20007, ambient: -4.0, outageHours: 8, housesPerSeg: 30 },
+  { id: "long",     label: "Long outage", desc: "+0 °C · 12 h cold soak",
+    seed: 30019, ambient: 0.0, outageHours: 12, housesPerSeg: 30 },
+  { id: "winter",   label: "Worst case", desc: "−5 °C · 12 h cold soak",
+    seed: 40031, ambient: -5.0, outageHours: 12, housesPerSeg: 35 },
+];
+
+/* ──────────────────────────────────────────────────────────────
+ * UI
+ * ────────────────────────────────────────────────────────────── */
+const dom = {
+  feeders: document.getElementById("feeders"),
+  trunkLine: document.getElementById("trunk-line"),
+  trunkAmps: document.getElementById("trunk-amps"),
+  chart: document.getElementById("trunk-chart"),
+  cmTrip: document.getElementById("cm-trip"),
+  cmTime: document.getElementById("cm-time"),
+  cmRest: document.getElementById("cm-rest"),
+  msTrunk: document.getElementById("ms-trunk"),
+  msShield: document.getElementById("ms-shield"),
+  msSteps: document.getElementById("ms-steps"),
+  rec: document.getElementById("rec"),
+  recTitle: document.getElementById("rec-title"),
+  recLive: document.getElementById("rec-live"),
+  recAction: document.getElementById("rec-action"),
+  recPred: document.getElementById("rec-pred"),
+  recShield: document.getElementById("rec-shield"),
+  recConfText: document.getElementById("rec-conf-text"),
+  recConfBar: document.getElementById("rec-conf-bar"),
+  recWhy: document.getElementById("rec-why"),
+  recActions: document.getElementById("rec-actions"),
+  btnAccept: document.getElementById("btn-accept"),
+  btnWait: document.getElementById("btn-wait"),
+  btnOverride: document.getElementById("btn-override"),
+  overridePick: document.getElementById("override-pick"),
+  overrideList: document.getElementById("override-list"),
+  history: document.getElementById("history"),
+  scenariosEl: document.getElementById("scenarios"),
+  stepBtn: document.getElementById("step-btn"),
+  playBtn: document.getElementById("play-btn"),
+  resetBtn: document.getElementById("reset-btn"),
+};
+dom.cmTrip.textContent = TRIP_AMPS + " A";
+
+let env;
+let currentScenario = SCENARIOS[0];
+let currentRec = null;
+let shieldVetoes = 0;
+let trunkHistory = [];  // [{t,a}]
+let auto = false;
+let autoTimer = null;
+let speed = 1;
+
+function buildScenarios(){
+  dom.scenariosEl.innerHTML = "";
+  for(const s of SCENARIOS){
+    const b = document.createElement("button");
+    b.className = "scen-btn";
+    b.dataset.id = s.id;
+    b.setAttribute("aria-current", s.id === currentScenario.id ? "true" : "false");
+    b.innerHTML = `<span>${s.label}</span><span class="meta">${s.desc}</span>`;
+    b.addEventListener("click", () => loadScenario(s));
+    dom.scenariosEl.appendChild(b);
+  }
+}
+
+function buildFeeders(){
+  dom.feeders.innerHTML = "";
+  for(let i=0;i<N_SEGMENTS;i++){
+    const el = document.createElement("div");
+    el.className = "seg";
+    el.dataset.i = i;
+    el.innerHTML = `
+      <div class="name">S${i+1}</div>
+      <div class="state">cold</div>
+      <div class="load">0 kW</div>`;
+    el.addEventListener("click", () => onSegmentClick(i));
+    dom.feeders.appendChild(el);
+  }
+}
+
+function loadScenario(scenario){
+  currentScenario = scenario;
+  document.querySelectorAll(".scen-btn").forEach(b =>
+    b.setAttribute("aria-current", b.dataset.id === scenario.id ? "true" : "false")
+  );
+  env = new Env(scenario);
+  shieldVetoes = 0;
+  trunkHistory = [];
+  stopAuto();
+  pushTrunk(0);
+  computeRecommendation();
+  renderAll();
+  setHistory([]);
+}
+
+function pushTrunk(t){
+  trunkHistory.push({ t, a: env.trunkAmps() });
+}
+
+function setHistory(items){
+  if(items.length === 0){
+    dom.history.innerHTML = '<div class="empty">Click <b>Step</b> to start.</div>';
+    return;
+  }
+  dom.history.innerHTML = items.slice(-50).map(h => {
+    const t = `${Math.floor(h.t / 60)}:${String(Math.floor(h.t % 60)).padStart(2,"0")}`;
+    const badge = h.kind === "accept" ? '<span class="acc">accept</span>'
+                : h.kind === "override" ? '<span class="ovr">override</span>'
+                : h.kind === "veto" ? '<span class="veto">shield</span>'
+                : h.kind === "wait" ? '<span class="veto">wait</span>'
+                : "";
+    return `<div class="h-row"><div class="t">${t}</div><div class="desc">${h.desc}${badge}</div><div class="amps">${h.amps.toFixed(0)} A</div></div>`;
+  }).join("");
+  dom.history.scrollTop = dom.history.scrollHeight;
+}
+
+function computeRecommendation(){
+  if(env.tripped){
+    currentRec = { tripped: true, action: null };
+    return;
+  }
+  currentRec = advisorRecommend(env);
+}
+
+function renderAll(){
+  // Segments
+  const recSeg = currentRec && currentRec.action != null ? currentRec.action : -1;
+  for(let i=0;i<N_SEGMENTS;i++){
+    const el = dom.feeders.children[i];
+    el.classList.remove("warm", "on", "trip", "recommended");
+    el.querySelector(".load").textContent = env.energized[i]
+      ? env.segmentLoadKW(i).toFixed(0) + " kW"
+      : `${env.coldMinutes[i].toFixed(0)} min cold`;
+    if(env.tripped){ el.classList.add("trip"); }
+    else if(env.energized[i]){
+      const elapsedSinceClose = (env.pops[i].tSince ?? Infinity);
+      el.classList.add(elapsedSinceClose < 90 ? "warm" : "on");
+    }
+    el.querySelector(".state").textContent = env.tripped ? "tripped"
+      : env.energized[i] ? "energized" : "cold";
+    if(i === recSeg && !env.energized[i] && !env.tripped) el.classList.add("recommended");
+    // star
+    if(el.querySelector(".star")) el.querySelector(".star").remove();
+    if(i === recSeg && !env.energized[i] && !env.tripped){
+      const s = document.createElement("div");
+      s.className = "star"; s.textContent = "★";
+      el.appendChild(s);
+    }
+  }
+  // Trunk amps + line
+  const a = env.trunkAmps();
+  dom.trunkAmps.textContent = a.toFixed(0) + " A";
+  dom.trunkAmps.classList.remove("warn", "trip");
+  if(env.tripped) dom.trunkAmps.classList.add("trip");
+  else if(a > SHIELD_THRESH * 0.85) dom.trunkAmps.classList.add("warn");
+  dom.trunkLine.classList.toggle("tripped", env.tripped);
+  dom.msTrunk.textContent = a.toFixed(0) + " A";
+  dom.msTrunk.className = "v" + (env.tripped ? " r" : (a > SHIELD_THRESH * 0.85 ? "" : (env.allOn() ? " g" : "")));
+  dom.msShield.textContent = shieldVetoes;
+  dom.msSteps.textContent = env.stepCount;
+  // Chart
+  drawChart();
+  // Time + restored
+  const tSec = env.stepCount * STEP_SECONDS;
+  dom.cmTime.textContent = `${Math.floor(tSec / 60)}:${String(tSec % 60).padStart(2,"0")}`;
+  const onCount = env.energized.filter(x => x).length;
+  dom.cmRest.textContent = `${onCount}/${N_SEGMENTS}`;
+  // Recommendation card
+  renderRec();
+}
+
+function drawChart(){
+  const w = 400, h = 100, pad = 4;
+  const lines = [];
+  // trip line
+  const yTrip = h - 8 - ((TRIP_AMPS / 300) * 78);
+  const yShield = h - 8 - ((SHIELD_THRESH / 300) * 78);
+  lines.push(`<line x1="${pad}" y1="${yTrip}" x2="${w - pad}" y2="${yTrip}" stroke="#c0392b" stroke-dasharray="3 3" stroke-width="1"/>`);
+  lines.push(`<text x="${w - 5}" y="${yTrip - 3}" fill="#c0392b" font-size="9" text-anchor="end" font-family="JetBrains Mono,Menlo,monospace">trip 240 A</text>`);
+  lines.push(`<line x1="${pad}" y1="${yShield}" x2="${w - pad}" y2="${yShield}" stroke="#f5c518" stroke-dasharray="2 2" stroke-width="1"/>`);
+  lines.push(`<text x="${w - 5}" y="${yShield - 3}" fill="#c5651a" font-size="9" text-anchor="end" font-family="JetBrains Mono,Menlo,monospace">shield 228 A</text>`);
+  // line
+  const maxT = Math.max(20 * 60, trunkHistory.length ? trunkHistory[trunkHistory.length - 1].t : 0) + 60;
+  const pts = trunkHistory.map(p => {
+    const x = pad + (p.t / maxT) * (w - 2 * pad);
+    const y = h - 8 - (Math.min(p.a, 300) / 300) * 78;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const color = env.tripped ? "#c0392b" : "#0b3a78";
+  if(pts) lines.push(`<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2"/>`);
+  dom.chart.innerHTML = lines.join("");
+}
+
+function renderRec(){
+  if(env.tripped){
+    dom.rec.classList.add("tripped"); dom.rec.classList.remove("done");
+    dom.recTitle.textContent = "Advisor · TRIPPED";
+    dom.recLive.textContent = "halted";
+    dom.recAction.innerHTML = '<b>upstream breaker opened</b>';
+    dom.recPred.textContent = `${env.trunkAmps().toFixed(0)} A`;
+    dom.recPred.className = "v bad";
+    dom.recShield.textContent = "did not prevent in time";
+    dom.recShield.className = "v bad";
+    dom.recConfText.textContent = "—";
+    dom.recConfBar.style.width = "0%";
+    dom.recWhy.textContent = "Trunk current exceeded the trip threshold of 240 A. Reset the scenario to try again.";
+    [dom.btnAccept, dom.btnWait, dom.btnOverride].forEach(b => b.disabled = true);
+    dom.overridePick.classList.remove("show");
+    return;
+  }
+  dom.rec.classList.remove("tripped");
+  if(env.allOn()){
+    dom.rec.classList.add("done");
+    dom.recTitle.textContent = "Advisor · DONE";
+    dom.recLive.textContent = "complete";
+    dom.recAction.innerHTML = '<b>restoration complete</b>';
+    dom.recPred.textContent = `${env.trunkAmps().toFixed(0)} A`;
+    dom.recPred.className = "v ok";
+    dom.recShield.textContent = "passed";
+    dom.recShield.className = "v ok";
+    dom.recConfText.textContent = "100%";
+    dom.recConfBar.style.width = "100%";
+    dom.recWhy.textContent = `All 8 segments energized in ${env.stepCount} steps (${(env.stepCount * STEP_SECONDS / 60).toFixed(1)} min). Shield vetoed ${shieldVetoes} action(s) along the way.`;
+    [dom.btnAccept, dom.btnWait, dom.btnOverride].forEach(b => b.disabled = true);
+    dom.overridePick.classList.remove("show");
+    return;
+  }
+  dom.rec.classList.remove("done");
+  const r = currentRec;
+  dom.recTitle.textContent = "Advisor · recommendation";
+  dom.recLive.textContent = "ready";
+  if(r.kind === "close"){
+    dom.recAction.innerHTML = `close switch <b>S${r.action + 1}</b>`;
+    dom.recPred.textContent = `${r.amps.toFixed(0)} A · ${(SHIELD_THRESH - r.amps).toFixed(0)} A headroom`;
+    dom.recPred.className = r.amps > SHIELD_THRESH * 0.9 ? "v warn" : "v ok";
+    dom.recShield.textContent = "✓ passed";
+    dom.recShield.className = "v ok";
+    dom.btnAccept.disabled = false;
+    dom.btnAccept.textContent = `Accept · close S${r.action + 1}`;
+  } else if(r.kind === "wait"){
+    dom.recAction.innerHTML = `wait <b>${STEP_SECONDS} s</b> (no safe close)`;
+    dom.recPred.textContent = `${env.trunkAmps().toFixed(0)} A`;
+    dom.recPred.className = "v warn";
+    dom.recShield.textContent = "✗ vetoed all closes";
+    dom.recShield.className = "v warn";
+    dom.btnAccept.disabled = false;
+    dom.btnAccept.textContent = "Accept · wait";
+  }
+  dom.recConfText.textContent = `${(r.confidence * 100).toFixed(0)}%`;
+  dom.recConfBar.style.width = `${(r.confidence * 100).toFixed(0)}%`;
+  dom.recWhy.textContent = r.why;
+  dom.btnWait.disabled = false;
+  dom.btnOverride.disabled = false;
+}
+
+function appendHistory(desc, kind, amps){
+  env.history.push({ t: env.stepCount * STEP_SECONDS, desc, kind, amps });
+  setHistory(env.history);
+}
+
+function onSegmentClick(i){
+  if(env.tripped || env.allOn()) return;
+  if(env.energized[i]) return;   // already on
+  // Treat as manual override
+  doOverride(i);
+}
+
+function doStep(action, kind){
+  if(env.tripped || env.allOn()) return;
+  env.apply(action);
+  pushTrunk(env.stepCount * STEP_SECONDS);
+  // history
+  let desc;
+  if(typeof action === "number") desc = `Closed S${action + 1}`;
+  else desc = "Waited 30 s";
+  if(env.tripped) desc += " — TRIPPED";
+  appendHistory(desc, kind, env.trunkAmps());
+  computeRecommendation();
+  renderAll();
+  if(env.tripped || env.allOn()) stopAuto();
+}
+
+function onAccept(){
+  const r = currentRec;
+  if(!r) return;
+  if(r.kind === "close") doStep(r.action, "accept");
+  else if(r.kind === "wait") doStep(null, "accept");
+}
+function onWait(){ doStep(null, "veto"); }
+function onOverride(){
+  dom.overridePick.classList.toggle("show");
+  if(dom.overridePick.classList.contains("show")){
+    dom.overrideList.innerHTML = "";
+    for(let i=0;i<N_SEGMENTS;i++){
+      const b = document.createElement("button");
+      b.textContent = `S${i+1}`;
+      b.disabled = env.energized[i];
+      b.addEventListener("click", () => { dom.overridePick.classList.remove("show"); doOverride(i); });
+      dom.overrideList.appendChild(b);
+    }
+  }
+}
+function doOverride(i){
+  // Check shield: did this violate?
+  const predAmps = env.forecast(i);
+  if(predAmps > SHIELD_THRESH){
+    shieldVetoes++;  // record that operator overrode the shield warning
+  }
+  doStep(i, "override");
+}
+
+function startAuto(){
+  auto = true;
+  dom.playBtn.textContent = "■ Pause";
+  dom.playBtn.classList.add("primary");
+  const tick = () => {
+    if(!auto || env.tripped || env.allOn()) return stopAuto();
+    onAccept();
+    autoTimer = setTimeout(tick, 800 / speed);
+  };
+  tick();
+}
+function stopAuto(){
+  auto = false;
+  dom.playBtn.textContent = "▶ Auto";
+  dom.playBtn.classList.remove("primary");
+  if(autoTimer){ clearTimeout(autoTimer); autoTimer = null; }
+}
+function toggleAuto(){ auto ? stopAuto() : startAuto(); }
+
+dom.btnAccept.addEventListener("click", onAccept);
+dom.btnWait.addEventListener("click", onWait);
+dom.btnOverride.addEventListener("click", onOverride);
+dom.stepBtn.addEventListener("click", onAccept);
+dom.playBtn.addEventListener("click", toggleAuto);
+dom.resetBtn.addEventListener("click", () => loadScenario(currentScenario));
+document.querySelectorAll(".speed button").forEach(b => {
+  b.addEventListener("click", () => {
+    speed = parseInt(b.dataset.speed, 10);
+    document.querySelectorAll(".speed button").forEach(x =>
+      x.setAttribute("aria-current", x === b ? "true" : "false")
+    );
+  });
+});
+
+buildScenarios();
+buildFeeders();
+loadScenario(currentScenario);
+</script>
+</body>
+</html>

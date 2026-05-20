@@ -338,6 +338,62 @@
   .console .actions button.override{background:transparent;color:#9aa5c2}
   .console .conf-bar{height:4px;background:#1f2a45;border-radius:2px;overflow:hidden;margin-top:10px}
   .console .conf-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--grn),var(--yel));width:0%;transition:width .8s ease}
+
+  /* ── #twin section ──────────────────────────────────── */
+  .twin-figure{margin:18px 0;padding:0}
+  .twin-figure img{display:block;width:100%;height:auto;border-radius:var(--radius);border:1px solid var(--line);background:var(--paper);box-shadow:var(--shadow-sm)}
+  .twin-figure figcaption{margin-top:8px;font-size:13px;color:var(--ink2);font-style:normal;line-height:1.55}
+  .twin-figure-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}
+  @media (max-width:820px){.twin-figure-row{grid-template-columns:1fr}}
+
+  .twin-widget{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 18px 16px;margin:22px 0}
+  .twin-widget-meta{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+  .twin-widget-meta .info{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
+  .twin-widget-meta .info .lbl{color:var(--mute);margin-right:4px}
+  .twin-widget-meta .info b{color:var(--ink);font-weight:600}
+  .twin-widget .anim-ctrls{display:flex;align-items:center;gap:8px}
+  .twin-widget .btn-pill{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .15s}
+  .twin-widget .btn-pill:hover{border-color:var(--navy);color:var(--navy)}
+  .twin-widget .btn-pill.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .twin-widget .btn-pill.primary:hover{background:var(--navy);border-color:var(--navy)}
+  .twin-widget .speeds{display:inline-flex;background:var(--bg2);border-radius:999px;padding:3px;gap:2px}
+  .twin-widget .speeds button{font-family:var(--mono);font-size:11px;color:var(--ink2);padding:4px 9px;border-radius:999px;background:transparent;border:none;cursor:pointer}
+  .twin-widget .speeds button[aria-current="true"]{background:var(--ink);color:#fff}
+  .twin-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:820px){.twin-panels{grid-template-columns:1fr}}
+  .twin-panel{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .twin-panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+  .twin-policy{font-size:14px;font-weight:600;color:var(--ink)}
+  .twin-tag{display:inline-flex;padding:2px 8px;border-radius:999px;font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.02em;margin-left:6px;vertical-align:middle}
+  .twin-tag.ok{background:#e7f5ee;color:var(--grn)}
+  .twin-tag.bad{background:#fdecec;color:var(--red)}
+  .twin-clock{font-family:var(--mono);font-size:12px;color:var(--ink2)}
+  .twin-net{width:100%;height:auto;display:block;margin-bottom:6px}
+  .twin-curve{width:100%;height:auto;display:block}
+  .twin-net-sub{fill:var(--paper);stroke:var(--ink);stroke-width:1.5}
+  .twin-net-sub.tripped{fill:#fdecec;stroke:var(--red)}
+  .twin-net-feeder{transition:fill .25s,stroke .25s}
+  .twin-net-feeder.on{fill:#dff5e9;stroke:var(--grn)}
+  .twin-net-feeder.off{fill:var(--paper);stroke:var(--mute)}
+  .twin-net-feeder.tripped{fill:#fdecec;stroke:var(--red)}
+  .twin-net-line{stroke:var(--mute);stroke-width:1.6;fill:none;transition:stroke .25s}
+  .twin-net-line.on{stroke:var(--grn)}
+  .twin-net-line.tripped{stroke:var(--red);stroke-dasharray:4,3}
+  .twin-net-label{font-family:var(--mono);font-size:9px;fill:var(--ink2);text-anchor:middle}
+  .twin-curve-area{fill:rgba(11,58,120,.10)}
+  .twin-curve-area.bad{fill:rgba(192,57,43,.10)}
+  .twin-curve-line{fill:none;stroke:var(--navy);stroke-width:1.6}
+  .twin-curve-line.bad{stroke:var(--red)}
+  .twin-curve-line.ok{stroke:var(--grn)}
+  .twin-curve-thr{stroke:var(--red);stroke-width:1;stroke-dasharray:3,3;fill:none}
+  .twin-curve-thr-lbl{font-family:var(--mono);font-size:9px;fill:var(--red)}
+  .twin-curve-grid{stroke:var(--line2);stroke-width:0.8}
+  .twin-curve-cursor{stroke:var(--ink);stroke-width:1;stroke-dasharray:2,2;opacity:.45}
+  .twin-curve-axis{font-family:var(--mono);font-size:9px;fill:var(--mute)}
+  .twin-curve-spike{stroke:var(--red);stroke-width:1.6;fill:none}
+  .twin-curve-spike-dot{fill:var(--red);stroke:#fff;stroke-width:1.2}
+  .twin-curve-outage{fill:rgba(192,57,43,.04)}
+  .twin-legend{margin-top:12px;font-size:12.5px;color:var(--ink2);line-height:1.55}
 </style>
 </head>
 <body>
@@ -358,7 +414,9 @@
       <li><a href="#how" data-i18n="nav.how">How it works</a></li>
       <li><a href="#stages" data-i18n="nav.stages">Stages</a></li>
       <li><a href="#risks" data-i18n="nav.risks">Risks</a></li>
+      <li><a href="#results" data-i18n="nav.results">Results</a></li>
       <li><a href="#repos" data-i18n="nav.repos">Repos</a></li>
+      <li><a href="../console/">Console&nbsp;↗</a></li>
       <li><a href="../twin/">Twin&nbsp;↗</a></li>
     </ul>
     <div class="lang-toggle" role="group" aria-label="Language">
@@ -644,15 +702,79 @@
   </div>
 </section>
 
+<section id="twin">
+  <div class="section-label"><span class="num">07</span><span class="eyebrow">In the twin</span></div>
+  <h2>The substation, in <em>motion</em>.</h2>
+  <p class="kicker" style="margin-bottom:18px">An oblast-scale digital twin: 35&nbsp;/&nbsp;10&nbsp;kV substation, six 10&nbsp;kV feeders, 36 distribution transformers. Loads are a population of 1R1C thermostatic-house equivalents. Cold-load pickup isn't a multiplier here — it's what happens when N&nbsp;thousand thermostats find themselves below their lower deadband at the same moment.</p>
+
+  <figure class="reveal twin-figure">
+    <img src="assets/twin-hero.png" alt="Naive vs smart restoration: substation P traces from the Vinnytsia 35/10 kV twin"/>
+    <figcaption>Same outage, two policies. Left: every feeder closed simultaneously at restoration — the CLPU spike hits 26.3 MW and the substation transformer trips. Right: a 12-minute settle between closures, last urban feeder deferred — five of six restored, no trips.</figcaption>
+  </figure>
+
+  <!-- Inline auto-playing widget -->
+  <div class="twin-widget reveal">
+    <div class="twin-widget-meta">
+      <div class="info"><span class="lbl">scenario</span> <b>3-h outage at -3.5&nbsp;°C, ERA5 Jan&nbsp;2024</b></div>
+      <div class="anim-ctrls">
+        <button class="btn-pill primary" id="twin-play-btn">Play</button>
+        <button class="btn-pill" id="twin-reset-btn">Reset</button>
+        <span class="speeds" role="group" aria-label="Playback speed">
+          <button data-tspeed="60"  aria-current="false">1×</button>
+          <button data-tspeed="300" aria-current="true">5×</button>
+          <button data-tspeed="900">15×</button>
+          <button data-tspeed="2400">40×</button>
+        </span>
+      </div>
+    </div>
+    <div class="twin-panels">
+      <div class="twin-panel" data-scenario="outage-naive">
+        <div class="twin-panel-head">
+          <div class="twin-policy">Naive close-all <span class="twin-tag bad">substation trips</span></div>
+          <div class="twin-clock" id="twin-clock-naive">t = 0 min</div>
+        </div>
+        <svg class="twin-net" id="twin-net-naive" viewBox="0 0 380 120"></svg>
+        <svg class="twin-curve" id="twin-curve-naive" viewBox="0 0 380 130"></svg>
+      </div>
+      <div class="twin-panel" data-scenario="outage-smart">
+        <div class="twin-panel-head">
+          <div class="twin-policy">Smart rural-first <span class="twin-tag ok">5/6 restored</span></div>
+          <div class="twin-clock" id="twin-clock-smart">t = 0 min</div>
+        </div>
+        <svg class="twin-net" id="twin-net-smart" viewBox="0 0 380 120"></svg>
+        <svg class="twin-curve" id="twin-curve-smart" viewBox="0 0 380 130"></svg>
+      </div>
+    </div>
+    <p class="twin-legend">
+      Each panel runs against the actual telemetry the OpenDSS twin produced. Network glyph shows the six 10&nbsp;kV feeders (rural / peri-urban / urban). Curve below is the substation supply; the red dashed line is the substation transformer trip threshold (25&nbsp;MW = ~80&nbsp;% of 2 × 16&nbsp;MVA nameplate).
+    </p>
+  </div>
+
+  <div class="twin-figure-row">
+    <figure class="reveal twin-figure">
+      <img src="assets/twin-peaks.png" alt="Substation peak load across four scenarios"/>
+      <figcaption>Peak demand across four winter scenarios. Only the naive close-all crosses the 25&nbsp;MW transformer thermal limit.</figcaption>
+    </figure>
+    <figure class="reveal twin-figure">
+      <img src="assets/twin-per-feeder.png" alt="Per-feeder buildup during smart restoration"/>
+      <figcaption>Per-feeder buildup during smart restoration. Rural feeders carry the diversified load while the urban ones are still cold; the second urban feeder (f2) is held back.</figcaption>
+    </figure>
+  </div>
+
+  <p style="margin-top:18px;font-size:14.5px;color:var(--ink2)">
+    For the full interactive demo — four scenarios, play / pause / scrub, network detail, per-feeder load and indoor temperature panels — visit <a href="../twin/">restart-grid&nbsp;/&nbsp;twin →</a>. Source code: <a href="https://github.com/anastasiiapoliienko/vinnytsia-twin">vinnytsia-twin</a> (twin, calibration, scenarios) and <a href="https://github.com/anastasiiapoliienko/restart-grid-rl">restart-grid-rl</a> (the RL env that consumes the calibrated population).
+  </p>
+</section>
+
 <section id="prevent">
-  <div class="section-label"><span class="num">07</span><span class="eyebrow" data-i18n="s06.eyebrow">What this prevents</span></div>
+  <div class="section-label"><span class="num">08</span><span class="eyebrow" data-i18n="s06.eyebrow">What this prevents</span></div>
   <div class="prevent reveal">
     <p data-i18n="s06.p">Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — <em>it is hours of heat returned to people in February.</em></p>
   </div>
 </section>
 
 <section id="risks">
-  <div class="section-label"><span class="num">08</span><span class="eyebrow" data-i18n="s07.eyebrow">Risks owned up to</span></div>
+  <div class="section-label"><span class="num">09</span><span class="eyebrow" data-i18n="s07.eyebrow">Risks owned up to</span></div>
   <h2 data-i18n="s07.h2">The four ways this could fail — and how each is <em>handled</em>.</h2>
   <div class="grid cols-2">
     <div class="risk reveal">
@@ -703,7 +825,7 @@
 </section>
 
 <section id="repos">
-  <div class="section-label"><span class="num">09</span><span class="eyebrow" data-i18n="s08.eyebrow">Repositories &amp; resources</span></div>
+  <div class="section-label"><span class="num">10</span><span class="eyebrow" data-i18n="s08.eyebrow">Repositories &amp; resources</span></div>
   <h2 data-i18n="s08.h2">What's <em>already built</em> — and where to read the code.</h2>
   <p class="kicker" style="margin-bottom:22px" data-i18n="s08.kicker">The case above isn't theoretical. Three open repos already implement the foundations: a Phase 0 RL policy that beats the safe baseline, an oblast-scale digital twin where cold-load pickup emerges naturally, and a longer technical write-up of the full design.</p>
   <div class="repos">
@@ -774,6 +896,7 @@
       "nav.how": "How it works",
       "nav.stages": "Stages",
       "nav.risks": "Risks",
+      "nav.results": "Results",
       "nav.repos": "Repos",
       "nav.cta": "Code",
       "nav.ctaCount": "3 repos",
@@ -932,6 +1055,7 @@
       "nav.how": "Як це працює",
       "nav.stages": "Етапи",
       "nav.risks": "Ризики",
+      "nav.results": "Результати",
       "nav.repos": "Репозиторії",
       "nav.cta": "Код",
       "nav.ctaCount": "3 репозиторії",
@@ -3506,6 +3630,298 @@
     });
   });
   render();
+})();
+</script>
+
+<!-- ── #twin: Vinnytsia twin inline widget ─────────────────────────────── -->
+<script>
+(function(){
+  const SUB_TRIP_KW = 25000;
+  const W = 380, H_NET = 120, H_CUR = 130;
+  const FEEDER_LAYOUT = [
+    { name: 'f1', x: 75,  y: 30, zone: 'urban' },
+    { name: 'f2', x: 305, y: 30, zone: 'urban' },
+    { name: 'f3', x: 75,  y: 60, zone: 'peri'  },
+    { name: 'f4', x: 305, y: 60, zone: 'peri'  },
+    { name: 'f5', x: 75,  y: 90, zone: 'rural' },
+    { name: 'f6', x: 305, y: 90, zone: 'rural' },
+  ];
+  const ZONE_COLOR = { urban: '#0b3a78', peri: '#1a56ad', rural: '#0f9d6b' };
+
+  // Per-panel state.
+  const panels = {};
+  let t = 0;          // shared model time in minutes
+  let speed = 300;    // model minutes per real second
+  let playing = false;
+  let lastFrame = 0;
+  let maxT = 480;
+
+  async function loadScenarios(){
+    const base = '../twin/data/scenarios';
+    const [naive, smart] = await Promise.all([
+      fetch(`${base}/outage-naive.json`).then(r => r.json()),
+      fetch(`${base}/outage-smart.json`).then(r => r.json())
+    ]);
+    panels['outage-naive'] = naive;
+    panels['outage-smart'] = smart;
+    maxT = Math.max(
+      naive.frames[naive.frames.length - 1].t_min,
+      smart.frames[smart.frames.length - 1].t_min
+    );
+  }
+
+  function drawNetwork(svg, scenario){
+    svg.innerHTML = '';
+    // Substation rect
+    const sub = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    sub.setAttribute('x', W/2 - 40); sub.setAttribute('y', H_NET/2 - 16);
+    sub.setAttribute('width', 80); sub.setAttribute('height', 32);
+    sub.setAttribute('rx', 6);
+    sub.setAttribute('class','twin-net-sub');
+    sub.setAttribute('id', `${scenario.id}-sub`);
+    svg.appendChild(sub);
+    const subT = document.createElementNS('http://www.w3.org/2000/svg','text');
+    subT.setAttribute('x', W/2); subT.setAttribute('y', H_NET/2 + 3);
+    subT.setAttribute('text-anchor','middle');
+    subT.setAttribute('font-family','var(--mono)'); subT.setAttribute('font-size','9.5');
+    subT.setAttribute('fill','var(--ink2)');
+    subT.textContent = '35/10 kV';
+    svg.appendChild(subT);
+    // Six feeders
+    FEEDER_LAYOUT.forEach(f => {
+      const lineX = f.x < W/2 ? W/2 - 40 : W/2 + 40;
+      const line = document.createElementNS('http://www.w3.org/2000/svg','path');
+      line.setAttribute('d', `M ${lineX} ${H_NET/2} C ${(lineX+f.x)/2} ${H_NET/2}, ${(lineX+f.x)/2} ${f.y}, ${f.x} ${f.y}`);
+      line.setAttribute('class','twin-net-line off');
+      line.setAttribute('id', `${scenario.id}-line-${f.name}`);
+      svg.appendChild(line);
+      const circ = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      circ.setAttribute('cx', f.x); circ.setAttribute('cy', f.y);
+      circ.setAttribute('r', 10);
+      circ.setAttribute('stroke-width', 1.5);
+      circ.setAttribute('class','twin-net-feeder off');
+      circ.setAttribute('id', `${scenario.id}-node-${f.name}`);
+      svg.appendChild(circ);
+      const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+      lbl.setAttribute('x', f.x); lbl.setAttribute('y', f.y + 3);
+      lbl.setAttribute('class','twin-net-label');
+      lbl.setAttribute('font-family','var(--mono)'); lbl.setAttribute('font-size','9');
+      lbl.setAttribute('fill', ZONE_COLOR[f.zone]); lbl.setAttribute('font-weight','600');
+      lbl.textContent = f.name.toUpperCase();
+      svg.appendChild(lbl);
+    });
+  }
+
+  function drawCurve(svg, scenario){
+    svg.innerHTML = '';
+    const padL = 32, padR = 8, padT = 14, padB = 22;
+    const tMax = scenario.frames[scenario.frames.length - 1].t_min;
+    const pMax = 30000;   // fixed scale so naive vs smart are comparable
+    const xOf = ti => padL + (ti / tMax) * (W - padL - padR);
+    const yOf = p => H_CUR - padB - (p / pMax) * (H_CUR - padT - padB);
+    // Outage shading
+    let outStart = null, outEnd = null;
+    for(const e of scenario.events){
+      if(e.kind === 'feeder_open' && outStart === null) outStart = e.t_min;
+      if(e.kind === 'feeder_close' && outStart !== null && outEnd === null){ outEnd = e.t_min; break; }
+    }
+    if(outStart !== null && outEnd !== null){
+      const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      r.setAttribute('x', xOf(outStart)); r.setAttribute('y', padT);
+      r.setAttribute('width', xOf(outEnd) - xOf(outStart));
+      r.setAttribute('height', H_CUR - padT - padB);
+      r.setAttribute('class','twin-curve-outage');
+      svg.appendChild(r);
+    }
+    // Threshold
+    const thr = document.createElementNS('http://www.w3.org/2000/svg','line');
+    thr.setAttribute('x1', padL); thr.setAttribute('x2', W - padR);
+    thr.setAttribute('y1', yOf(SUB_TRIP_KW)); thr.setAttribute('y2', yOf(SUB_TRIP_KW));
+    thr.setAttribute('class','twin-curve-thr');
+    svg.appendChild(thr);
+    const thrL = document.createElementNS('http://www.w3.org/2000/svg','text');
+    thrL.setAttribute('x', W - padR); thrL.setAttribute('y', yOf(SUB_TRIP_KW) - 3);
+    thrL.setAttribute('text-anchor','end');
+    thrL.setAttribute('class','twin-curve-thr-lbl');
+    thrL.textContent = '25 MW';
+    svg.appendChild(thrL);
+    // Y-axis labels (0, 10, 20, 30)
+    for(const p of [0, 10000, 20000, 30000]){
+      const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+      lbl.setAttribute('x', padL - 4); lbl.setAttribute('y', yOf(p) + 3);
+      lbl.setAttribute('text-anchor','end');
+      lbl.setAttribute('class','twin-curve-axis');
+      lbl.textContent = (p/1000).toFixed(0);
+      svg.appendChild(lbl);
+    }
+    const yLbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    yLbl.setAttribute('x', padL - 4); yLbl.setAttribute('y', padT - 3);
+    yLbl.setAttribute('text-anchor','end');
+    yLbl.setAttribute('class','twin-curve-axis');
+    yLbl.textContent = 'MW';
+    svg.appendChild(yLbl);
+    // X-axis hour ticks
+    for(let h = 0; h <= tMax / 60; h++){
+      const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+      lbl.setAttribute('x', xOf(h*60)); lbl.setAttribute('y', H_CUR - padB + 11);
+      lbl.setAttribute('text-anchor','middle');
+      lbl.setAttribute('class','twin-curve-axis');
+      lbl.textContent = h + 'h';
+      svg.appendChild(lbl);
+    }
+    // Pre-rendered full curve (translucent context)
+    const fullColor = scenario.metrics.n_trips > 0 ? 'bad' : 'ok';
+    const fullPts = scenario.frames.map(f => `${xOf(f.t_min)},${yOf(f.sub_p_kw)}`);
+    const areaPts = [`${xOf(0)},${yOf(0)}`, ...fullPts, `${xOf(tMax)},${yOf(0)}`];
+    const area = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    area.setAttribute('points', areaPts.join(' '));
+    area.setAttribute('class','twin-curve-area' + (fullColor==='bad' ? ' bad':''));
+    area.setAttribute('opacity', '0.25');   // dim full curve to highlight the cursor sweep
+    svg.appendChild(area);
+    // Pre-spike phantom for naive (vertical line at trip moment up to actual peak)
+    const tripEvt = scenario.events.find(e => e.kind === 'substation_trip');
+    if(tripEvt){
+      const peakKW = scenario.metrics.peak_kw;
+      const phantom = document.createElementNS('http://www.w3.org/2000/svg','line');
+      phantom.setAttribute('x1', xOf(tripEvt.t_min)); phantom.setAttribute('x2', xOf(tripEvt.t_min));
+      phantom.setAttribute('y1', yOf(0)); phantom.setAttribute('y2', yOf(peakKW));
+      phantom.setAttribute('class','twin-curve-spike');
+      phantom.setAttribute('opacity', '0.35');
+      svg.appendChild(phantom);
+      const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('cx', xOf(tripEvt.t_min)); dot.setAttribute('cy', yOf(peakKW));
+      dot.setAttribute('r', 3);
+      dot.setAttribute('class','twin-curve-spike-dot');
+      dot.setAttribute('opacity', '0.4');
+      svg.appendChild(dot);
+    }
+    // Live path (animated up to current t) -- drawn over the dim background
+    const live = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+    live.setAttribute('class','twin-curve-line' + (fullColor==='bad' ? ' bad':' ok'));
+    live.setAttribute('points','');
+    live.setAttribute('id', `${scenario.id}-curve-live`);
+    svg.appendChild(live);
+    // Cursor
+    const cursor = document.createElementNS('http://www.w3.org/2000/svg','line');
+    cursor.setAttribute('class','twin-curve-cursor');
+    cursor.setAttribute('id', `${scenario.id}-curve-cursor`);
+    cursor.setAttribute('y1', padT); cursor.setAttribute('y2', H_CUR - padB);
+    cursor.setAttribute('x1', xOf(0)); cursor.setAttribute('x2', xOf(0));
+    svg.appendChild(cursor);
+    // Store scales for updates.
+    svg._xOf = xOf; svg._yOf = yOf; svg._tMax = tMax;
+  }
+
+  function findFrame(scenario, ti){
+    // Frames are at 1-min spacing.
+    const idx = Math.min(scenario.frames.length - 1, Math.max(0, Math.round(ti)));
+    return scenario.frames[idx];
+  }
+
+  function update(scenario, sid, ti){
+    const frame = findFrame(scenario, ti);
+    // Clock
+    document.getElementById(`twin-clock-${sid}`).textContent = `t = ${frame.t_min.toFixed(0)} min`;
+    // Substation rect
+    const subEl = document.getElementById(`${scenario.id}-sub`);
+    const subTripped = scenario.events.some(e => e.kind === 'substation_trip' && e.t_min <= frame.t_min)
+                    && frame.feeder_energized.every(x => x === 0);
+    subEl.setAttribute('class', 'twin-net-sub' + (subTripped ? ' tripped' : ''));
+    // Feeder visuals
+    scenario.feeder_names.forEach((f, i) => {
+      const node = document.getElementById(`${scenario.id}-node-${f}`);
+      const line = document.getElementById(`${scenario.id}-line-${f}`);
+      const isTripped = scenario.events.some(e => (e.kind === 'trip' && e.feeder === f && e.t_min <= frame.t_min)
+                                                || (e.kind === 'substation_trip' && e.t_min <= frame.t_min))
+                     && frame.feeder_energized[i] === 0;
+      let cls = '', lcls = '';
+      if(frame.feeder_energized[i]) { cls = 'on'; lcls = 'on'; }
+      else if(isTripped)            { cls = 'tripped'; lcls = 'tripped'; }
+      else                          { cls = 'off'; lcls = 'off'; }
+      node.setAttribute('class', 'twin-net-feeder ' + cls);
+      line.setAttribute('class', 'twin-net-line ' + lcls);
+    });
+    // Curve: animate the live path up to current t.
+    const curveSvg = document.getElementById(`twin-curve-${sid}`);
+    const xOf = curveSvg._xOf, yOf = curveSvg._yOf;
+    const live = document.getElementById(`${scenario.id}-curve-live`);
+    const pts = [];
+    const upTo = Math.min(scenario.frames.length - 1, Math.round(ti));
+    for(let i = 0; i <= upTo; i++){
+      pts.push(`${xOf(scenario.frames[i].t_min)},${yOf(scenario.frames[i].sub_p_kw)}`);
+    }
+    live.setAttribute('points', pts.join(' '));
+    const cursor = document.getElementById(`${scenario.id}-curve-cursor`);
+    cursor.setAttribute('x1', xOf(frame.t_min)); cursor.setAttribute('x2', xOf(frame.t_min));
+  }
+
+  function renderAll(){
+    if(!panels['outage-naive']) return;
+    update(panels['outage-naive'], 'naive', t);
+    update(panels['outage-smart'], 'smart', t);
+  }
+
+  function frame(now){
+    if(!playing) return;
+    if(!lastFrame) lastFrame = now;
+    const dt = (now - lastFrame) / 1000;
+    lastFrame = now;
+    t += dt * speed;
+    if(t >= maxT){
+      // Loop continuously.
+      t = 0;
+    }
+    renderAll();
+    requestAnimationFrame(frame);
+  }
+
+  function play(){
+    playing = true; lastFrame = 0;
+    document.getElementById('twin-play-btn').textContent = 'Pause';
+    requestAnimationFrame(frame);
+  }
+  function pause(){
+    playing = false;
+    document.getElementById('twin-play-btn').textContent = 'Play';
+  }
+  function reset(){
+    t = 0; playing = false; lastFrame = 0;
+    document.getElementById('twin-play-btn').textContent = 'Play';
+    renderAll();
+  }
+
+  async function init(){
+    await loadScenarios();
+    drawNetwork(document.getElementById('twin-net-naive'), panels['outage-naive']);
+    drawNetwork(document.getElementById('twin-net-smart'), panels['outage-smart']);
+    drawCurve(document.getElementById('twin-curve-naive'), panels['outage-naive']);
+    drawCurve(document.getElementById('twin-curve-smart'), panels['outage-smart']);
+    renderAll();
+
+    document.getElementById('twin-play-btn').addEventListener('click', () => playing ? pause() : play());
+    document.getElementById('twin-reset-btn').addEventListener('click', reset);
+    document.querySelectorAll('.twin-widget .speeds button').forEach(b => {
+      b.addEventListener('click', () => {
+        speed = parseInt(b.dataset.tspeed, 10);
+        document.querySelectorAll('.twin-widget .speeds button').forEach(x =>
+          x.setAttribute('aria-current', x === b ? 'true' : 'false'));
+      });
+    });
+
+    // Auto-play once the widget scrolls into view.
+    const widget = document.querySelector('.twin-widget');
+    if(widget && 'IntersectionObserver' in window){
+      const io = new IntersectionObserver((entries) => {
+        if(entries[0].isIntersecting && !playing){
+          play();
+          io.disconnect();
+        }
+      }, { threshold: 0.35 });
+      io.observe(widget);
+    }
+  }
+
+  init().catch(err => console.error('twin widget init failed:', err));
 })();
 </script>
 
