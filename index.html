@@ -4,6 +4,15 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Restart the grid, correctly</title>
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('lang');
+      if(!saved){ saved = (navigator.language || 'en').toLowerCase().startsWith('uk') ? 'uk' : 'en'; }
+      document.documentElement.lang = saved;
+    }catch(e){}
+  })();
+</script>
 <style>
   :root{
     --bg:#fafaf7;
@@ -52,86 +61,223 @@
   .close h3{color:#fff;font-size:13px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.18em;margin:0 0 6px;font-weight:600;opacity:.85}
   .close .big{font-size:26px;font-weight:600;letter-spacing:-.01em;line-height:1.25}
   .close p{color:#cdd6e8;margin:10px 0 0}
+
+  .lang-toggle{position:fixed;top:18px;right:18px;display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;z-index:10;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+  .lang-pill{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2);background:transparent;border:none;border-radius:999px;padding:5px 10px;cursor:pointer;font-weight:600;transition:background .15s,color .15s}
+  .lang-pill:hover{color:var(--ink)}
+  .lang-pill[aria-current="true"]{background:var(--ink);color:#fff}
 </style>
 </head>
 <body>
+
+<div class="lang-toggle" role="group" aria-label="Language">
+  <button type="button" class="lang-pill" data-lang="en" aria-current="true">EN</button>
+  <button type="button" class="lang-pill" data-lang="uk" aria-current="false">UA</button>
+</div>
+
 <div class="wrap">
 
 <header>
-  <div class="eyebrow">Restart · a case for learned grid restoration</div>
-  <h1>Ukraine restarts its grid wrong every week. There is a way to do it right.</h1>
-  <p class="lede">An AI advisor that learns the safest sequence to re-energize feeders after a blackout — trained on a digital twin of Ukraine's actual network, and presented to operators with a one-line explanation for every recommendation.</p>
+  <div class="eyebrow" data-i18n="eyebrow">Restart · a case for learned grid restoration</div>
+  <h1 data-i18n="h1">Ukraine restarts its grid wrong every week. There is a way to do it right.</h1>
+  <p class="lede" data-i18n="lede">An AI advisor that learns the safest sequence to re-energize feeders after a blackout — trained on a digital twin of Ukraine's actual network, and presented to operators with a one-line explanation for every recommendation.</p>
 </header>
 
-<h2>The problem</h2>
+<h2 data-i18n="problem.h2">The problem</h2>
 <div class="grid cols-3">
-  <div class="stat"><div class="v">3–8×</div><div class="k">cold-load inrush vs steady-state, the moment power returns</div></div>
-  <div class="stat"><div class="v">~50%</div><div class="k">of Ukraine's thermal generation lost or degraded since 2022</div></div>
-  <div class="stat"><div class="v">weekly</div><div class="k">topology changes from strikes and repairs — paper procedures go stale</div></div>
+  <div class="stat"><div class="v">3–8×</div><div class="k" data-i18n="stat.1">cold-load inrush vs steady-state, the moment power returns</div></div>
+  <div class="stat"><div class="v">~50%</div><div class="k" data-i18n="stat.2">of Ukraine's thermal generation lost or degraded since 2022</div></div>
+  <div class="stat"><div class="v" data-i18n="stat.3v">weekly</div><div class="k" data-i18n="stat.3">topology changes from strikes and repairs — paper procedures go stale</div></div>
 </div>
-<p style="margin-top:14px">After every blackout, an operator must re-energize a feeder. With every thermostat, fridge, and heater off, demand snaps back all at once and trips the upstream breaker — blackout again. The current playbook is a paper procedure written for a grid that no longer exists. Operators perform it under air-raid sirens, with degraded telemetry, sometimes from candlelight.</p>
+<p style="margin-top:14px" data-i18n="problem.p">After every blackout, an operator must re-energize a feeder. With every thermostat, fridge, and heater off, demand snaps back all at once and trips the upstream breaker — blackout again. The current playbook is a paper procedure written for a grid that no longer exists. Operators perform it under air-raid sirens, with degraded telemetry, sometimes from candlelight.</p>
 
-<h2>The idea</h2>
-<p>A reinforcement-learning policy that recommends <i>which segment to energize next</i>, <i>at what voltage ramp</i>, <i>after what dwell time</i>. The policy is trained against millions of synthetic blackout scenarios on a calibrated digital twin of Ukrainian topology. Every recommendation is shown to a human operator with an explanation. Never autonomous.</p>
-<div class="quote">Restoration is the one grid problem where seconds of delay cost megawatt-hours, and where the right action depends on weather, time, and damage. That is exactly the regime where RL beats both human procedures and classical optimization.</div>
+<h2 data-i18n="idea.h2">The idea</h2>
+<p data-i18n="idea.p">A reinforcement-learning policy that recommends <i>which segment to energize next</i>, <i>at what voltage ramp</i>, <i>after what dwell time</i>. The policy is trained against millions of synthetic blackout scenarios on a calibrated digital twin of Ukrainian topology. Every recommendation is shown to a human operator with an explanation. Never autonomous.</p>
+<div class="quote" data-i18n="idea.quote">Restoration is the one grid problem where seconds of delay cost megawatt-hours, and where the right action depends on weather, time, and damage. That is exactly the regime where RL beats both human procedures and classical optimization.</div>
 
-<h2>How it works</h2>
+<h2 data-i18n="how.h2">How it works</h2>
 <ol class="steps">
-  <li><b>Build a twin of a real Ukrainian sub-region.</b> One oblast's 35 / 10 kV network modeled in <code>OpenDSS</code>. Calibrated against ≥18 months of historical SCADA traces. Loads modeled as a population of equivalent-thermal-parameter houses, so cold-load behavior <i>emerges</i> rather than being hard-coded.</li>
-  <li><b>Generate scenarios.</b> Synthesize millions of blackout starting states across season, ambient temperature, outage duration, and damage pattern. This dataset — restoration under realistic adversarial damage — exists nowhere else.</li>
-  <li><b>Train a policy.</b> PPO with action masking in <code>Stable-Baselines3</code>. Curriculum from single feeder to full regional topology. Reward = load restored, penalized for trips, voltage violations, and time. An explainer is attached at training time, not bolted on after.</li>
-  <li><b>Validate in hardware.</b> Replay the policy on <code>Typhoon HIL</code> in real time. This is the sim-to-real check: does it still beat the baseline when load parameters drift and measurement noise is added?</li>
-  <li><b>Shadow-mode beside the operator.</b> The console shows the agent's recommendation next to the operator's intended action. The operator decides. Every disagreement becomes a training example.</li>
-  <li><b>Promote to advisory.</b> After months of high agreement, the operator can <i>accept</i> a recommendation with one click. Two-person confirmation above a learned risk threshold. The system never becomes fully closed-loop.</li>
+  <li data-i18n="step.1"><b>Build a twin of a real Ukrainian sub-region.</b> One oblast's 35 / 10 kV network modeled in <code>OpenDSS</code>. Calibrated against ≥18 months of historical SCADA traces. Loads modeled as a population of equivalent-thermal-parameter houses, so cold-load behavior <i>emerges</i> rather than being hard-coded.</li>
+  <li data-i18n="step.2"><b>Generate scenarios.</b> Synthesize millions of blackout starting states across season, ambient temperature, outage duration, and damage pattern. This dataset — restoration under realistic adversarial damage — exists nowhere else.</li>
+  <li data-i18n="step.3"><b>Train a policy.</b> PPO with action masking in <code>Stable-Baselines3</code>. Curriculum from single feeder to full regional topology. Reward = load restored, penalized for trips, voltage violations, and time. An explainer is attached at training time, not bolted on after.</li>
+  <li data-i18n="step.4"><b>Validate in hardware.</b> Replay the policy on <code>Typhoon HIL</code> in real time. This is the sim-to-real check: does it still beat the baseline when load parameters drift and measurement noise is added?</li>
+  <li data-i18n="step.5"><b>Shadow-mode beside the operator.</b> The console shows the agent's recommendation next to the operator's intended action. The operator decides. Every disagreement becomes a training example.</li>
+  <li data-i18n="step.6"><b>Promote to advisory.</b> After months of high agreement, the operator can <i>accept</i> a recommendation with one click. Two-person confirmation above a learned risk threshold. The system never becomes fully closed-loop.</li>
 </ol>
 
-<h2>Why this works where the alternatives don't</h2>
+<h2 data-i18n="why.h2">Why this works where the alternatives don't</h2>
 <div class="grid cols-3">
-  <div class="card"><h3>Paper procedures</h3><p>Assume seasonal averages and stable topology. Ukraine in 2026 has neither.</p></div>
-  <div class="card"><h3>Classical optimization</h3><p>Requires re-formulating every time the grid changes shape. The grid changes shape every week.</p></div>
-  <div class="card"><h3>Learned policy</h3><p>Maps state → next action. Topology and damage are inputs, not assumptions. Retrains on its own disagreements.</p></div>
+  <div class="card"><h3 data-i18n="alt.1.h3">Paper procedures</h3><p data-i18n="alt.1.p">Assume seasonal averages and stable topology. Ukraine in 2026 has neither.</p></div>
+  <div class="card"><h3 data-i18n="alt.2.h3">Classical optimization</h3><p data-i18n="alt.2.p">Requires re-formulating every time the grid changes shape. The grid changes shape every week.</p></div>
+  <div class="card"><h3 data-i18n="alt.3.h3">Learned policy</h3><p data-i18n="alt.3.p">Maps state → next action. Topology and damage are inputs, not assumptions. Retrains on its own disagreements.</p></div>
 </div>
 
-<h2>Stages</h2>
+<h2 data-i18n="stages.h2">Stages</h2>
 <div class="grid cols-2">
   <div class="card">
-    <span class="tag">stage one</span>
-    <h3>Single-feeder proof</h3>
-    <p>One 10 kV feeder in OpenDSS. The trained policy beats both the greedy baseline and the paper procedure on time-to-99% restoration and on cascading trips.</p>
+    <span class="tag" data-i18n="stage.1.tag">stage one</span>
+    <h3 data-i18n="stage.1.h3">Single-feeder proof</h3>
+    <p data-i18n="stage.1.p">One 10 kV feeder in OpenDSS. The trained policy beats both the greedy baseline and the paper procedure on time-to-99% restoration and on cascading trips.</p>
   </div>
   <div class="card">
-    <span class="tag">stage two</span>
-    <h3>Regional twin</h3>
-    <p>An entire oblast modeled and calibrated to historical SCADA. Policy curriculum-trained across seasons and damage patterns. Operator-facing explainer working.</p>
+    <span class="tag" data-i18n="stage.2.tag">stage two</span>
+    <h3 data-i18n="stage.2.h3">Regional twin</h3>
+    <p data-i18n="stage.2.p">An entire oblast modeled and calibrated to historical SCADA. Policy curriculum-trained across seasons and damage patterns. Operator-facing explainer working.</p>
   </div>
   <div class="card">
-    <span class="tag y">stage three</span>
-    <h3>Hardware-in-the-loop and shadow</h3>
-    <p>Real-time validation on Typhoon HIL. The console runs live in a control room. Operators see recommendations, decide, and the disagreement log feeds the next training run.</p>
+    <span class="tag y" data-i18n="stage.3.tag">stage three</span>
+    <h3 data-i18n="stage.3.h3">Hardware-in-the-loop and shadow</h3>
+    <p data-i18n="stage.3.p">Real-time validation on Typhoon HIL. The console runs live in a control room. Operators see recommendations, decide, and the disagreement log feeds the next training run.</p>
   </div>
   <div class="card">
-    <span class="tag g">stage four</span>
-    <h3>Advisory with approval</h3>
-    <p>One-click accept becomes available where the agent's risk score is low and the operator agrees. Two-person confirmation above the threshold. Always a human in the loop.</p>
+    <span class="tag g" data-i18n="stage.4.tag">stage four</span>
+    <h3 data-i18n="stage.4.h3">Advisory with approval</h3>
+    <p data-i18n="stage.4.p">One-click accept becomes available where the agent's risk score is low and the operator agrees. Two-person confirmation above the threshold. Always a human in the loop.</p>
   </div>
 </div>
 
-<h2>What this prevents</h2>
-<p>Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — it is hours of heat returned to people in February.</p>
+<h2 data-i18n="prevent.h2">What this prevents</h2>
+<p data-i18n="prevent.p">Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — it is hours of heat returned to people in February.</p>
 
-<h2>Risks owned up to</h2>
+<h2 data-i18n="risks.h2">Risks owned up to</h2>
 <div class="grid cols-2">
-  <div class="card"><h3>Sim-to-real gap</h3><p>Field load won't perfectly match the population we sampled. Handled with domain randomization during training and online fine-tuning from real disagreements.</p></div>
-  <div class="card"><h3>Operator trust</h3><p>One visibly wrong recommendation costs a year of credibility. Handled by a long shadow period, an explanation attached to every recommendation, and no autonomous mode.</p></div>
-  <div class="card"><h3>Data access</h3><p>SCADA history is sensitive. Handled by training on-prem inside the utility perimeter; no data leaves the building.</p></div>
-  <div class="card"><h3>Topology drift</h3><p>A re-routed substation is a new problem. Handled by conditioning the policy on a topology hash and meta-training across a distribution of topologies, so adaptation is fast.</p></div>
+  <div class="card"><h3 data-i18n="risk.1.h3">Sim-to-real gap</h3><p data-i18n="risk.1.p">Field load won't perfectly match the population we sampled. Handled with domain randomization during training and online fine-tuning from real disagreements.</p></div>
+  <div class="card"><h3 data-i18n="risk.2.h3">Operator trust</h3><p data-i18n="risk.2.p">One visibly wrong recommendation costs a year of credibility. Handled by a long shadow period, an explanation attached to every recommendation, and no autonomous mode.</p></div>
+  <div class="card"><h3 data-i18n="risk.3.h3">Data access</h3><p data-i18n="risk.3.p">SCADA history is sensitive. Handled by training on-prem inside the utility perimeter; no data leaves the building.</p></div>
+  <div class="card"><h3 data-i18n="risk.4.h3">Topology drift</h3><p data-i18n="risk.4.p">A re-routed substation is a new problem. Handled by conditioning the policy on a topology hash and meta-training across a distribution of topologies, so adaptation is fast.</p></div>
 </div>
 
 <div class="close">
-  <h3>The case in one line</h3>
-  <div class="big">Ukraine has the world's most demanding grid-restoration problem, the world's richest dataset for solving it, and tooling that didn't exist five years ago. The question is no longer whether this works — only whether someone builds it before the next winter.</div>
+  <h3 data-i18n="close.h3">The case in one line</h3>
+  <div class="big" data-i18n="close.big">Ukraine has the world's most demanding grid-restoration problem, the world's richest dataset for solving it, and tooling that didn't exist five years ago. The question is no longer whether this works — only whether someone builds it before the next winter.</div>
 </div>
 
 </div>
+
+<script>
+  const i18n = {
+    en: {
+      "eyebrow": "Restart · a case for learned grid restoration",
+      "h1": "Ukraine restarts its grid wrong every week. There is a way to do it right.",
+      "lede": "An AI advisor that learns the safest sequence to re-energize feeders after a blackout — trained on a digital twin of Ukraine's actual network, and presented to operators with a one-line explanation for every recommendation.",
+
+      "problem.h2": "The problem",
+      "stat.1": "cold-load inrush vs steady-state, the moment power returns",
+      "stat.2": "of Ukraine's thermal generation lost or degraded since 2022",
+      "stat.3v": "weekly",
+      "stat.3": "topology changes from strikes and repairs — paper procedures go stale",
+      "problem.p": "After every blackout, an operator must re-energize a feeder. With every thermostat, fridge, and heater off, demand snaps back all at once and trips the upstream breaker — blackout again. The current playbook is a paper procedure written for a grid that no longer exists. Operators perform it under air-raid sirens, with degraded telemetry, sometimes from candlelight.",
+
+      "idea.h2": "The idea",
+      "idea.p": "A reinforcement-learning policy that recommends <i>which segment to energize next</i>, <i>at what voltage ramp</i>, <i>after what dwell time</i>. The policy is trained against millions of synthetic blackout scenarios on a calibrated digital twin of Ukrainian topology. Every recommendation is shown to a human operator with an explanation. Never autonomous.",
+      "idea.quote": "Restoration is the one grid problem where seconds of delay cost megawatt-hours, and where the right action depends on weather, time, and damage. That is exactly the regime where RL beats both human procedures and classical optimization.",
+
+      "how.h2": "How it works",
+      "step.1": "<b>Build a twin of a real Ukrainian sub-region.</b> One oblast's 35 / 10 kV network modeled in <code>OpenDSS</code>. Calibrated against ≥18 months of historical SCADA traces. Loads modeled as a population of equivalent-thermal-parameter houses, so cold-load behavior <i>emerges</i> rather than being hard-coded.",
+      "step.2": "<b>Generate scenarios.</b> Synthesize millions of blackout starting states across season, ambient temperature, outage duration, and damage pattern. This dataset — restoration under realistic adversarial damage — exists nowhere else.",
+      "step.3": "<b>Train a policy.</b> PPO with action masking in <code>Stable-Baselines3</code>. Curriculum from single feeder to full regional topology. Reward = load restored, penalized for trips, voltage violations, and time. An explainer is attached at training time, not bolted on after.",
+      "step.4": "<b>Validate in hardware.</b> Replay the policy on <code>Typhoon HIL</code> in real time. This is the sim-to-real check: does it still beat the baseline when load parameters drift and measurement noise is added?",
+      "step.5": "<b>Shadow-mode beside the operator.</b> The console shows the agent's recommendation next to the operator's intended action. The operator decides. Every disagreement becomes a training example.",
+      "step.6": "<b>Promote to advisory.</b> After months of high agreement, the operator can <i>accept</i> a recommendation with one click. Two-person confirmation above a learned risk threshold. The system never becomes fully closed-loop.",
+
+      "why.h2": "Why this works where the alternatives don't",
+      "alt.1.h3": "Paper procedures", "alt.1.p": "Assume seasonal averages and stable topology. Ukraine in 2026 has neither.",
+      "alt.2.h3": "Classical optimization", "alt.2.p": "Requires re-formulating every time the grid changes shape. The grid changes shape every week.",
+      "alt.3.h3": "Learned policy", "alt.3.p": "Maps state → next action. Topology and damage are inputs, not assumptions. Retrains on its own disagreements.",
+
+      "stages.h2": "Stages",
+      "stage.1.tag": "stage one", "stage.1.h3": "Single-feeder proof",
+      "stage.1.p": "One 10 kV feeder in OpenDSS. The trained policy beats both the greedy baseline and the paper procedure on time-to-99% restoration and on cascading trips.",
+      "stage.2.tag": "stage two", "stage.2.h3": "Regional twin",
+      "stage.2.p": "An entire oblast modeled and calibrated to historical SCADA. Policy curriculum-trained across seasons and damage patterns. Operator-facing explainer working.",
+      "stage.3.tag": "stage three", "stage.3.h3": "Hardware-in-the-loop and shadow",
+      "stage.3.p": "Real-time validation on Typhoon HIL. The console runs live in a control room. Operators see recommendations, decide, and the disagreement log feeds the next training run.",
+      "stage.4.tag": "stage four", "stage.4.h3": "Advisory with approval",
+      "stage.4.p": "One-click accept becomes available where the agent's risk score is low and the operator agrees. Two-person confirmation above the threshold. Always a human in the loop.",
+
+      "prevent.h2": "What this prevents",
+      "prevent.p": "Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — it is hours of heat returned to people in February.",
+
+      "risks.h2": "Risks owned up to",
+      "risk.1.h3": "Sim-to-real gap", "risk.1.p": "Field load won't perfectly match the population we sampled. Handled with domain randomization during training and online fine-tuning from real disagreements.",
+      "risk.2.h3": "Operator trust", "risk.2.p": "One visibly wrong recommendation costs a year of credibility. Handled by a long shadow period, an explanation attached to every recommendation, and no autonomous mode.",
+      "risk.3.h3": "Data access", "risk.3.p": "SCADA history is sensitive. Handled by training on-prem inside the utility perimeter; no data leaves the building.",
+      "risk.4.h3": "Topology drift", "risk.4.p": "A re-routed substation is a new problem. Handled by conditioning the policy on a topology hash and meta-training across a distribution of topologies, so adaptation is fast.",
+
+      "close.h3": "The case in one line",
+      "close.big": "Ukraine has the world's most demanding grid-restoration problem, the world's richest dataset for solving it, and tooling that didn't exist five years ago. The question is no longer whether this works — only whether someone builds it before the next winter."
+    },
+    uk: {
+      "eyebrow": "Restart · аргументи за навчене відновлення мережі",
+      "h1": "Україна щотижня перезапускає мережу неправильно. Є спосіб робити це правильно.",
+      "lede": "ШІ-радник, який знаходить найбезпечнішу послідовність відновлення живлення фідерів після блекауту. Натренований на цифровому двійнику реальної української мережі — і подає диспетчеру однорядкове пояснення до кожної рекомендації.",
+
+      "problem.h2": "Проблема",
+      "stat.1": "стрибок холодного навантаження проти усталеного режиму — у мить, коли світло повертається",
+      "stat.2": "теплової генерації України втрачено або виведено з ладу з 2022 року",
+      "stat.3v": "щотижня",
+      "stat.3": "зміни топології через обстріли й ремонти — паперові інструкції застарівають",
+      "problem.p": "Після кожного блекауту диспетчер мусить відновити живлення фідера. Усі термостати, холодильники й обігрівачі вимкнені — тож попит повертається одразу і весь, і захист на головному автоматі спрацьовує. Знову блекаут. Чинна інструкція — паперова, написана для мережі, якої вже не існує. Диспетчери роблять це під сиренами повітряної тривоги, з пошкодженою телеметрією, часом — при свічках.",
+
+      "idea.h2": "Ідея",
+      "idea.p": "Політика навчання з підкріпленням, яка підказує <i>який сегмент вмикати наступним</i>, <i>з яким нарощуванням напруги</i>, <i>з якою витримкою</i>. Натренована на мільйонах синтетичних сценаріїв блекаутів на каліброваному цифровому двійнику української мережі. Кожну рекомендацію диспетчер бачить разом із поясненням. Ніколи не автономно.",
+      "idea.quote": "Відновлення — це єдина задача в електромережі, де секунди затримки коштують мегават-годин, а правильна дія залежить від погоди, часу й характеру пошкоджень. Саме в такому режимі RL перевершує і людські інструкції, і класичну оптимізацію.",
+
+      "how.h2": "Як це працює",
+      "step.1": "<b>Побудувати двійник реального українського регіону.</b> Мережа 35 / 10 кВ однієї області, змодельована в <code>OpenDSS</code> і відкалібрована за ≥18 місяцями історичних SCADA-трас. Навантаження подано як популяцію будинків з еквівалентними тепловими параметрами — і поведінка холодного навантаження тут <i>виникає сама</i>, а не закладається в код.",
+      "step.2": "<b>Згенерувати сценарії.</b> Синтезувати мільйони початкових станів блекаутів — за сезонами, температурою повітря, тривалістю відключень і патернами пошкодження. Такого датасету — відновлення в умовах реалістичних бойових пошкоджень — більше ніде немає.",
+      "step.3": "<b>Натренувати політику.</b> PPO з маскуванням дій у <code>Stable-Baselines3</code>. Курикулум — від одного фідера до повної регіональної топології. Винагорода = відновлене навантаження, зі штрафами за спрацювання захисту, порушення напруги та витрачений час. Пояснювач вбудований на етапі навчання, а не доклеєний зверху після.",
+      "step.4": "<b>Перевірити на апаратурі.</b> Запустити політику на <code>Typhoon HIL</code> у реальному часі. Це перевірка sim-to-real: чи лишається вона кращою за базову лінію, коли параметри навантаження дрейфують, а до вимірювань додано шум?",
+      "step.5": "<b>Тіньовий режим поруч з диспетчером.</b> Консоль показує рекомендацію агента поруч з тим, що збирається зробити диспетчер. Рішення приймає диспетчер. Кожна розбіжність стає прикладом для наступного навчання.",
+      "step.6": "<b>Перевести в дорадчий режим.</b> Після кількох місяців високої згоди диспетчер може <i>прийняти</i> рекомендацію одним кліком. Якщо оцінка ризику перевищує навчений поріг — потрібне підтвердження другого оператора. Контур ніколи не стає повністю замкнутим.",
+
+      "why.h2": "Чому це працює, а альтернативи — ні",
+      "alt.1.h3": "Паперові інструкції", "alt.1.p": "Розраховані на сезонні усереднення і стабільну топологію. В Україні 2026 року немає ні першого, ні другого.",
+      "alt.2.h3": "Класична оптимізація", "alt.2.p": "Потребує переформулювання задачі щоразу, коли мережа змінює форму. А мережа змінює форму щотижня.",
+      "alt.3.h3": "Навчена політика", "alt.3.p": "Стан → наступна дія. Топологія й пошкодження — це вхідні дані, а не припущення. Перенавчається на власних розбіжностях.",
+
+      "stages.h2": "Етапи",
+      "stage.1.tag": "етап перший", "stage.1.h3": "Підтвердження на одному фідері",
+      "stage.1.p": "Один фідер 10 кВ в OpenDSS. Натренована політика перевершує і жадібну базову лінію, і паперову інструкцію — за часом до 99% відновлення та за кількістю каскадних спрацювань захисту.",
+      "stage.2.tag": "етап другий", "stage.2.h3": "Регіональний двійник",
+      "stage.2.p": "Ціла область змодельована й відкалібрована за історичною SCADA. Політика натренована з курикулумом за сезонами та патернами пошкодження. Пояснювач для диспетчера працює.",
+      "stage.3.tag": "етап третій", "stage.3.h3": "Апаратура в контурі і тінь",
+      "stage.3.p": "Перевірка в реальному часі на Typhoon HIL. Консоль працює наживо в диспетчерській. Диспетчери бачать рекомендації, приймають рішення, а журнал розбіжностей живить наступний цикл навчання.",
+      "stage.4.tag": "етап четвертий", "stage.4.h3": "Дорадчий режим з підтвердженням",
+      "stage.4.p": "Прийняття одним кліком доступне там, де оцінка ризику агента низька і диспетчер з нею згоден. Над порогом — підтвердження двох операторів. Завжди людина в контурі.",
+
+      "prevent.h2": "Чому це має значення",
+      "prevent.p": "Кожне каскадне спрацювання захисту під час відновлення — це ще одна година без електрики. Українською зимою це означає опалення, вимкнене в лікарнях, зупинені водяні насоси, перерваний діаліз, котли в багатоквартирних будинках, які не запускаються, і вуличні генератори, що виснажують дизельний запас міста, який воно вже не може поповнити. Відчутне скорочення каскадних спрацювань під час відновлення — це не метрика; це години тепла, поверненого людям у лютому.",
+
+      "risks.h2": "Визнані ризики",
+      "risk.1.h3": "Розрив sim-to-real", "risk.1.p": "Польове навантаження не збігатиметься точно з тією популяцією, яку ми згенерували. Опрацьовано: доменна рандомізація під час навчання плюс онлайн-донавчання на реальних розбіжностях.",
+      "risk.2.h3": "Довіра диспетчерів", "risk.2.p": "Одна очевидно хибна рекомендація коштує року довіри. Опрацьовано: довгий тіньовий період, пояснення до кожної рекомендації, жодного автономного режиму.",
+      "risk.3.h3": "Доступ до даних", "risk.3.p": "Історія SCADA — це чутливі дані. Опрацьовано: навчання on-prem усередині периметра енергокомпанії; дані не залишають будівлю.",
+      "risk.4.h3": "Дрейф топології", "risk.4.p": "Підстанція з новою схемою — це фактично нова задача. Опрацьовано: політика отримує хеш топології як вхід, плюс мета-навчання на цілому розподілі топологій — адаптація стає швидкою.",
+
+      "close.h3": "Суть одним рядком",
+      "close.big": "Україна має найскладнішу у світі задачу відновлення мережі, найбагатший у світі датасет для її розв'язання й інструменти, яких п'ять років тому ще не існувало. Питання вже не в тому, чи це працює, — а лише в тому, чи хтось встигне побудувати це до наступної зими."
+    }
+  };
+
+  function applyLang(lang){
+    if(!i18n[lang]) lang = 'en';
+    document.documentElement.lang = lang;
+    try{ localStorage.setItem('lang', lang); }catch(e){}
+    const dict = i18n[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const k = el.getAttribute('data-i18n');
+      if(dict[k] != null) el.innerHTML = dict[k];
+    });
+    document.querySelectorAll('.lang-pill').forEach(b=>{
+      b.setAttribute('aria-current', b.dataset.lang === lang ? 'true' : 'false');
+    });
+  }
+  document.querySelectorAll('.lang-pill').forEach(b=>{
+    b.addEventListener('click', ()=> applyLang(b.dataset.lang));
+  });
+  applyLang(document.documentElement.lang || 'en');
+</script>
+
 </body>
 </html>
