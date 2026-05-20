@@ -415,6 +415,7 @@
       <li><a href="#stages" data-i18n="nav.stages">Stages</a></li>
       <li><a href="#risks" data-i18n="nav.risks">Risks</a></li>
       <li><a href="#results" data-i18n="nav.results">Results</a></li>
+      <li><a href="#twin" data-i18n="nav.twin">Twin</a></li>
       <li><a href="#repos" data-i18n="nav.repos">Repos</a></li>
       <li><a href="../console/">Console&nbsp;↗</a></li>
       <li><a href="../twin/">Twin&nbsp;↗</a></li>
@@ -704,22 +705,22 @@
 </section>
 
 <section id="twin">
-  <div class="section-label"><span class="num">07</span><span class="eyebrow">In the twin</span></div>
-  <h2>The substation, in <em>motion</em>.</h2>
-  <p class="kicker" style="margin-bottom:18px">An oblast-scale digital twin: 35&nbsp;/&nbsp;10&nbsp;kV substation, six 10&nbsp;kV feeders, 36 distribution transformers. Loads are a population of 1R1C thermostatic-house equivalents. Cold-load pickup isn't a multiplier here — it's what happens when N&nbsp;thousand thermostats find themselves below their lower deadband at the same moment.</p>
+  <div class="section-label"><span class="num">07</span><span class="eyebrow" data-i18n="sT.eyebrow">In the twin</span></div>
+  <h2 data-i18n="sT.h2">The substation, in <em>motion</em>.</h2>
+  <p class="kicker" style="margin-bottom:18px" data-i18n="sT.kicker">An oblast-scale digital twin: 35&nbsp;/&nbsp;10&nbsp;kV substation, six 10&nbsp;kV feeders, 36 distribution transformers. Loads are a population of 1R1C thermostatic-house equivalents. Cold-load pickup isn't a multiplier here — it's what happens when N&nbsp;thousand thermostats find themselves below their lower deadband at the same moment.</p>
 
   <figure class="reveal twin-figure">
     <img src="assets/twin-hero.png" alt="Naive vs smart restoration: substation P traces from the Vinnytsia 35/10 kV twin"/>
-    <figcaption>Same outage, two policies. Left: every feeder closed simultaneously at restoration — the CLPU spike hits 26.3 MW and the substation transformer trips. Right: a 12-minute settle between closures, last urban feeder deferred — five of six restored, no trips.</figcaption>
+    <figcaption data-i18n="sT.cap1">Same outage, two policies. Left: every feeder closed simultaneously at restoration — the CLPU spike hits 26.3 MW and the substation transformer trips. Right: a 12-minute settle between closures, last urban feeder deferred — five of six restored, no trips.</figcaption>
   </figure>
 
   <!-- Inline auto-playing widget -->
   <div class="twin-widget reveal">
     <div class="twin-widget-meta">
-      <div class="info"><span class="lbl">scenario</span> <b>3-h outage at -3.5&nbsp;°C, ERA5 Jan&nbsp;2024</b></div>
+      <div class="info"><span class="lbl" data-i18n="sT.scn">scenario</span> <b data-i18n="sT.scnv">3-h outage at -3.5&nbsp;°C, ERA5 Jan&nbsp;2024</b></div>
       <div class="anim-ctrls">
-        <button class="btn-pill primary" id="twin-play-btn">Play</button>
-        <button class="btn-pill" id="twin-reset-btn">Reset</button>
+        <button class="btn-pill primary" id="twin-play-btn" data-i18n="sT.play">Play</button>
+        <button class="btn-pill" id="twin-reset-btn" data-i18n="sT.reset">Reset</button>
         <span class="speeds" role="group" aria-label="Playback speed">
           <button data-tspeed="60"  aria-current="false">1×</button>
           <button data-tspeed="300" aria-current="true">5×</button>
@@ -731,7 +732,7 @@
     <div class="twin-panels">
       <div class="twin-panel" data-scenario="outage-naive">
         <div class="twin-panel-head">
-          <div class="twin-policy">Naive close-all <span class="twin-tag bad">substation trips</span></div>
+          <div class="twin-policy"><span data-i18n="sT.naive">Naive close-all</span> <span class="twin-tag bad" data-i18n="sT.tagBad">substation trips</span></div>
           <div class="twin-clock" id="twin-clock-naive">t = 0 min</div>
         </div>
         <svg class="twin-net" id="twin-net-naive" viewBox="0 0 380 120"></svg>
@@ -739,14 +740,14 @@
       </div>
       <div class="twin-panel" data-scenario="outage-smart">
         <div class="twin-panel-head">
-          <div class="twin-policy">Smart rural-first <span class="twin-tag ok">5/6 restored</span></div>
+          <div class="twin-policy"><span data-i18n="sT.smart">Smart rural-first</span> <span class="twin-tag ok" data-i18n="sT.tagOk">5/6 restored</span></div>
           <div class="twin-clock" id="twin-clock-smart">t = 0 min</div>
         </div>
         <svg class="twin-net" id="twin-net-smart" viewBox="0 0 380 120"></svg>
         <svg class="twin-curve" id="twin-curve-smart" viewBox="0 0 380 130"></svg>
       </div>
     </div>
-    <p class="twin-legend">
+    <p class="twin-legend" data-i18n="sT.legend">
       Each panel runs against the actual telemetry the OpenDSS twin produced. Network glyph shows the six 10&nbsp;kV feeders (rural / peri-urban / urban). Curve below is the substation supply; the red dashed line is the substation transformer trip threshold (25&nbsp;MW = ~80&nbsp;% of 2 × 16&nbsp;MVA nameplate).
     </p>
   </div>
@@ -754,15 +755,15 @@
   <div class="twin-figure-row">
     <figure class="reveal twin-figure">
       <img src="assets/twin-peaks.png" alt="Substation peak load across four scenarios"/>
-      <figcaption>Peak demand across four winter scenarios. Only the naive close-all crosses the 25&nbsp;MW transformer thermal limit.</figcaption>
+      <figcaption data-i18n="sT.cap2">Peak demand across four winter scenarios. Only the naive close-all crosses the 25&nbsp;MW transformer thermal limit.</figcaption>
     </figure>
     <figure class="reveal twin-figure">
       <img src="assets/twin-per-feeder.png" alt="Per-feeder buildup during smart restoration"/>
-      <figcaption>Per-feeder buildup during smart restoration. Rural feeders carry the diversified load while the urban ones are still cold; the second urban feeder (f2) is held back.</figcaption>
+      <figcaption data-i18n="sT.cap3">Per-feeder buildup during smart restoration. Rural feeders carry the diversified load while the urban ones are still cold; the second urban feeder (f2) is held back.</figcaption>
     </figure>
   </div>
 
-  <p style="margin-top:18px;font-size:14.5px;color:var(--ink2)">
+  <p style="margin-top:18px;font-size:14.5px;color:var(--ink2)" data-i18n="sT.cta">
     For the full interactive demo — four scenarios, play / pause / scrub, network detail, per-feeder load and indoor temperature panels — visit <a href="../twin/">restart-grid&nbsp;/&nbsp;twin →</a>. Source code: <a href="https://github.com/anastasiiapoliienko/vinnytsia-twin">vinnytsia-twin</a> (twin, calibration, scenarios) and <a href="https://github.com/anastasiiapoliienko/restart-grid-rl">restart-grid-rl</a> (the RL env that consumes the calibrated population).
   </p>
 </section>
@@ -907,6 +908,7 @@
       "nav.stages": "Stages",
       "nav.risks": "Risks",
       "nav.results": "Results",
+      "nav.twin": "Twin",
       "nav.repos": "Repos",
       "nav.manual": "Manual&nbsp;↓",
       "manual.eyebrow": "User manual · PDF · 18 pages",
@@ -1019,6 +1021,23 @@
       "footer.left": "Restart · the case for learned grid restoration",
       "footer.right": "v0.1 · last updated 2026-05",
 
+      "sT.eyebrow": "In the twin",
+      "sT.h2": "The substation, in <em>motion</em>.",
+      "sT.kicker": "An oblast-scale digital twin: 35&nbsp;/&nbsp;10&nbsp;kV substation, six 10&nbsp;kV feeders, 36 distribution transformers. Loads are a population of 1R1C thermostatic-house equivalents. Cold-load pickup isn't a multiplier here — it's what happens when N&nbsp;thousand thermostats find themselves below their lower deadband at the same moment.",
+      "sT.cap1": "Same outage, two policies. Left: every feeder closed simultaneously at restoration — the CLPU spike hits 26.3 MW and the substation transformer trips. Right: a 12-minute settle between closures, last urban feeder deferred — five of six restored, no trips.",
+      "sT.scn": "scenario",
+      "sT.scnv": "3-h outage at -3.5&nbsp;°C, ERA5 Jan&nbsp;2024",
+      "sT.play": "Play",
+      "sT.reset": "Reset",
+      "sT.naive": "Naive close-all",
+      "sT.tagBad": "substation trips",
+      "sT.smart": "Smart rural-first",
+      "sT.tagOk": "5/6 restored",
+      "sT.legend": "Each panel runs against the actual telemetry the OpenDSS twin produced. Network glyph shows the six 10&nbsp;kV feeders (rural / peri-urban / urban). Curve below is the substation supply; the red dashed line is the substation transformer trip threshold (25&nbsp;MW = ~80&nbsp;% of 2 × 16&nbsp;MVA nameplate).",
+      "sT.cap2": "Peak demand across four winter scenarios. Only the naive close-all crosses the 25&nbsp;MW transformer thermal limit.",
+      "sT.cap3": "Per-feeder buildup during smart restoration. Rural feeders carry the diversified load while the urban ones are still cold; the second urban feeder (f2) is held back.",
+      "sT.cta": "For the full interactive demo — four scenarios, play / pause / scrub, network detail, per-feeder load and indoor temperature panels — visit <a href=\"../twin/\">restart-grid&nbsp;/&nbsp;twin →</a>. Source code: <a href=\"https://github.com/anastasiiapoliienko/vinnytsia-twin\">vinnytsia-twin</a> (twin, calibration, scenarios) and <a href=\"https://github.com/anastasiiapoliienko/restart-grid-rl\">restart-grid-rl</a> (the RL env that consumes the calibrated population).",
+
       "sR.eyebrow": "Results from running it",
       "sR.h2": "What it actually does, on <em>1000 blackouts</em>.",
       "sR.kicker": "Every number below comes from running the Phase-0 agent against scenarios it never saw during training — and the safety shield against the same 1000 seeds. Three independently trained policies, three random seeds, one OpenDSS twin.",
@@ -1060,7 +1079,16 @@
       "sR.cons.whyt": "why this segment, this moment",
       "sR.cons.b1": "Accept",
       "sR.cons.b2": "Wait 30 s",
-      "sR.cons.b3": "Override"
+      "sR.cons.b3": "Override",
+
+      "sR.anim.p": "Same scenario (ambient <span id=\"anim-amb\">+1.6 °C</span>, 6 h cold soak) given to four policies. Each panel runs the actual telemetry the OpenDSS twin produced.",
+      "sR.anim.legend": "<b style=\"color:var(--red)\">Greedy</b> trips at step 6. <b style=\"color:var(--ink2)\">Sequential-d8</b> spaces closures with a 4-min dwell — safe but ~32 min. <b style=\"color:var(--navy)\">PPO</b> finishes in ~10 min with no trip on this scenario. <b style=\"color:var(--navy)\">PPO + shield</b> takes only one extra step here because the shield never had to veto — but on the long tail where bare PPO trips, the shield is what brings the rate to 0%.",
+      "sR.cmp.p": "Same 1000 seeds for every policy. PPO numbers are the mean of three independently trained policies; ± is the spread across those seeds.",
+      "sR.heat.p": "800 scenarios × 3 trained policies, binned by outage duration (rows) and ambient temperature (columns). Cell is bare-PPO trip rate. Failures dispersed across the parameter space, not concentrated — which is why the next attack was a shield (forecasting veto) rather than more training.",
+      "sR.heat.p2": "The worst column is +1 to +3 °C — counter-intuitively, the policy handled deep cold better than mild ambient, because deep cold produced more uniformly heavy CLPU it had seen during training while mild ambient gave variable inrush the policy guessed wrong on.",
+      "sR.heat.p3": "Phase-1 answer: a safety shield that runs a one-step forecast under each candidate close and vetoes if predicted trunk exceeds 228 A (95% of trip). Trip rate dropped from 9.2% to 0.0% with only +0.2 steps cost.",
+      "sR.cons.p": "The product isn't the policy — it's this card. Every recommendation arrives with a forecast, a one-line \"why,\" a confidence score, and the safety-shield verdict. Never closed-loop; the operator always decides.",
+      "sR.cons.whyp": "Cold-minutes on S4 are highest of remaining (482 min vs mean 410). Trunk headroom is 53 A — safe for one moderate-CLPU close, and the shield's one-step forecast confirms 218 A under the 228 A veto threshold. Closing S4 now puts you 4 actions from completion, projected total time 9 min — faster than the d=8 procedure by 12 min."
     },
     uk: {
       "brand.sub": "аргументи",
@@ -1070,6 +1098,7 @@
       "nav.stages": "Етапи",
       "nav.risks": "Ризики",
       "nav.results": "Результати",
+      "nav.twin": "Двійник",
       "nav.repos": "Репозиторії",
       "nav.manual": "Інструкція&nbsp;↓",
       "manual.eyebrow": "Інструкція користувача · PDF · 18 сторінок",
@@ -1093,7 +1122,7 @@
       "tldr.1": "<b>Проблема.</b> Кожен перезапуск викликає каскадне відключення. Паперові інструкції розраховані на мережу, якої в Україні вже немає.",
       "tldr.2": "<b>Ідея.</b> RL-політика підказує <i>який фідер вмикати, з яким нарощуванням напруги, з якою витримкою</i> — і пояснює це одним рядком.",
       "tldr.3": "<b>Двійник.</b> Калібрована OpenDSS-модель реальної області, перевірена на апаратурі Typhoon HIL.",
-      "tldr.4": "<b>Людина в контурі.</b> Тіньовий режим → дорадчий → прийняття одним кліком за підтвердження двох операторів. Жодного автономного режиму.",
+      "tldr.4": "<b>Людина в контурі.</b> Тіньовий режим → дорадчий → прийняття одним кліком, з підтвердженням двох операторів. Жодного автономного режиму.",
 
       "s01.eyebrow": "Проблема",
       "s01.h2": "Чинна інструкція <em>написана для мережі, якої вже не існує</em>.",
@@ -1146,10 +1175,10 @@
       "stage.4.p": "Прийняття одним кліком доступне там, де оцінка ризику агента низька і диспетчер з нею згоден. Над порогом — підтвердження двох операторів. Завжди людина в контурі.",
 
       "s06.eyebrow": "Чому це має значення",
-      "s06.p": "Кожне каскадне спрацювання захисту під час відновлення — це ще одна година без електрики. Українською зимою це означає опалення, вимкнене в лікарнях, зупинені водяні насоси, перерваний діаліз, котли в багатоквартирних будинках, які не запускаються, і вуличні генератори, що виснажують дизельний запас міста, який воно вже не може поповнити. Відчутне скорочення каскадних спрацювань під час відновлення — це не метрика, <em>це години тепла, поверненого людям у лютому.</em>",
+      "s06.p": "Кожне каскадне спрацювання захисту під час відновлення — це ще одна година без світла. Українською зимою це означає опалення, вимкнене в лікарнях; зупинені водяні насоси; перерваний діаліз; котли в багатоповерхівках, які не запускаються; і вуличні генератори, що допалюють дизельний запас, поповнити який місто вже не зможе. Відчутно зменшити кількість каскадних спрацювань під час відновлення — це не метрика, <em>це години тепла, повернутого людям у лютому.</em>",
 
       "s07.eyebrow": "Визнані ризики",
-      "s07.h2": "Чотири способи, у які це може провалитися — і як з кожним з них <em>впоралися</em>.",
+      "s07.h2": "Чотири способи провалити це — і як з кожним з них <em>впоралися</em>.",
       "risk.1.tag": "ризик 01", "risk.1.h3": "Розрив sim-to-real",
       "risk.1.p": "Польове навантаження не збігатиметься точно з тією популяцією, яку ми згенерували.",
       "risk.1.mit": "<b>опрацьовано</b> Доменна рандомізація під час навчання плюс онлайн-донавчання на реальних розбіжностях.",
@@ -1165,14 +1194,14 @@
 
       "s08.eyebrow": "Репозиторії та матеріали",
       "s08.h2": "Що <em>вже зроблено</em> — і де подивитися код.",
-      "s08.kicker": "Усе вище — не теорія. Три відкриті репозиторії вже реалізують основу: RL-політика Фази 0, що випереджає безпечну базову лінію; цифровий двійник масштабу області, де холодне навантаження виникає само по собі; і докладніший технічний опис усього дизайну.",
+      "s08.kicker": "Усе сказане вище — не теорія. Три відкриті репозиторії вже втілюють основу: RL-політика Фази&nbsp;0, що випереджає безпечну базову лінію; цифровий двійник масштабу області, де холодне навантаження виникає само по собі; і докладніший технічний розбір усієї архітектури.",
       "repo.1.kind": "Фаза 0 · RL-політика",
       "repo.1.p": "8-сегментний фідер 10 кВ в OpenDSS, ETP+CLPU модель навантаження, Gymnasium-середовище, дві базові лінії і MaskablePPO-тренер. Натренована політика завершує відновлення ~у 4× швидше за безпечну базову лінію з витримками — при тій самій нульовій кількості спрацювань захисту.",
       "repo.2.kind": "Цифровий двійник · масштаб області",
       "repo.2.p": "Вінницька підстанція 35 / 10 кВ в OpenDSS з шістьма фідерами і ETP-популяцією будинків. Холодне навантаження виникає само по собі — без множника CLPU. Є базове калібрування й калібрування з урахуванням CLPU.",
       "repo.3.kind": "Поглиблено · технічно",
-      "repo.3.h3": "RL для холодного навантаження — повний дизайн",
-      "repo.3.p": "Розгорнутий опис: архітектура, функція винагороди, простір станів і дій, джерела даних, технічний стек, поетапний план, ризики й метрики успіху. З інтерактивним демо «наївний підхід проти RL».",
+      "repo.3.h3": "RL для холодного навантаження — уся архітектура",
+      "repo.3.p": "Розгорнутий опис: архітектура, функція винагороди, простір станів і дій, джерела даних, технічний стек, поетапний план, ризики й метрики успіху. Плюс інтерактивне демо «наївний підхід проти RL».",
 
       "close.label": "Суть одним рядком",
       "close.big": "Україна має <em>найскладнішу у світі</em> задачу відновлення мережі, найбагатший у світі датасет для її розв'язання й інструменти, яких п'ять років тому ще не існувало. Питання вже не в тому, чи це працює, — <em>а лише в тому, чи хтось встигне побудувати це до наступної зими.</em>",
@@ -1184,46 +1213,71 @@
 
       "sR.eyebrow": "Результати запуску",
       "sR.h2": "Що це справді робить — на <em>1000 блекаутах</em>.",
-      "sR.kicker": "Кожне число нижче — з реального запуску агента Phase 0 на сценаріях, яких він не бачив під час навчання, і захисного щита на тих самих 1000 сідах. Три незалежно натреновані політики, три випадкові сіди, один двійник OpenDSS.",
-      "sR.s1": "Середня кількість кроків PPO + щит до 99% відновлення",
-      "sR.s2": "кроків потрібно найбезпечнішому фіксованому графіку — у 6,8 рази повільніше",
-      "sR.s3": "частота спрацювань зі щитом (без щита PPO мав 9,2% — щит закриває прогалину)",
-      "sR.anim.h3": "Один блекаут, чотири стратегії, реальна телеметрія",
+      "sR.kicker": "Кожне число нижче — з реального запуску агента Фази&nbsp;0 на сценаріях, яких він не бачив під час навчання, і запуску захисного щита на тих самих 1000 сідах. Три незалежно натреновані політики, три випадкові сіди, один двійник OpenDSS.",
+      "sR.s1": "Середня кількість кроків у PPO зі щитом до 99% відновлення",
+      "sR.s2": "кроків потрібно найбезпечнішому фіксованому графіку — у 6,8 раза повільніше",
+      "sR.s3": "частка спрацювань зі щитом (без щита PPO давав 9,2% — щит закриває прогалину)",
+      "sR.anim.h3": "Один блекаут, чотири стратегії, справжня телеметрія",
+      "sR.anim.p": "Той самий сценарій (температура <span id=\"anim-amb\">+1.6 °C</span>, 6 год холодного простою) поданий чотирьом політикам. Кожна панель грає телеметрію, яку реально видав двійник OpenDSS.",
+      "sR.anim.legend": "<b style=\"color:var(--red)\">Жадібна</b> вибиває на 6-му кроці. <b style=\"color:var(--ink2)\">Послідовна-d8</b> рознесена 4-хвилинною витримкою — безпечно, але ~32 хв. <b style=\"color:var(--navy)\">PPO</b> завершує за ~10 хв без жодного спрацювання в цьому сценарії. <b style=\"color:var(--navy)\">PPO + щит</b> робить тут лише один зайвий крок — щитові не довелося ветувати; але на довгому хвості, де PPO без щита спрацьовує захист, саме щит зводить частку до нуля.",
       "sR.anim.seed": "сід",
       "sR.anim.triplabel": "поріг спрацювання",
-      "sR.anim.play": "Старт",
+      "sR.anim.play": "Запустити",
       "sR.anim.reset": "Скинути",
-      "sR.cmp.h3": "1000 утриманих сценаріїв, шість політик",
+      "sR.cmp.h3": "1000 відкладених сценаріїв, шість політик",
+      "sR.cmp.p": "Ті самі 1000 сідів для кожної політики. Числа для PPO — середнє по трьох незалежно натренованих політиках; ± — розкид між ними.",
       "sR.cmp.col1": "політика",
       "sR.cmp.col2": "% спрацювань",
       "sR.cmp.col3": "% відновлення",
       "sR.cmp.col4": "кроків до 99%",
       "sR.cmp.col5": "пік (А)",
       "sR.cmp.r1": "жадібна",
-      "sR.cmp.r2": "послідовна, пауза 8",
-      "sR.cmp.r3": "послідовна, пауза 12",
+      "sR.cmp.r2": "послідовна, витримка 8",
+      "sR.cmp.r3": "послідовна, витримка 12",
       "sR.cmp.r4": "PPO (3 сіди)",
-      "sR.cmp.r5": "PPO + захисний щит",
-      "sR.heat.h3": "Де жили ті 9% базового PPO?",
-      "sR.heat.xaxis": "температура середовища (°C) →",
+      "sR.cmp.r5": "PPO + щит",
+      "sR.heat.h3": "Де ховалися ті 9% у PPO без щита?",
+      "sR.heat.p": "800 сценаріїв × 3 натреновані політики, розбиті за тривалістю відключення (рядки) і температурою повітря (стовпці). Клітинка — частка спрацювань у PPO без щита. Невдачі розсіяні по простору параметрів, а не зосереджені — саме тому наступним кроком став щит (форкастинговий вето), а не ще більше навчання.",
+      "sR.heat.xaxis": "температура повітря (°C) →",
       "sR.heat.yaxis": "↑ тривалість блекауту (год)",
-      "sR.heat.h3b": "Що це сказало і що ми з цим зробили",
+      "sR.heat.h3b": "Що це нам сказало — і що ми з цим зробили",
+      "sR.heat.p2": "Найгірший стовпець — від +1 до +3 °C. Контрінтуїтивно: політика впоралася з сильним холодом краще, ніж із помірним. Сильний холод давав однорідно важкий CLPU, який вона багато разів бачила під час навчання; за помірної температури кидок був мінливий, і політика на ньому помилялася.",
+      "sR.heat.p3": "Відповідь Фази&nbsp;1: щит безпеки, який під кожне кандидатне замикання прогнозує на один крок наперед і ветує, якщо очікуваний струм у магістралі перевищує 228 А (95% порога спрацювання). Частка спрацювань впала з 9,2% до 0,0% — ціною лише +0,2 кроку.",
       "sR.cons.h3": "Що бачить диспетчер",
+      "sR.cons.p": "Продукт — не політика, а ось ця картка. Кожна рекомендація приходить із прогнозом, однорядковим «чому», оцінкою впевненості й вердиктом щита безпеки. Жодного замкнутого контуру — рішення завжди за диспетчером.",
       "sR.cons.ttl": "Restart · фідер L-114 · рекомендація",
-      "sR.cons.live": "● ЖИВО · оновлено 2 с тому",
+      "sR.cons.live": "● НАЖИВО · оновлено 2 с тому",
       "sR.cons.k1": "рекомендована дія",
-      "sR.cons.v1pre": "закрити вимикач",
-      "sR.cons.k2": "прогноз струму магістралі після дії (30 с)",
-      "sR.cons.v2": "218 А · захисний щит ✓ пройдено",
-      "sR.cons.k3": "прогноз струму магістралі на +120 с",
+      "sR.cons.v1pre": "замкнути автомат",
+      "sR.cons.k2": "прогноз струму в магістралі через 30 с",
+      "sR.cons.v2": "218 А · щит безпеки ✓ пройдено",
+      "sR.cons.k3": "прогноз струму в магістралі через +120 с",
       "sR.cons.v3": "181 А · CLPU згас",
-      "sR.cons.k4": "рекомендована пауза до наступної дії",
+      "sR.cons.k4": "рекомендована витримка до наступної дії",
       "sR.cons.v4": "60 с",
       "sR.cons.k5": "впевненість",
-      "sR.cons.whyt": "чому цей сегмент і саме зараз",
+      "sR.cons.whyt": "чому саме цей сегмент і саме зараз",
+      "sR.cons.whyp": "Cold-minutes на S4 — найбільші з решти (482 хв проти середніх 410). Запас у магістралі — 53 А: безпечно для одного помірного CLPU-замикання, а одно-крокове прогнозування щита підтверджує 218 А — нижче порога 228 А. Замикання S4 зараз залишає 4 дії до завершення, прогнозований повний час — 9 хв, на 12 хв швидше за процедуру d=8.",
       "sR.cons.b1": "Прийняти",
-      "sR.cons.b2": "Чекати 30 с",
-      "sR.cons.b3": "Перевизначити"
+      "sR.cons.b2": "Зачекати 30 с",
+      "sR.cons.b3": "Власна дія",
+
+      "sT.eyebrow": "У двійнику",
+      "sT.h2": "Підстанція в <em>русі</em>.",
+      "sT.kicker": "Цифровий двійник масштабу області: підстанція 35&nbsp;/&nbsp;10&nbsp;кВ, шість 10-кВ фідерів, 36 розподільчих трансформаторів. Навантаження — популяція еквівалентних термостатних будинків (1R1C). Холодне навантаження тут — не множник; це те, що стається, коли N&nbsp;тисяч термостатів одночасно опиняються нижче своєї нижньої межі.",
+      "sT.cap1": "Те саме відключення, дві політики. Зліва: усі фідери замкнуті одночасно — CLPU-стрибок сягає 26,3&nbsp;МВт, і трансформатор підстанції вибиває. Справа: 12-хвилинна витримка між замиканнями, останній міський фідер відкладено — п'ять з шести відновлено, жодного спрацювання.",
+      "sT.scn": "сценарій",
+      "sT.scnv": "3-год відключення при −3,5&nbsp;°C, ERA5 січень&nbsp;2024",
+      "sT.play": "Запустити",
+      "sT.reset": "Скинути",
+      "sT.naive": "Наївно: усі одразу",
+      "sT.tagBad": "підстанція вибила",
+      "sT.smart": "Розумно: спершу сільські",
+      "sT.tagOk": "5/6 відновлено",
+      "sT.legend": "Кожна панель грає реальну телеметрію, яку видав двійник OpenDSS. Гліф мережі — шість 10-кВ фідерів (сільські / приміські / міські). Крива нижче — живлення підстанції; червона пунктирна — поріг спрацювання захисту трансформатора (25&nbsp;МВт = ~80&nbsp;% від 2 × 16&nbsp;МВА номіналу).",
+      "sT.cap2": "Пікове навантаження для чотирьох зимових сценаріїв. Лише «усі одразу» перетинає тепловий ліміт трансформатора 25&nbsp;МВт.",
+      "sT.cap3": "Розгортання по фідерах при розумному відновленні. Сільські фідери несуть розрізнене навантаження, поки міські ще холодні; другий міський фідер (f2) тримається на потім.",
+      "sT.cta": "Для повного інтерактивного демо — чотири сценарії, відтворення / пауза / перемотування, деталі мережі, панелі навантаження по фідерах і температура в приміщенні — переходьте до <a href=\"../twin/\">restart-grid&nbsp;/&nbsp;twin →</a>. Вихідний код: <a href=\"https://github.com/anastasiiapoliienko/vinnytsia-twin\">vinnytsia-twin</a> (двійник, калібрування, сценарії) і <a href=\"https://github.com/anastasiiapoliienko/restart-grid-rl\">restart-grid-rl</a> (RL-середовище, яке користується каліброваною популяцією)."
     }
   };
 
