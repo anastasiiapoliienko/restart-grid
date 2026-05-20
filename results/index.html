@@ -4,6 +4,15 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Restart · results from running the model</title>
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('lang');
+      if(!saved){ saved = (navigator.language || 'en').toLowerCase().startsWith('uk') ? 'uk' : 'en'; }
+      document.documentElement.lang = saved;
+    }catch(e){}
+  })();
+</script>
 <style>
   :root{
     --bg:#fafaf7;
@@ -119,35 +128,46 @@
   .console .conf-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--grn),var(--yel));width:0%;transition:width .8s ease}
 
   footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:12.5px;font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  .lang-toggle{position:fixed;top:18px;right:18px;display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;z-index:50;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+  .lang-pill{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2);background:transparent;border:none;border-radius:999px;padding:5px 10px;cursor:pointer;font-weight:600;transition:background .15s,color .15s}
+  .lang-pill:hover{color:var(--ink)}
+  .lang-pill[aria-current="true"]{background:var(--ink);color:#fff}
 </style>
 </head>
 <body>
+
+<div class="lang-toggle" role="group" aria-label="Language">
+  <button type="button" class="lang-pill" data-lang="en" aria-current="true">EN</button>
+  <button type="button" class="lang-pill" data-lang="uk" aria-current="false">UA</button>
+</div>
+
 <div class="wrap">
 
 <header>
-  <a class="backlink" href="../">← back to the case</a>
-  <div class="eyebrow">Restart · live results</div>
-  <h1>What the model learned, on 1000 held-out blackouts.</h1>
-  <p class="lede">Every number on this page comes from actually running the Phase-0 single-feeder RL agent against scenarios it never saw during training. The animation, the comparison, and the failure-mode heatmap are all driven by the JSON files the program emitted; the operator console is the mockup of what we'd actually ship.</p>
+  <a class="backlink" href="../" data-i18n="back">← back to the case</a>
+  <div class="eyebrow" data-i18n="eyebrow">Restart · live results</div>
+  <h1 data-i18n="h1">What the model learned, on 1000 held-out blackouts.</h1>
+  <p class="lede" data-i18n="lede">Every number on this page comes from actually running the Phase-0 single-feeder RL agent against scenarios it never saw during training. The animation, the comparison, and the failure-mode heatmap are all driven by the JSON files the program emitted; the operator console is the mockup of what we'd actually ship.</p>
 </header>
 
 <!-- ────────────── Hero stats ────────────── -->
-<h2>Headline</h2>
+<h2 data-i18n="head.h2">Headline</h2>
 <div class="grid cols-3">
-  <div class="stat"><div class="v">11.5</div><div class="k">PPO mean steps to 99% restored (±0.0 across 3 seeds)</div></div>
-  <div class="stat"><div class="v">79</div><div class="k">safest fixed-dwell baseline, for the same outcome — 6.9× slower</div></div>
-  <div class="stat"><div class="v r">9.2%</div><div class="k">honest gap: PPO trip rate on 1000 long-tail scenarios — Phase 1's job to close</div></div>
+  <div class="stat"><div class="v">11.5</div><div class="k" data-i18n="head.s1">PPO mean steps to 99% restored (±0.0 across 3 seeds)</div></div>
+  <div class="stat"><div class="v">79</div><div class="k" data-i18n="head.s2">safest fixed-dwell baseline, for the same outcome — 6.9× slower</div></div>
+  <div class="stat"><div class="v r">9.2%</div><div class="k" data-i18n="head.s3">honest gap: PPO trip rate on 1000 long-tail scenarios — Phase 1's job to close</div></div>
 </div>
 
 <!-- ────────────── A · Live restoration animation ────────────── -->
-<h2>A · One blackout, three strategies, real telemetry</h2>
-<p>Same scenario (ambient <span id="anim-amb">+1.6 °C</span>, 6 h cold soak) given to three policies. Each panel runs the actual telemetry captured from <code>scripts/capture_trace.py</code> — segment colors and trunk current are the real values OpenDSS produced.</p>
+<h2 data-i18n="A.h2">A · One blackout, three strategies, real telemetry</h2>
+<p data-i18n="A.p">Same scenario (ambient <span id="anim-amb">+1.6 °C</span>, 6 h cold soak) given to three policies. Each panel runs the actual telemetry captured from <code>scripts/capture_trace.py</code> — segment colors and trunk current are the real values OpenDSS produced.</p>
 <div class="anim-card">
   <div class="anim-meta">
-    <div class="info">scenario seed <b id="anim-seed">10042</b> · trip limit <b id="anim-trip">240 A</b></div>
+    <div class="info"><span data-i18n="A.seed">scenario seed</span> <b id="anim-seed">10042</b> · <span data-i18n="A.tripLim">trip limit</span> <b id="anim-trip">240 A</b></div>
     <div class="anim-ctrls">
-      <button class="btn primary" id="play-btn">Play</button>
-      <button class="btn" id="reset-btn">Reset</button>
+      <button class="btn primary" id="play-btn" data-i18n="A.play">Play</button>
+      <button class="btn" id="reset-btn" data-i18n="A.reset">Reset</button>
       <span class="speeds" role="group" aria-label="Playback speed">
         <button data-speed="1" aria-current="false">1×</button>
         <button data-speed="2" aria-current="true">2×</button>
@@ -158,45 +178,45 @@
   </div>
   <div class="panels" id="panels"></div>
 </div>
-<p style="margin-top:14px;color:var(--ink2);font-size:13px">
+<p style="margin-top:14px;color:var(--ink2);font-size:13px" data-i18n="A.legend">
   <b style="color:var(--red)">Greedy</b> trips at step 6 — closing every breaker as fast as possible pushes the trunk over 240 A.
   <b style="color:var(--ink2)">Sequential-d8</b> spaces closures with a fixed 4-min dwell; safe but takes ~32 min.
   <b style="color:var(--navy)">PPO</b> learns when to bunch closures and when to wait — finishes in ~10 min, no trip.
 </p>
 
 <!-- ────────────── C · 1000-scenario comparison ────────────── -->
-<h2>C · 1000 held-out scenarios, four policies</h2>
-<p>Every policy was evaluated on the <i>same</i> 1000 seeds. PPO numbers are the mean of three independently trained policies; the ± figure is the standard deviation across those seeds.</p>
+<h2 data-i18n="C.h2">C · 1000 held-out scenarios, four policies</h2>
+<p data-i18n="C.p">Every policy was evaluated on the <i>same</i> 1000 seeds. PPO numbers are the mean of three independently trained policies; the ± figure is the standard deviation across those seeds.</p>
 <table>
   <thead>
-    <tr><th>policy</th><th>trip%</th><th>restore%</th><th>steps to 99%</th><th>peak trunk A</th></tr>
+    <tr><th data-i18n="C.col1">policy</th><th data-i18n="C.col2">trip%</th><th data-i18n="C.col3">restore%</th><th data-i18n="C.col4">steps to 99%</th><th data-i18n="C.col5">peak trunk A</th></tr>
   </thead>
   <tbody>
-    <tr><td>greedy</td><td class="num">100%</td><td class="num">0%</td><td class="num">—</td><td class="num">256</td></tr>
-    <tr><td>sequential, dwell 4</td><td class="num">17.5%</td><td class="num">82.5%</td><td class="num">31</td><td class="num">232</td></tr>
-    <tr><td>sequential, dwell 8</td><td class="num">0.3%</td><td class="num">99.7%</td><td class="num">55</td><td class="num">224</td></tr>
-    <tr><td>sequential, dwell 12</td><td class="num">0.0%</td><td class="num">100.0%</td><td class="num">79</td><td class="num">222</td></tr>
-    <tr class="highlight"><td>PPO (3-seed ensemble)</td><td class="num">9.2% ± 1.6</td><td class="num">90.8% ± 1.6</td><td class="num">11.5 ± 0.0</td><td class="num">232 ± 0.3</td></tr>
+    <tr><td data-i18n="C.r1">greedy</td><td class="num">100%</td><td class="num">0%</td><td class="num">—</td><td class="num">256</td></tr>
+    <tr><td data-i18n="C.r2">sequential, dwell 4</td><td class="num">17.5%</td><td class="num">82.5%</td><td class="num">31</td><td class="num">232</td></tr>
+    <tr><td data-i18n="C.r3">sequential, dwell 8</td><td class="num">0.3%</td><td class="num">99.7%</td><td class="num">55</td><td class="num">224</td></tr>
+    <tr><td data-i18n="C.r4">sequential, dwell 12</td><td class="num">0.0%</td><td class="num">100.0%</td><td class="num">79</td><td class="num">222</td></tr>
+    <tr class="highlight"><td data-i18n="C.r5">PPO (3-seed ensemble)</td><td class="num">9.2% ± 1.6</td><td class="num">90.8% ± 1.6</td><td class="num">11.5 ± 0.0</td><td class="num">232 ± 0.3</td></tr>
   </tbody>
 </table>
-<p style="margin-top:14px;color:var(--ink2);font-size:13.5px">The trained policy finishes restoration <b>~5–7× faster</b> than the safest fixed-dwell baseline. It also currently trips on ~9% of the long tail. The chart below shows the full per-scenario distribution behind those means.</p>
+<p style="margin-top:14px;color:var(--ink2);font-size:13.5px" data-i18n="C.note">The trained policy finishes restoration <b>~5–7× faster</b> than the safest fixed-dwell baseline. It also currently trips on ~9% of the long tail. The chart below shows the full per-scenario distribution behind those means.</p>
 <div style="background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-top:6px">
   <img src="comparison.png" alt="Policy comparison: peak trunk current, steps to 99% restored, trip vs restore rate" style="width:100%;height:auto;display:block;border-radius:8px"/>
 </div>
 
 <!-- ────────────── D · Failure-mode heatmap ────────────── -->
-<h2>D · Where does the 9% live?</h2>
-<p>800 scenarios × 3 trained policies, binned by outage duration (rows) and ambient temperature (columns). Each cell shows the PPO trip rate for scenarios falling in that bin. The honest finding: failures are dispersed across the parameter space rather than concentrated in one corner — there's no single "easy fix," which is why <b>Phase 1's safety shield</b> is the right next attack rather than just more training data.</p>
+<h2 data-i18n="D.h2">D · Where does the 9% live?</h2>
+<p data-i18n="D.p">800 scenarios × 3 trained policies, binned by outage duration (rows) and ambient temperature (columns). Each cell shows the PPO trip rate for scenarios falling in that bin. The honest finding: failures are dispersed across the parameter space rather than concentrated in one corner — there's no single "easy fix," which is why <b>Phase 1's safety shield</b> is the right next attack rather than just more training data.</p>
 <div class="heatmap-wrap">
   <div>
-    <div class="heatmap-axes" style="margin-bottom:6px;text-align:right">ambient temperature (°C) →</div>
+    <div class="heatmap-axes" style="margin-bottom:6px;text-align:right" data-i18n="D.xax">ambient temperature (°C) →</div>
     <div id="heatmap-grid" class="heatmap-grid"></div>
-    <div class="heatmap-axes" style="margin-top:6px;text-align:right">↑ outage duration (h)</div>
+    <div class="heatmap-axes" style="margin-top:6px;text-align:right" data-i18n="D.yax">↑ outage duration (h)</div>
   </div>
   <div style="flex:1;min-width:200px">
-    <h3 style="margin-top:0">What this says</h3>
-    <p style="font-size:13.5px">No clean failure corner. The worst column is +1 to +3 °C — slightly counter-intuitive (the policy actually handles deep cold better than mild ambient, because deep cold produces more uniformly heavy CLPU it has already seen, while mild ambient gives variable inrush the policy guesses wrong on).</p>
-    <p style="font-size:13.5px">The path to 0% trip isn't "train more on the worst column." It's a <b>safety shield</b>: a forecasting head that vetoes any closure expected to cross 240 A. PPO chooses, the shield checks.</p>
+    <h3 style="margin-top:0" data-i18n="D.h3">What this says</h3>
+    <p style="font-size:13.5px" data-i18n="D.p1">No clean failure corner. The worst column is +1 to +3 °C — slightly counter-intuitive (the policy actually handles deep cold better than mild ambient, because deep cold produces more uniformly heavy CLPU it has already seen, while mild ambient gives variable inrush the policy guesses wrong on).</p>
+    <p style="font-size:13.5px" data-i18n="D.p2">The path to 0% trip isn't "train more on the worst column." It's a <b>safety shield</b>: a forecasting head that vetoes any closure expected to cross 240 A. PPO chooses, the shield checks.</p>
     <div class="heatmap-legend">
       <span>0%</span>
       <div class="legend-gradient"></div>
@@ -206,48 +226,48 @@
 </div>
 
 <!-- ────────────── F · Operator console mockup ────────────── -->
-<h2>F · What the operator sees</h2>
-<p>The product isn't the policy — it's this card. Every recommendation arrives with a forecast, a one-line "why," and a confidence score. Never closed-loop; the operator always decides.</p>
+<h2 data-i18n="F.h2">F · What the operator sees</h2>
+<p data-i18n="F.p">The product isn't the policy — it's this card. Every recommendation arrives with a forecast, a one-line "why," and a confidence score. Never closed-loop; the operator always decides.</p>
 <div class="console">
   <div class="hd">
-    <div class="ttl">Restart · feeder L-114 · recommendation</div>
-    <div class="live">● LIVE · updated 2 s ago</div>
+    <div class="ttl" data-i18n="F.ttl">Restart · feeder L-114 · recommendation</div>
+    <div class="live" data-i18n="F.live">● LIVE · updated 2 s ago</div>
   </div>
   <div class="row">
-    <span class="k">recommended action</span>
-    <span class="v">close switch <b>S4</b></span>
+    <span class="k" data-i18n="F.k1">recommended action</span>
+    <span class="v" data-i18n="F.v1">close switch <b>S4</b></span>
   </div>
   <div class="row">
-    <span class="k">predicted trunk current after action (30 s)</span>
-    <span class="v ok">218 A · 22 A headroom under trip</span>
+    <span class="k" data-i18n="F.k2">predicted trunk current after action (30 s)</span>
+    <span class="v ok" data-i18n="F.v2">218 A · 22 A headroom under trip</span>
   </div>
   <div class="row">
-    <span class="k">predicted trunk current at +120 s</span>
-    <span class="v ok">181 A · CLPU decayed</span>
+    <span class="k" data-i18n="F.k3">predicted trunk current at +120 s</span>
+    <span class="v ok" data-i18n="F.v3">181 A · CLPU decayed</span>
   </div>
   <div class="row">
-    <span class="k">suggested dwell before next action</span>
-    <span class="v">60 s</span>
+    <span class="k" data-i18n="F.k4">suggested dwell before next action</span>
+    <span class="v" data-i18n="F.v4">60 s</span>
   </div>
   <div class="row">
-    <span class="k">confidence</span>
+    <span class="k" data-i18n="F.k5">confidence</span>
     <span class="v warn">94%</span>
   </div>
   <div class="conf-bar"><i id="conf-i" style="width:94%"></i></div>
   <div class="why">
-    <b>why this segment, this moment</b>
-    Cold-minutes on S4 are highest of remaining (482 min, vs. mean 410). Trunk headroom is 53 A — safe for one moderate-CLPU close. S1/S2/S3 already restored and at decayed inrush, so the bus baseline is steady. Closing S4 now puts you 4 actions from completion at projected total time 9 min — faster than the d=8 procedure by 12 min.
+    <b data-i18n="F.whyt">why this segment, this moment</b>
+    <span data-i18n="F.whyp">Cold-minutes on S4 are highest of remaining (482 min, vs. mean 410). Trunk headroom is 53 A — safe for one moderate-CLPU close. S1/S2/S3 already restored and at decayed inrush, so the bus baseline is steady. Closing S4 now puts you 4 actions from completion at projected total time 9 min — faster than the d=8 procedure by 12 min.</span>
   </div>
   <div class="actions">
-    <button class="accept">Accept</button>
-    <button class="wait">Wait 30 s</button>
-    <button class="override">Override</button>
+    <button class="accept" data-i18n="F.acc">Accept</button>
+    <button class="wait" data-i18n="F.wait">Wait 30 s</button>
+    <button class="override" data-i18n="F.ovr">Override</button>
   </div>
 </div>
 
 <footer>
-  <span>Restart · live results · driven by JSON from <a href="https://github.com/anastasiiapoliienko/restart-grid-rl">restart-grid-rl</a></span>
-  <span><a href="../">← back to the case</a></span>
+  <span data-i18n="foot.left">Restart · live results · driven by JSON from <a href="https://github.com/anastasiiapoliienko/restart-grid-rl">restart-grid-rl</a></span>
+  <span><a href="../" data-i18n="back">← back to the case</a></span>
 </footer>
 
 </div>
@@ -1948,6 +1968,126 @@
 }</script>
 
 <script>
+/* ============================ i18n ============================ */
+const i18n = {
+  en: {
+    "back": "← back to the case",
+    "eyebrow": "Restart · live results",
+    "h1": "What the model learned, on 1000 held-out blackouts.",
+    "lede": "Every number on this page comes from actually running the Phase-0 single-feeder RL agent against scenarios it never saw during training. The animation, the comparison, and the failure-mode heatmap are all driven by the JSON files the program emitted; the operator console is the mockup of what we'd actually ship.",
+    "head.h2": "Headline",
+    "head.s1": "PPO mean steps to 99% restored (±0.0 across 3 seeds)",
+    "head.s2": "safest fixed-dwell baseline, for the same outcome — 6.9× slower",
+    "head.s3": "honest gap: PPO trip rate on 1000 long-tail scenarios — Phase 1's job to close",
+    "A.h2": "A · One blackout, three strategies, real telemetry",
+    "A.p": "Same scenario (ambient <span id=\"anim-amb\">+1.6 °C</span>, 6 h cold soak) given to three policies. Each panel runs the actual telemetry captured from <code>scripts/capture_trace.py</code> — segment colors and trunk current are the real values OpenDSS produced.",
+    "A.seed": "scenario seed",
+    "A.tripLim": "trip limit",
+    "A.play": "Play", "A.pause": "Pause", "A.reset": "Reset",
+    "A.legend": "<b style=\"color:var(--red)\">Greedy</b> trips at step 6 — closing every breaker as fast as possible pushes the trunk over 240 A. <b style=\"color:var(--ink2)\">Sequential-d8</b> spaces closures with a fixed 4-min dwell; safe but takes ~32 min. <b style=\"color:var(--navy)\">PPO</b> learns when to bunch closures and when to wait — finishes in ~10 min, no trip.",
+    "C.h2": "C · 1000 held-out scenarios, four policies",
+    "C.p": "Every policy was evaluated on the <i>same</i> 1000 seeds. PPO numbers are the mean of three independently trained policies; the ± figure is the standard deviation across those seeds.",
+    "C.col1": "policy", "C.col2": "trip%", "C.col3": "restore%", "C.col4": "steps to 99%", "C.col5": "peak trunk A",
+    "C.r1": "greedy", "C.r2": "sequential, dwell 4", "C.r3": "sequential, dwell 8", "C.r4": "sequential, dwell 12", "C.r5": "PPO (3-seed ensemble)",
+    "C.note": "The trained policy finishes restoration <b>~5–7× faster</b> than the safest fixed-dwell baseline. It also currently trips on ~9% of the long tail. The chart below shows the full per-scenario distribution behind those means.",
+    "D.h2": "D · Where does the 9% live?",
+    "D.p": "800 scenarios × 3 trained policies, binned by outage duration (rows) and ambient temperature (columns). Each cell shows the PPO trip rate for scenarios falling in that bin. The honest finding: failures are dispersed across the parameter space rather than concentrated in one corner — there's no single \"easy fix,\" which is why <b>Phase 1's safety shield</b> is the right next attack rather than just more training data.",
+    "D.xax": "ambient temperature (°C) →",
+    "D.yax": "↑ outage duration (h)",
+    "D.h3": "What this says",
+    "D.p1": "No clean failure corner. The worst column is +1 to +3 °C — slightly counter-intuitive (the policy actually handles deep cold better than mild ambient, because deep cold produces more uniformly heavy CLPU it has already seen, while mild ambient gives variable inrush the policy guesses wrong on).",
+    "D.p2": "The path to 0% trip isn't \"train more on the worst column.\" It's a <b>safety shield</b>: a forecasting head that vetoes any closure expected to cross 240 A. PPO chooses, the shield checks.",
+    "F.h2": "F · What the operator sees",
+    "F.p": "The product isn't the policy — it's this card. Every recommendation arrives with a forecast, a one-line \"why,\" and a confidence score. Never closed-loop; the operator always decides.",
+    "F.ttl": "Restart · feeder L-114 · recommendation",
+    "F.live": "● LIVE · updated 2 s ago",
+    "F.k1": "recommended action", "F.v1": "close switch <b>S4</b>",
+    "F.k2": "predicted trunk current after action (30 s)", "F.v2": "218 A · 22 A headroom under trip",
+    "F.k3": "predicted trunk current at +120 s", "F.v3": "181 A · CLPU decayed",
+    "F.k4": "suggested dwell before next action", "F.v4": "60 s",
+    "F.k5": "confidence",
+    "F.whyt": "why this segment, this moment",
+    "F.whyp": "Cold-minutes on S4 are highest of remaining (482 min, vs. mean 410). Trunk headroom is 53 A — safe for one moderate-CLPU close. S1/S2/S3 already restored and at decayed inrush, so the bus baseline is steady. Closing S4 now puts you 4 actions from completion at projected total time 9 min — faster than the d=8 procedure by 12 min.",
+    "F.acc": "Accept", "F.wait": "Wait 30 s", "F.ovr": "Override",
+    "foot.left": "Restart · live results · driven by JSON from <a href=\"https://github.com/anastasiiapoliienko/restart-grid-rl\">restart-grid-rl</a>",
+    // dynamic
+    "run.greedy": "greedy", "run.sequential-d8": "sequential-d8", "run.ppo": "PPO",
+    "st.cold": "cold", "st.restoring": "restoring", "st.tripped": "TRIPPED", "st.restored": "RESTORED",
+    "lbl.trunk": "trunk", "lbl.on": "on", "lbl.t": "t",
+    "chart.trip": "trip {n} A"
+  },
+  uk: {
+    "back": "← до аргументів",
+    "eyebrow": "Restart · живі результати",
+    "h1": "Чого навчилася модель — на 1000 відкладених блекаутах.",
+    "lede": "Кожне число на цій сторінці — з реального запуску RL-агента Фази 0 на одному фідері проти сценаріїв, яких він не бачив під час навчання. Анімація, порівняльна таблиця та теплова мапа провалів — усі живляться JSON-файлами, що їх видала програма; диспетчерська консоль — це мокап того, що ми б справді доставляли.",
+    "head.h2": "Заголовок",
+    "head.s1": "Середня кількість кроків PPO до 99% відновлення (±0.0 на 3 сідах)",
+    "head.s2": "Найбезпечніший фіксований графік до того ж результату — у 6,9 раза повільніше",
+    "head.s3": "Чесний розрив: частка спрацювань PPO на 1000 сценаріях довгого хвоста — це завдання Фази 1",
+    "A.h2": "A · Один блекаут, три стратегії, справжня телеметрія",
+    "A.p": "Той самий сценарій (температура <span id=\"anim-amb\">+1.6 °C</span>, 6 год холодного простою) подано трьом політикам. Кожна панель грає реальну телеметрію, захоплену в <code>scripts/capture_trace.py</code> — кольори сегментів і струм у магістралі — це справжні значення, що видав OpenDSS.",
+    "A.seed": "сід сценарію",
+    "A.tripLim": "поріг спрацювання",
+    "A.play": "Запустити", "A.pause": "Пауза", "A.reset": "Скинути",
+    "A.legend": "<b style=\"color:var(--red)\">Жадібна</b> вибиває на 6-му кроці — замикання усіх автоматів якомога швидше штовхає магістраль за межу 240 А. <b style=\"color:var(--ink2)\">Послідовна-d8</b> розносить замикання з фіксованою 4-хвилинною витримкою — безпечно, але ~32 хв. <b style=\"color:var(--navy)\">PPO</b> вчиться, коли збирати замикання у пачку, а коли чекати — завершує за ~10 хв, без жодного спрацювання.",
+    "C.h2": "C · 1000 відкладених сценаріїв, чотири політики",
+    "C.p": "Кожна політика оцінена на <i>тих самих</i> 1000 сідах. Числа для PPO — середнє по трьох незалежно натренованих політиках; ± — стандартне відхилення між ними.",
+    "C.col1": "політика", "C.col2": "% спрацювань", "C.col3": "% відновлення", "C.col4": "кроків до 99%", "C.col5": "пік у магістралі, А",
+    "C.r1": "жадібна", "C.r2": "послідовна, витримка 4", "C.r3": "послідовна, витримка 8", "C.r4": "послідовна, витримка 12", "C.r5": "PPO (ансамбль з 3 сідів)",
+    "C.note": "Натренована політика завершує відновлення <b>у 5–7× швидше</b> за найбезпечніший фіксований графік. Водночас на ~9% довгого хвоста вона зараз вибиває. Графік нижче показує повний розподіл по сценаріях, що стоїть за цими середніми.",
+    "D.h2": "D · Де ховаються ці 9%?",
+    "D.p": "800 сценаріїв × 3 натреновані політики, розбиті за тривалістю відключення (рядки) і температурою повітря (стовпці). У клітинці — частка спрацювань PPO для сценаріїв з цього діапазону. Чесне спостереження: невдачі розсіяні по простору параметрів, а не зосереджені в одному кутку — простого «легкого лагодження» немає, тому <b>щит безпеки Фази 1</b> — правильний наступний хід, а не просто більше тренувальних даних.",
+    "D.xax": "температура повітря (°C) →",
+    "D.yax": "↑ тривалість відключення (год)",
+    "D.h3": "Що це нам каже",
+    "D.p1": "Чистого кутка провалу немає. Найгірший стовпець — від +1 до +3 °C. Це трохи контрінтуїтивно: політика впоралася з сильним холодом краще, ніж із помірним. Сильний холод дає однорідно важкий CLPU, який вона багато разів бачила; помірна температура дає мінливий кидок, на якому вона помиляється.",
+    "D.p2": "Шлях до 0% спрацювань — не «більше тренуватися на найгіршому стовпці», а <b>щит безпеки</b>: прогнозувальна голова, яка ветує будь-яке замикання, що очікувано перетинає 240 А. PPO вибирає, щит перевіряє.",
+    "F.h2": "F · Що бачить диспетчер",
+    "F.p": "Продукт — не політика, а ось ця картка. Кожна рекомендація приходить із прогнозом, однорядковим «чому» і оцінкою впевненості. Жодного замкнутого контуру — диспетчер завжди вирішує.",
+    "F.ttl": "Restart · фідер L-114 · рекомендація",
+    "F.live": "● НАЖИВО · оновлено 2 с тому",
+    "F.k1": "рекомендована дія", "F.v1": "замкнути <b>S4</b>",
+    "F.k2": "прогноз струму в магістралі через 30 с після дії", "F.v2": "218 А · запас 22 А до спрацювання",
+    "F.k3": "прогноз струму в магістралі на +120 с", "F.v3": "181 А · CLPU згас",
+    "F.k4": "рекомендована витримка до наступної дії", "F.v4": "60 с",
+    "F.k5": "впевненість",
+    "F.whyt": "чому саме цей сегмент і саме зараз",
+    "F.whyp": "Cold-minutes для S4 — найбільші з решти (482 хв проти середніх 410). Запас у магістралі — 53 А: безпечно для одного помірного CLPU-замикання. S1/S2/S3 уже відновлені й на згаслому кидку, тож фоновий струм у шині стабільний. Замикання S4 зараз залишає 4 дії до завершення, прогнозований повний час — 9 хв, на 12 хв швидше за процедуру d=8.",
+    "F.acc": "Прийняти", "F.wait": "Зачекати 30 с", "F.ovr": "Власна дія",
+    "foot.left": "Restart · живі результати · живляться JSON-файлами з <a href=\"https://github.com/anastasiiapoliienko/restart-grid-rl\">restart-grid-rl</a>",
+    "run.greedy": "жадібна", "run.sequential-d8": "послідовна-d8", "run.ppo": "PPO",
+    "st.cold": "холодний", "st.restoring": "відновлюється", "st.tripped": "СПРАЦЮВАЛО", "st.restored": "ВІДНОВЛЕНО",
+    "lbl.trunk": "магістраль", "lbl.on": "ввімкн.", "lbl.t": "час",
+    "chart.trip": "поріг {n} А"
+  }
+};
+
+let LANG = document.documentElement.lang || 'en';
+function t(key, vars){
+  let s = (i18n[LANG] && i18n[LANG][key]) != null ? i18n[LANG][key] : (i18n.en[key] != null ? i18n.en[key] : key);
+  if(vars){ for(const k in vars){ s = s.split('{'+k+'}').join(vars[k]); } }
+  return s;
+}
+function applyLang(lang){
+  if(!i18n[lang]) lang = 'en';
+  LANG = lang;
+  document.documentElement.lang = lang;
+  try{ localStorage.setItem('lang', lang); }catch(e){}
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(i18n[lang][k] != null) el.innerHTML = i18n[lang][k];
+  });
+  document.querySelectorAll('.lang-pill').forEach(b=>{
+    b.setAttribute('aria-current', b.dataset.lang === lang ? 'true' : 'false');
+  });
+  // Re-render dynamic content if app is up
+  if(typeof window.__rerenderResults === 'function') window.__rerenderResults();
+}
+document.querySelectorAll('.lang-pill').forEach(b=>{
+  b.addEventListener('click', ()=> applyLang(b.dataset.lang));
+});
+
 /* ============================ HEATMAP ============================ */
 (function(){
   const hm = JSON.parse(document.getElementById('heatmap-data').textContent);
@@ -2019,18 +2159,19 @@
     const wrap = document.createElement('div');
     wrap.className = 'panel';
     wrap.dataset.idx = idx;
+    const runLabel = t('run.' + run.name) || run.name;
     wrap.innerHTML = `
-      <div class="pname"><b>${run.name}</b><span class="status">cold</span></div>
+      <div class="pname"><b class="run-label" data-run="${run.name}">${runLabel}</b><span class="status">${t('st.cold')}</span></div>
       <div class="feeder">${Array.from({length:N},(_,i)=>`<div class="seg" data-i="${i}">S${i+1}</div>`).join('')}</div>
       <div class="chart"><svg viewBox="0 0 320 110" width="100%" height="110">
         <line x1="20" y1="${110 - (TRIP/300)*100 - 5}" x2="320" y2="${110 - (TRIP/300)*100 - 5}" stroke="#c0392b" stroke-dasharray="3 3" stroke-width="1"/>
-        <text x="316" y="${110 - (TRIP/300)*100 - 8}" fill="#c0392b" font-size="9" text-anchor="end" font-family="ui-monospace,Menlo,monospace">trip ${TRIP.toFixed(0)} A</text>
+        <text class="trip-label" x="316" y="${110 - (TRIP/300)*100 - 8}" fill="#c0392b" font-size="9" text-anchor="end" font-family="ui-monospace,Menlo,monospace">${t('chart.trip', { n: TRIP.toFixed(0) })}</text>
         <polyline points="" fill="none" stroke="#0b3a78" stroke-width="2"/>
       </svg></div>
       <div class="stats-row">
-        <div><span class="lbl">trunk</span><b class="trunk">0 A</b></div>
-        <div><span class="lbl">on</span><b class="onct">0/${N}</b></div>
-        <div><span class="lbl">t</span><b class="timer">0:00</b></div>
+        <div><span class="lbl lbl-trunk">${t('lbl.trunk')}</span><b class="trunk">0 A</b></div>
+        <div><span class="lbl lbl-on">${t('lbl.on')}</span><b class="onct">0/${N}</b></div>
+        <div><span class="lbl lbl-t">${t('lbl.t')}</span><b class="timer">0:00</b></div>
       </div>`;
     panelsEl.appendChild(wrap);
     return {
@@ -2042,6 +2183,11 @@
       trunk: wrap.querySelector('.trunk'),
       onct: wrap.querySelector('.onct'),
       timer: wrap.querySelector('.timer'),
+      runLabelEl: wrap.querySelector('.run-label'),
+      tripLabelEl: wrap.querySelector('.trip-label'),
+      lblTrunkEl: wrap.querySelector('.lbl-trunk'),
+      lblOnEl: wrap.querySelector('.lbl-on'),
+      lblTEl: wrap.querySelector('.lbl-t'),
     };
   });
 
@@ -2089,11 +2235,11 @@
       });
       // Status
       if(t >= p.run.final_t){
-        if(p.run.trip){ p.wrap.classList.add('tripped'); p.wrap.classList.remove('done'); p.status.textContent = 'TRIPPED'; p.status.style.color = 'var(--red)'; }
-        else if(p.run.restored){ p.wrap.classList.add('done'); p.wrap.classList.remove('tripped'); p.status.textContent = 'RESTORED'; p.status.style.color = 'var(--grn)'; }
+        if(p.run.trip){ p.wrap.classList.add('tripped'); p.wrap.classList.remove('done'); p.status.textContent = t('st.tripped'); p.status.style.color = 'var(--red)'; }
+        else if(p.run.restored){ p.wrap.classList.add('done'); p.wrap.classList.remove('tripped'); p.status.textContent = t('st.restored'); p.status.style.color = 'var(--grn)'; }
       } else {
         p.wrap.classList.remove('tripped','done');
-        p.status.textContent = step.n_energized > 0 ? 'restoring' : 'cold';
+        p.status.textContent = step.n_energized > 0 ? t('st.restoring') : t('st.cold');
         p.status.style.color = 'var(--ink2)';
       }
       // Stats
@@ -2123,7 +2269,7 @@
     if(t >= maxT){
       t = maxT;
       playing = false;
-      document.getElementById('play-btn').textContent = 'Play';
+      document.getElementById('play-btn').textContent = t('A.play');
     }
     render();
     if(playing) requestAnimationFrame(frame);
@@ -2133,23 +2279,38 @@
     if(t >= maxT) t = 0;
     playing = true;
     lastFrame = 0;
-    document.getElementById('play-btn').textContent = 'Pause';
+    document.getElementById('play-btn').textContent = t('A.pause');
     requestAnimationFrame(frame);
   }
   function pause(){
     playing = false;
-    document.getElementById('play-btn').textContent = 'Play';
+    document.getElementById('play-btn').textContent = t('A.play');
   }
   function reset(){
     t = 0;
     playing = false;
     lastFrame = 0;
-    document.getElementById('play-btn').textContent = 'Play';
+    document.getElementById('play-btn').textContent = t('A.play');
     render();
   }
 
   document.getElementById('play-btn').addEventListener('click', () => playing ? pause() : play());
   document.getElementById('reset-btn').addEventListener('click', reset);
+
+  // Re-render hooks for language toggle
+  window.__rerenderResults = function(){
+    // Refresh per-panel labels
+    panels.forEach(p => {
+      if(p.runLabelEl) p.runLabelEl.textContent = t('run.' + p.run.name) || p.run.name;
+      if(p.tripLabelEl) p.tripLabelEl.textContent = t('chart.trip', { n: TRIP.toFixed(0) });
+      if(p.lblTrunkEl) p.lblTrunkEl.textContent = t('lbl.trunk');
+      if(p.lblOnEl) p.lblOnEl.textContent = t('lbl.on');
+      if(p.lblTEl) p.lblTEl.textContent = t('lbl.t');
+    });
+    // Refresh play button + force a re-render so statuses update
+    document.getElementById('play-btn').textContent = playing ? t('A.pause') : t('A.play');
+    render();
+  };
 
   document.querySelectorAll('.speeds button').forEach(b => {
     b.addEventListener('click', () => {
@@ -2160,6 +2321,9 @@
 
   render();
 })();
+
+// Apply language now that all panels are built and __rerenderResults is defined
+applyLang(LANG);
 </script>
 </body>
 </html>
