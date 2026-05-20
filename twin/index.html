@@ -8,6 +8,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('lang');
+      if(!saved){ saved = (navigator.language || 'en').toLowerCase().startsWith('uk') ? 'uk' : 'en'; }
+      document.documentElement.lang = saved;
+    }catch(e){}
+  })();
+</script>
 <style>
   :root{
     --bg:#faf8f3;
@@ -132,6 +141,11 @@
   .backend-status .led{width:7px;height:7px;border-radius:50%;background:var(--mute)}
   .backend-status.live .led{background:var(--grn);box-shadow:0 0 6px rgba(15,157,107,.7)}
   .backend-status.replay .led{background:var(--yel)}
+
+  .lang-toggle{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;margin-right:6px}
+  .lang-pill{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2);background:transparent;border:none;border-radius:999px;padding:5px 10px;cursor:pointer;font-weight:600;transition:background .15s,color .15s}
+  .lang-pill:hover{color:var(--ink)}
+  .lang-pill[aria-current="true"]{background:var(--ink);color:#fff}
 </style>
 </head>
 <body>
@@ -142,21 +156,25 @@
       <span class="dot"></span>
       <a href="/restart-grid/">restart</a>
       <span class="slash">/</span>
-      <span class="sub">twin</span>
+      <span class="sub" data-i18n="brand.sub">twin</span>
     </span>
     <ul>
-      <li><a href="/restart-grid/pitch/">Pitch</a></li>
-      <li><a href="/restart-grid/technical/">Technical</a></li>
-      <li><a href="/restart-grid/twin/" aria-current="page">Twin</a></li>
+      <li><a href="/restart-grid/pitch/" data-i18n="nav.pitch">Pitch</a></li>
+      <li><a href="/restart-grid/technical/" data-i18n="nav.technical">Technical</a></li>
+      <li><a href="/restart-grid/twin/" aria-current="page" data-i18n="nav.twin">Twin</a></li>
     </ul>
-    <a class="btn primary" href="https://github.com/anastasiiapoliienko/vinnytsia-twin" target="_blank" rel="noopener">Source ↗</a>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" class="lang-pill" data-lang="en" aria-current="true">EN</button>
+      <button type="button" class="lang-pill" data-lang="uk" aria-current="false">UA</button>
+    </div>
+    <a class="btn primary" href="https://github.com/anastasiiapoliienko/vinnytsia-twin" target="_blank" rel="noopener" data-i18n="nav.source">Source ↗</a>
   </div>
 </nav>
 
 <main>
-  <h1>Watch <em>cold-load pickup</em> emerge.</h1>
+  <h1 data-i18n="h1">Watch <em>cold-load pickup</em> emerge.</h1>
   <p class="lede">
-    A 35/10&nbsp;kV Vinnytsia-stand-in substation, calibrated against synthetic SCADA traces, with loads modelled as a population of thermostatic-house equivalents. No CLPU multiplier is hard-coded anywhere — the spike on re-energization comes purely from <code>n</code>&nbsp;houses turning their heaters on at the same moment. Pick a scenario, hit play.
+    <span data-i18n="lede">A 35/10&nbsp;kV Vinnytsia-stand-in substation, calibrated against synthetic SCADA traces, with loads modelled as a population of thermostatic-house equivalents. No CLPU multiplier is hard-coded anywhere — the spike on re-energization comes purely from <code>n</code>&nbsp;houses turning their heaters on at the same moment. Pick a scenario, hit play.</span>
     <span id="backend-status" class="backend-status"><span class="led"></span><span class="lbl">connecting…</span></span>
   </p>
 
@@ -164,14 +182,14 @@
     <!-- Left column: main viz -->
     <div>
       <div class="panel">
-        <h3>Substation network</h3>
+        <h3 data-i18n="panel.net">Substation network</h3>
         <svg id="network" viewBox="0 0 800 340" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
 
       <div class="panel" style="margin-top:18px">
-        <h3>Substation load &amp; outdoor temperature</h3>
+        <h3 data-i18n="panel.load">Substation load &amp; outdoor temperature</h3>
         <div class="controls">
-          <button id="play" class="btn primary">▶ Play</button>
+          <button id="play" class="btn primary">▶ <span data-i18n="btn.play">Play</span></button>
           <div class="time" id="time-label">t = 0 min</div>
           <div class="scrub"><input type="range" id="scrub" min="0" max="100" value="0" step="1" /></div>
           <div class="speed-pill" id="speed-pill">
@@ -189,26 +207,26 @@
     <!-- Right column: scenarios + metrics -->
     <div>
       <div class="panel">
-        <h3>Scenarios</h3>
+        <h3 data-i18n="panel.scenarios">Scenarios</h3>
         <div class="scenario-list" id="scenario-list"></div>
       </div>
 
       <div class="panel" style="margin-top:18px">
-        <h3>This scenario's metrics</h3>
+        <h3 data-i18n="panel.metrics">This scenario's metrics</h3>
         <div class="metrics-grid" id="metrics"></div>
       </div>
 
       <div class="panel" style="margin-top:18px">
-        <h3>Indoor temperature (mean)</h3>
+        <h3 data-i18n="panel.indoor">Indoor temperature (mean)</h3>
         <div id="indoor-now" style="font-family:var(--serif);font-size:32px;line-height:1.1">— <span class="u" style="font-family:var(--mono);font-size:13px;color:var(--ink2)">°C</span></div>
-        <div style="font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.5">
+        <div style="font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.5" data-i18n="indoor.desc">
           Population-average across all ETP houses. During outages this drifts toward the outdoor temperature; on re-energization heaters turn on coincidentally.
         </div>
       </div>
     </div>
   </div>
 
-  <div class="footer-note">
+  <div class="footer-note" data-i18n="footer.note">
     <strong>How this works.</strong>
     The page first tries a live Python backend (FastAPI on Hugging Face Spaces) at <code id="backend-url">—</code>. If it's asleep or unreachable, it falls back to pre-computed scenarios bundled under <code>/twin/data/scenarios/</code>. The simulation stack — OpenDSS, NumPy-vectorised ETP populations, scipy Nelder-Mead calibration — lives in <a href="https://github.com/anastasiiapoliienko/vinnytsia-twin">anastasiiapoliienko/vinnytsia-twin</a>. The RL restoration env that consumes the calibrated population is in <a href="https://github.com/anastasiiapoliienko/restart-grid-rl">restart-grid-rl</a>.
   </div>
@@ -216,13 +234,156 @@
 
 <script>
 // ============================================================
+// i18n
+// ============================================================
+const i18n = {
+  en: {
+    "brand.sub": "twin",
+    "nav.pitch": "Pitch",
+    "nav.technical": "Technical",
+    "nav.twin": "Twin",
+    "nav.source": "Source ↗",
+    "h1": "Watch <em>cold-load pickup</em> emerge.",
+    "lede": "A 35/10&nbsp;kV Vinnytsia-stand-in substation, calibrated against synthetic SCADA traces, with loads modelled as a population of thermostatic-house equivalents. No CLPU multiplier is hard-coded anywhere — the spike on re-energization comes purely from <code>n</code>&nbsp;houses turning their heaters on at the same moment. Pick a scenario, hit play.",
+    "panel.net": "Substation network",
+    "panel.load": "Substation load & outdoor temperature",
+    "panel.scenarios": "Scenarios",
+    "panel.metrics": "This scenario's metrics",
+    "panel.indoor": "Indoor temperature (mean)",
+    "btn.play": "Play",
+    "btn.pause": "Pause",
+    "indoor.desc": "Population-average across all ETP houses. During outages this drifts toward the outdoor temperature; on re-energization heaters turn on coincidentally.",
+    "footer.note": "<strong>How this works.</strong> The page first tries a live Python backend (FastAPI on Hugging Face Spaces) at <code id=\"backend-url\">—</code>. If it's asleep or unreachable, it falls back to pre-computed scenarios bundled under <code>/twin/data/scenarios/</code>. The simulation stack — OpenDSS, NumPy-vectorised ETP populations, scipy Nelder-Mead calibration — lives in <a href=\"https://github.com/anastasiiapoliienko/vinnytsia-twin\">anastasiiapoliienko/vinnytsia-twin</a>. The RL restoration env that consumes the calibrated population is in <a href=\"https://github.com/anastasiiapoliienko/restart-grid-rl\">restart-grid-rl</a>.",
+    // Dynamic
+    "be.connecting": "connecting…",
+    "be.live": "live backend",
+    "be.asleep": "backend asleep · replay mode",
+    "be.replay": "replay mode",
+    "be.notset": "(not configured)",
+    "time.label": "t = {n} min",
+    "time.hour":  "{n}h",
+    "chart.MW": "MW",
+    "chart.kW": "kW",
+    "chart.tripThr": "trip threshold {n} MW",
+    "chart.indoor": "indoor mean",
+    "chart.outdoor": "outdoor",
+    "load.failed": "Failed to load: {msg}",
+    // Pills
+    "pill.trip.one": "{n} trip",
+    "pill.trip.many": "{n} trips",
+    "pill.notrips": "no trips",
+    "pill.restored.all": "6/6 restored",
+    "pill.restored.some": "{n}/6 restored",
+    "pill.subout": "substation out",
+    // Metrics
+    "m.peak": "Peak load", "m.trips": "Trips", "m.restored": "Restored", "m.restoration": "Restoration",
+    "m.u.MW": "MW", "m.u.events": "events", "m.u.feeders": "feeders", "m.u.min": "min",
+    // Scenarios (by id)
+    "scn.baseline-day.label": "Normal winter day",
+    "scn.baseline-day.desc": "All feeders energized through a full day. No outage. Shows the diurnal demand pattern and how it tracks outdoor temperature.",
+    "scn.outage-naive.label": "Outage + naive close-all",
+    "scn.outage-naive.desc": "3-hour substation outage, then every feeder closed simultaneously. Cold-load pickup exceeds the per-feeder trip threshold; the urban feeders trip immediately.",
+    "scn.outage-smart.label": "Outage + smart restoration",
+    "scn.outage-smart.desc": "3-hour substation outage, then feeders closed rural-first with a 12-minute settle window between each. CLPU is sequenced; no trips.",
+    "scn.cold-snap.label": "Cold snap day",
+    "scn.cold-snap.desc": "Synthetic deep-cold day (~-15 degC). Steady-state demand is much higher; the CLPU headroom shrinks because per-house duty is near 1."
+  },
+  uk: {
+    "brand.sub": "двійник",
+    "nav.pitch": "Аргументи",
+    "nav.technical": "Технічно",
+    "nav.twin": "Двійник",
+    "nav.source": "Код ↗",
+    "h1": "Дивися, як виникає <em>холодне навантаження</em>.",
+    "lede": "Замінник Вінницької підстанції 35/10&nbsp;кВ, відкалібрований за синтетичними SCADA-трасами; навантаження подано як популяцію еквівалентних термостатних будинків. Жодного CLPU-множника в коді немає — стрибок на повторному увімкненні виникає просто тому, що <code>n</code>&nbsp;будинків одночасно вмикають свої обігрівачі. Оберіть сценарій і натисніть «запустити».",
+    "panel.net": "Схема підстанції",
+    "panel.load": "Навантаження підстанції та температура надворі",
+    "panel.scenarios": "Сценарії",
+    "panel.metrics": "Метрики цього сценарію",
+    "panel.indoor": "Температура в приміщенні (середня)",
+    "btn.play": "Запустити",
+    "btn.pause": "Пауза",
+    "indoor.desc": "Усереднення по всій популяції ETP-будинків. Під час відключення вона дрейфує у бік зовнішньої температури; на повторному вмиканні нагрівачі стартують у відсутність діверсифікації.",
+    "footer.note": "<strong>Як це працює.</strong> Сторінка спершу пробує живий Python-бекенд (FastAPI на Hugging Face Spaces) за адресою <code id=\"backend-url\">—</code>. Якщо він спить або недосяжний, використовуються попередньо порахувані сценарії з <code>/twin/data/scenarios/</code>. Симуляційний стек — OpenDSS, NumPy-векторизовані ETP-популяції, калібрування Нелдера–Міда зі scipy — лежить у <a href=\"https://github.com/anastasiiapoliienko/vinnytsia-twin\">anastasiiapoliienko/vinnytsia-twin</a>. RL-середовище відновлення, яке користується каліброваною популяцією, — у <a href=\"https://github.com/anastasiiapoliienko/restart-grid-rl\">restart-grid-rl</a>.",
+    "be.connecting": "з'єднуємо…",
+    "be.live": "живий бекенд",
+    "be.asleep": "бекенд спить · режим повтору",
+    "be.replay": "режим повтору",
+    "be.notset": "(не налаштовано)",
+    "time.label": "t = {n} хв",
+    "time.hour":  "{n} год",
+    "chart.MW": "МВт",
+    "chart.kW": "кВт",
+    "chart.tripThr": "поріг спрацювання {n} МВт",
+    "chart.indoor": "середня в приміщенні",
+    "chart.outdoor": "надворі",
+    "load.failed": "Не вдалося завантажити: {msg}",
+    "pill.trip.one": "{n} спрацювання",
+    "pill.trip.many": "{n} спрацювань",
+    "pill.notrips": "без спрацювань",
+    "pill.restored.all": "6/6 відновлено",
+    "pill.restored.some": "{n}/6 відновлено",
+    "pill.subout": "підстанція без живлення",
+    "m.peak": "Пік навантаження", "m.trips": "Спрацювань", "m.restored": "Відновлено", "m.restoration": "Час відновлення",
+    "m.u.MW": "МВт", "m.u.events": "подій", "m.u.feeders": "фідерів", "m.u.min": "хв",
+    "scn.baseline-day.label": "Звичайний зимовий день",
+    "scn.baseline-day.desc": "Усі фідери під живленням протягом доби. Без відключень. Видно добовий патерн попиту і як він іде за зовнішньою температурою.",
+    "scn.outage-naive.label": "Відключення + наївно «усі одразу»",
+    "scn.outage-naive.desc": "3-годинне відключення на підстанції, потім усі фідери замикаються одночасно. Холодне навантаження перевищує поріг спрацювання, міські фідери вибивають одразу.",
+    "scn.outage-smart.label": "Відключення + розумне відновлення",
+    "scn.outage-smart.desc": "3-годинне відключення на підстанції, потім фідери замикаються спершу сільські, з 12-хвилинною витримкою між кожним. CLPU розкладений у часі — жодного спрацювання.",
+    "scn.cold-snap.label": "День сильного похолодання",
+    "scn.cold-snap.desc": "Синтетичний день глибокого холоду (~-15 °C). Усталений попит сильно вищий; запас на CLPU скорочується, бо кожен будинок працює близько до повного завантаження."
+  }
+};
+
+let LANG = document.documentElement.lang || 'en';
+function t(key, vars){
+  let s = (i18n[LANG] && i18n[LANG][key]) != null ? i18n[LANG][key] : (i18n.en[key] != null ? i18n.en[key] : key);
+  if(vars){ for(const k in vars){ s = s.split('{'+k+'}').join(vars[k]); } }
+  return s;
+}
+function applyLang(lang){
+  if(!i18n[lang]) lang = 'en';
+  LANG = lang;
+  document.documentElement.lang = lang;
+  try{ localStorage.setItem('lang', lang); }catch(e){}
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(i18n[lang][k] != null) el.innerHTML = i18n[lang][k];
+  });
+  document.querySelectorAll('.lang-pill').forEach(b=>{
+    b.setAttribute('aria-current', b.dataset.lang === lang ? 'true' : 'false');
+  });
+  // Restore #backend-url that lives inside footer.note (re-rendered above)
+  const beUrlEl = document.getElementById('backend-url');
+  if(beUrlEl) beUrlEl.textContent = BACKEND_URL || t('be.notset');
+  // Re-render the play button text (was set by JS not data-i18n)
+  const playBtn = document.getElementById('play');
+  if(playBtn) playBtn.innerHTML = (playing ? '❚❚ ' : '▶ ') + (playing ? t('btn.pause') : t('btn.play'));
+  // Re-render time, scenario list, chart, metrics, backend status
+  if(current){
+    renderFrame();
+    drawNetwork(current);
+    drawChart(current);
+    drawTempChart(current);
+    updateMetrics(current);
+  }
+  if(window.__manifest){ renderScenarios(window.__manifest); }
+  renderBackendStatus();
+}
+document.querySelectorAll('.lang-pill').forEach(b=>{
+  b.addEventListener('click', ()=> applyLang(b.dataset.lang));
+});
+
+// ============================================================
 // Config
 // ============================================================
 // Set this to your deployed HF Space URL once it's live, e.g.
 //   https://anastasiiapoliienko-vinnytsia-twin.hf.space
 // While empty or unreachable, the page uses bundled pre-computed scenarios.
 const BACKEND_URL = ""; // populate after deploy
-document.getElementById("backend-url").textContent = BACKEND_URL || "(not configured)";
+document.getElementById("backend-url").textContent = BACKEND_URL || t('be.notset');
 
 const ZONE_COLORS = { urban: "#0b3a78", peri: "#1a56ad", rural: "#0f9d6b" };
 const SUB_TRIP_KW = 25000;
@@ -311,7 +472,7 @@ function drawNetwork(s) {
   label1.setAttribute('font-family','var(--mono)');
   label1.setAttribute('font-size','11.5'); label1.setAttribute('font-weight','600');
   label1.setAttribute('fill','var(--ink)');
-  label1.textContent = '35 / 10 kV';
+  label1.textContent = LANG === 'uk' ? '35 / 10 кВ' : '35 / 10 kV';
   sub.appendChild(label1);
   const label2 = document.createElementNS('http://www.w3.org/2000/svg','text');
   label2.setAttribute('x', cx); label2.setAttribute('y', cy + 9);
@@ -324,7 +485,7 @@ function drawNetwork(s) {
   loadText.setAttribute('text-anchor','middle');
   loadText.setAttribute('class','net-sub-label');
   loadText.setAttribute('id','sub-load-text');
-  loadText.textContent = '0 kW';
+  loadText.textContent = '0 ' + t('chart.kW');
   sub.appendChild(loadText);
   svg.appendChild(sub);
 
@@ -376,7 +537,7 @@ function drawNetwork(s) {
     loadLbl.setAttribute('x', p.x); loadLbl.setAttribute('y', p.y + 44);
     loadLbl.setAttribute('class','net-feeder-load');
     loadLbl.setAttribute('id', `load-${p.name}`);
-    loadLbl.textContent = '— kW';
+    loadLbl.textContent = '— ' + t('chart.kW');
     svg.appendChild(loadLbl);
   });
 }
@@ -387,7 +548,7 @@ function updateNetwork(frame) {
                   && frame.sub_p_kw === 0
                   && frame.feeder_energized.every(x => x === 0);
   subRect.setAttribute('class', subTripped ? 'net-sub-rect tripped' : 'net-sub-rect');
-  document.getElementById('sub-load-text').textContent = Math.round(frame.sub_p_kw).toLocaleString() + ' kW';
+  document.getElementById('sub-load-text').textContent = Math.round(frame.sub_p_kw).toLocaleString() + ' ' + t('chart.kW');
   current.feeder_names.forEach((name, i) => {
     const line = document.getElementById(`line-${name}`);
     const node = document.getElementById(`node-${name}`);
@@ -402,7 +563,7 @@ function updateNetwork(frame) {
     else if (isTripped)            { cls += ' tripped'; nodeCls += ' tripped'; }
     line.setAttribute('class', cls);
     node.setAttribute('class', nodeCls);
-    loadLbl.textContent = Math.round(frame.feeder_load_kw[i]).toLocaleString() + ' kW';
+    loadLbl.textContent = Math.round(frame.feeder_load_kw[i]).toLocaleString() + ' ' + t('chart.kW');
   });
 }
 
@@ -459,17 +620,17 @@ function drawChart(s) {
   yLab.setAttribute('x', padL - 6); yLab.setAttribute('y', padT - 6);
   yLab.setAttribute('text-anchor','end');
   yLab.setAttribute('class','chart-axis-label');
-  yLab.textContent = 'MW';
+  yLab.textContent = t('chart.MW');
   svg.appendChild(yLab);
 
   // X gridlines (every hour)
-  for (let t = 0; t <= tMax; t += 60) {
-    const x = xOf(t);
+  for (let tt = 0; tt <= tMax; tt += 60) {
+    const x = xOf(tt);
     const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
     lbl.setAttribute('x', x); lbl.setAttribute('y', h - padB + 14);
     lbl.setAttribute('text-anchor','middle');
     lbl.setAttribute('class','chart-axis-label');
-    lbl.textContent = (t / 60).toFixed(0) + 'h';
+    lbl.textContent = t('time.hour', { n: (tt / 60).toFixed(0) });
     svg.appendChild(lbl);
   }
 
@@ -483,7 +644,7 @@ function drawChart(s) {
   thrLab.setAttribute('x', w - padR); thrLab.setAttribute('y', yOf(SUB_TRIP_KW) - 4);
   thrLab.setAttribute('text-anchor','end');
   thrLab.setAttribute('class','chart-threshold-label');
-  thrLab.textContent = `trip threshold ${(SUB_TRIP_KW/1000).toFixed(0)} MW`;
+  thrLab.textContent = t('chart.tripThr', { n: (SUB_TRIP_KW/1000).toFixed(0) });
   svg.appendChild(thrLab);
 
   // Area under curve
@@ -559,9 +720,9 @@ function drawTempChart(s) {
   const legend = document.createElementNS('http://www.w3.org/2000/svg','g');
   legend.innerHTML = `
     <line x1="${padL}" y1="${padT - 2}" x2="${padL + 18}" y2="${padT - 2}" stroke="#0b3a78" stroke-width="1.4"/>
-    <text x="${padL + 22}" y="${padT + 1}" font-family="var(--mono)" font-size="10" fill="#46546a">indoor mean</text>
-    <line x1="${padL + 120}" y1="${padT - 2}" x2="${padL + 138}" y2="${padT - 2}" stroke="#7a8190" stroke-width="1.4" stroke-dasharray="3,3"/>
-    <text x="${padL + 142}" y="${padT + 1}" font-family="var(--mono)" font-size="10" fill="#46546a">outdoor</text>
+    <text x="${padL + 22}" y="${padT + 1}" font-family="var(--mono)" font-size="10" fill="#46546a">${t('chart.indoor')}</text>
+    <line x1="${padL + 160}" y1="${padT - 2}" x2="${padL + 178}" y2="${padT - 2}" stroke="#7a8190" stroke-width="1.4" stroke-dasharray="3,3"/>
+    <text x="${padL + 182}" y="${padT + 1}" font-family="var(--mono)" font-size="10" fill="#46546a">${t('chart.outdoor')}</text>
   `;
   svg.appendChild(legend);
 
@@ -578,14 +739,14 @@ function updateMetrics(s) {
   const grid = document.getElementById('metrics');
   const m = s.metrics;
   const cards = [
-    { k: "Peak load",       v: (m.peak_kw / 1000).toFixed(1), u: "MW",
+    { k: t('m.peak'),        v: (m.peak_kw / 1000).toFixed(1), u: t('m.u.MW'),
       cls: m.peak_kw > SUB_TRIP_KW ? "bad" : (m.peak_kw > 22000 ? "warn" : "ok") },
-    { k: "Trips",           v: m.n_trips, u: "events",
+    { k: t('m.trips'),       v: m.n_trips, u: t('m.u.events'),
       cls: m.n_trips > 0 ? "bad" : "ok" },
-    { k: "Restored",        v: Math.round(m.frac_restored_final * 6) + "/6", u: "feeders",
+    { k: t('m.restored'),    v: Math.round(m.frac_restored_final * 6) + "/6", u: t('m.u.feeders'),
       cls: m.frac_restored_final === 1 ? "ok" : (m.frac_restored_final >= 0.5 ? "warn" : "bad") },
-    { k: "Restoration",     v: m.restoration_minutes ? m.restoration_minutes.toFixed(0) : "—",
-      u: "min", cls: "" },
+    { k: t('m.restoration'), v: m.restoration_minutes ? m.restoration_minutes.toFixed(0) : "—",
+      u: t('m.u.min'), cls: "" },
   ];
   grid.innerHTML = cards.map(c =>
     `<div class="metric ${c.cls}"><div class="k">${c.k}</div><div class="v">${c.v} <span class="u">${c.u}</span></div></div>`
@@ -595,7 +756,7 @@ function updateMetrics(s) {
 function renderFrame() {
   if (!current) return;
   const f = current.frames[frameIdx];
-  document.getElementById('time-label').textContent = `t = ${f.t_min.toFixed(0)} min`;
+  document.getElementById('time-label').textContent = t('time.label', { n: f.t_min.toFixed(0) });
   document.getElementById('scrub').value = frameIdx;
   document.getElementById('indoor-now').innerHTML = `${f.indoor_mean_C.toFixed(1)} <span class="u" style="font-family:var(--mono);font-size:13px;color:var(--ink2)">°C</span>`;
   const { xOf } = chartScales(current);
@@ -625,7 +786,7 @@ function tick(now) {
   renderFrame();
   if (frameIdx >= current.frames.length - 1) {
     playing = false;
-    document.getElementById('play').textContent = '▶ Play';
+    document.getElementById('play').innerHTML = '▶ ' + t('btn.play');
     return;
   }
   requestAnimationFrame(tick);
@@ -633,7 +794,7 @@ function tick(now) {
 
 document.getElementById('play').addEventListener('click', () => {
   playing = !playing;
-  document.getElementById('play').textContent = playing ? '❚❚ Pause' : '▶ Play';
+  document.getElementById('play').innerHTML = (playing ? '❚❚ ' : '▶ ') + (playing ? t('btn.pause') : t('btn.play'));
   if (playing) {
     if (frameIdx >= current.frames.length - 1) frameIdx = 0;
     lastTick = null;
@@ -654,22 +815,25 @@ document.getElementById('speed-pill').addEventListener('click', e => {
 // ============================================================
 // Init
 // ============================================================
-async function init() {
-  const manifestRes = await fetch('data/scenarios/manifest.json');
-  const manifest = await manifestRes.json();
+function renderScenarios(manifest){
   const list = document.getElementById('scenario-list');
+  if(!list) return;
+  const selectedId = document.querySelector('.scenario-card[aria-selected="true"]')?.dataset.scenarioId;
   list.innerHTML = manifest.map(m => {
-    const tripsPill = m.metrics.n_trips > 0
-      ? `<span class="pill bad">${m.metrics.n_trips} trip</span>`
-      : `<span class="pill ok">no trips</span>`;
+    const trips = m.metrics.n_trips;
+    const tripsPill = trips > 0
+      ? `<span class="pill bad">${t(trips === 1 ? 'pill.trip.one' : 'pill.trip.many', { n: trips })}</span>`
+      : `<span class="pill ok">${t('pill.notrips')}</span>`;
     const restPill = m.metrics.frac_restored_final === 1
-      ? `<span class="pill ok">6/6 restored</span>`
+      ? `<span class="pill ok">${t('pill.restored.all')}</span>`
       : m.metrics.frac_restored_final === 0
-        ? `<span class="pill bad">substation out</span>`
-        : `<span class="pill warn">${Math.round(m.metrics.frac_restored_final*6)}/6 restored</span>`;
-    return `<div class="scenario-card" data-scenario-id="${m.id}" tabindex="0">
-        <div class="label">${m.label}</div>
-        <div class="desc">${m.description}</div>
+        ? `<span class="pill bad">${t('pill.subout')}</span>`
+        : `<span class="pill warn">${t('pill.restored.some', { n: Math.round(m.metrics.frac_restored_final*6) })}</span>`;
+    const lbl = t(`scn.${m.id}.label`) || m.label;
+    const desc = t(`scn.${m.id}.desc`) || m.description;
+    return `<div class="scenario-card" data-scenario-id="${m.id}" tabindex="0"${selectedId === m.id ? ' aria-selected="true"' : ''}>
+        <div class="label">${lbl}</div>
+        <div class="desc">${desc}</div>
         <div class="outcome">${tripsPill}${restPill}</div>
       </div>`;
   }).join('');
@@ -679,18 +843,37 @@ async function init() {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectScenario(c.dataset.scenarioId); }
     });
   });
+}
 
-  // Backend health
+function renderBackendStatus(){
   const status = document.getElementById('backend-status');
+  if(!status) return;
   const lbl = status.querySelector('.lbl');
-  backendOk = await pingBackend();
+  status.classList.remove('live','replay');
   if (backendOk) {
     status.classList.add('live');
-    lbl.textContent = 'live backend';
+    lbl.textContent = t('be.live');
   } else {
     status.classList.add('replay');
-    lbl.textContent = BACKEND_URL ? 'backend asleep · replay mode' : 'replay mode';
+    lbl.textContent = BACKEND_URL ? t('be.asleep') : t('be.replay');
   }
+}
+
+async function init() {
+  // Set initial connecting label
+  const beLbl = document.querySelector('#backend-status .lbl');
+  if(beLbl) beLbl.textContent = t('be.connecting');
+
+  const manifestRes = await fetch('data/scenarios/manifest.json');
+  const manifest = await manifestRes.json();
+  window.__manifest = manifest;
+  renderScenarios(manifest);
+
+  backendOk = await pingBackend();
+  renderBackendStatus();
+
+  // Apply language now that everything is wired (in case head pre-render set 'uk')
+  applyLang(LANG);
 
   // Load first scenario.
   await selectScenario(manifest[0].id);
@@ -698,7 +881,7 @@ async function init() {
 
 init().catch(err => {
   console.error(err);
-  document.querySelector('main').innerHTML += `<div style="color:var(--red);padding:20px">Failed to load: ${err.message}</div>`;
+  document.querySelector('main').innerHTML += `<div style="color:var(--red);padding:20px">${t('load.failed', { msg: err.message })}</div>`;
 });
 </script>
 
