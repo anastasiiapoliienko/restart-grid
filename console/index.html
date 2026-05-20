@@ -8,6 +8,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('lang');
+      if(!saved){ saved = (navigator.language || 'en').toLowerCase().startsWith('uk') ? 'uk' : 'en'; }
+      document.documentElement.lang = saved;
+    }catch(e){}
+  })();
+</script>
 <style>
   :root{
     --bg:#faf8f3;
@@ -182,15 +191,24 @@
 
   footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:12.5px;font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
   footer a{color:var(--ink2)}
+
+  .lang-toggle{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+  .lang-pill{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2);background:transparent;border:none;border-radius:999px;padding:5px 10px;cursor:pointer;font-weight:600;transition:background .15s,color .15s}
+  .lang-pill:hover{color:var(--ink)}
+  .lang-pill[aria-current="true"]{background:var(--ink);color:#fff}
 </style>
 </head>
 <body>
 
 <nav class="top">
   <div class="row">
-    <a href="../pitch/" class="brand"><span class="dot"></span>Restart<span class="slash">/</span><span class="sub">console</span></a>
+    <a href="../pitch/" class="brand"><span class="dot"></span>Restart<span class="slash">/</span><span class="sub" data-i18n="brand.sub">console</span></a>
     <div class="right">
-      <a href="../pitch/">← back to pitch</a>
+      <a href="../pitch/" data-i18n="nav.back">← back to pitch</a>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" class="lang-pill" data-lang="en" aria-current="true">EN</button>
+        <button type="button" class="lang-pill" data-lang="uk" aria-current="false">UA</button>
+      </div>
       <a class="cta" href="https://github.com/anastasiiapoliienko/restart-grid-rl" target="_blank">github</a>
     </div>
   </div>
@@ -199,19 +217,19 @@
 <div class="wrap">
 
 <div class="hero">
-  <div class="eyebrow">Live operator console</div>
-  <h1>Restore a feeder, one decision at a time. <em>You're the operator.</em></h1>
-  <p class="lede">An 8-segment 10 kV feeder is in cold blackout. The AI advisor proposes one closure at a time, with a forecast and a one-line "why". You accept, wait, or override. The same ETP + CLPU physics that runs in the OpenDSS twin runs here in your browser.</p>
+  <div class="eyebrow" data-i18n="eyebrow">Live operator console</div>
+  <h1 data-i18n="h1">Restore a feeder, one decision at a time. <em>You're the operator.</em></h1>
+  <p class="lede" data-i18n="lede">An 8-segment 10 kV feeder is in cold blackout. The AI advisor proposes one closure at a time, with a forecast and a one-line "why". You accept, wait, or override. The same ETP + CLPU physics that runs in the OpenDSS twin runs here in your browser.</p>
   <div class="badge">
     <span class="pill">v0.1</span>
-    <span>browser implementation · safety shield active · scenario presets below</span>
+    <span data-i18n="badge">browser implementation · safety shield active · scenario presets below</span>
   </div>
 </div>
 
 <!-- Scenario picker -->
 <div class="card">
-  <h3>Scenario</h3>
-  <p class="sub">Same physics each time. The harder scenarios stress the policy.</p>
+  <h3 data-i18n="scn.h3">Scenario</h3>
+  <p class="sub" data-i18n="scn.sub">Same physics each time. The harder scenarios stress the policy.</p>
   <div class="scenarios" id="scenarios"></div>
 </div>
 
@@ -220,13 +238,13 @@
   <!-- LEFT: live topology + chart -->
   <div>
     <div class="card">
-      <h3>Feeder L-114 · live state</h3>
-      <p class="sub">Click any de-energized segment to override; click an energized one to inspect.</p>
+      <h3 data-i18n="topo.h3">Feeder L-114 · live state</h3>
+      <p class="sub" data-i18n="topo.sub">Click any de-energized segment to override; click an energized one to inspect.</p>
       <div class="topo">
         <div class="substation">
-          <div class="lbl">source</div>
+          <div class="lbl" data-i18n="topo.source">source</div>
           <div class="icon">⏧</div>
-          <div class="lbl">trunk</div>
+          <div class="lbl" data-i18n="topo.trunk">trunk</div>
           <div class="amps" id="trunk-amps">0 A</div>
         </div>
         <div class="trunk-line" id="trunk-line"></div>
@@ -234,20 +252,20 @@
       </div>
       <div class="chart-box">
         <div class="chart-meta">
-          <div>trunk current (A) · trip limit <b id="cm-trip">240 A</b></div>
-          <div>elapsed <b id="cm-time">0:00</b> · restored <b id="cm-rest">0/8</b></div>
+          <div><span data-i18n="chart.trunkCur">trunk current (A) · trip limit</span> <b id="cm-trip">240 A</b></div>
+          <div><span data-i18n="chart.elapsed">elapsed</span> <b id="cm-time">0:00</b> · <span data-i18n="chart.restored">restored</span> <b id="cm-rest">0/8</b></div>
         </div>
         <svg id="trunk-chart" viewBox="0 0 400 100" width="100%" height="100" preserveAspectRatio="none"></svg>
       </div>
       <div class="stat-row">
-        <div class="mini-stat"><div class="v" id="ms-trunk">0 A</div><div class="k">trunk now</div></div>
-        <div class="mini-stat"><div class="v" id="ms-shield">0</div><div class="k">shield vetoes</div></div>
-        <div class="mini-stat"><div class="v" id="ms-steps">0</div><div class="k">steps taken</div></div>
+        <div class="mini-stat"><div class="v" id="ms-trunk">0 A</div><div class="k" data-i18n="ms.trunk">trunk now</div></div>
+        <div class="mini-stat"><div class="v" id="ms-shield">0</div><div class="k" data-i18n="ms.shield">shield vetoes</div></div>
+        <div class="mini-stat"><div class="v" id="ms-steps">0</div><div class="k" data-i18n="ms.steps">steps taken</div></div>
       </div>
       <div class="play-controls">
-        <button class="btn primary" id="step-btn">Step</button>
-        <button class="btn" id="play-btn">▶ Auto</button>
-        <button class="btn" id="reset-btn">Reset</button>
+        <button class="btn primary" id="step-btn" data-i18n="btn.step">Step</button>
+        <button class="btn" id="play-btn">▶ <span data-i18n="btn.auto">Auto</span></button>
+        <button class="btn" id="reset-btn" data-i18n="btn.reset">Reset</button>
         <span class="speed" role="group">
           <button data-speed="1" aria-current="true">1×</button>
           <button data-speed="2">2×</button>
@@ -262,60 +280,250 @@
   <div>
     <div class="rec" id="rec">
       <div class="hd">
-        <div class="ttl" id="rec-title">Advisor · recommendation</div>
-        <div class="live"><span class="blink"></span><span id="rec-live">ready</span></div>
+        <div class="ttl" id="rec-title" data-i18n="rec.title">Advisor · recommendation</div>
+        <div class="live"><span class="blink"></span><span id="rec-live" data-i18n="rec.live.ready">ready</span></div>
       </div>
       <div class="row">
-        <span class="k">recommended action</span>
+        <span class="k" data-i18n="rec.k.action">recommended action</span>
         <span class="v"><span id="rec-action">—</span></span>
       </div>
       <div class="row">
-        <span class="k">predicted trunk after 30 s</span>
+        <span class="k" data-i18n="rec.k.pred">predicted trunk after 30 s</span>
         <span class="v" id="rec-pred">—</span>
       </div>
       <div class="row">
-        <span class="k">safety shield (95% of trip)</span>
+        <span class="k" data-i18n="rec.k.shield">safety shield (95% of trip)</span>
         <span class="v" id="rec-shield">—</span>
       </div>
       <div class="row">
-        <span class="k">confidence</span>
+        <span class="k" data-i18n="rec.k.conf">confidence</span>
         <span class="v" id="rec-conf-text">—</span>
       </div>
       <div class="conf-bar"><i id="rec-conf-bar" style="width:0%"></i></div>
       <div class="why">
-        <b>why this action</b>
-        <span id="rec-why">Loading scenario…</span>
+        <b data-i18n="rec.why.lbl">why this action</b>
+        <span id="rec-why" data-i18n="rec.why.loading">Loading scenario…</span>
       </div>
       <div class="actions" id="rec-actions">
-        <button class="accept" id="btn-accept">Accept</button>
-        <button class="wait" id="btn-wait">Wait 30 s</button>
-        <button class="override" id="btn-override">Override</button>
+        <button class="accept" id="btn-accept" data-i18n="btn.accept">Accept</button>
+        <button class="wait" id="btn-wait" data-i18n="btn.wait">Wait 30 s</button>
+        <button class="override" id="btn-override" data-i18n="btn.override">Override</button>
       </div>
       <div class="override-pick" id="override-pick">
-        <div class="lbl">Override: choose a segment to close manually</div>
+        <div class="lbl" data-i18n="ov.lbl">Override: choose a segment to close manually</div>
         <div class="seglist" id="override-list"></div>
       </div>
     </div>
 
     <div class="card" style="margin-top:18px">
-      <h3>History</h3>
-      <p class="sub">What you and the advisor did, in order.</p>
+      <h3 data-i18n="hist.h3">History</h3>
+      <p class="sub" data-i18n="hist.sub">What you and the advisor did, in order.</p>
       <div class="history" id="history">
-        <div class="empty">Click <b>Step</b> to start.</div>
+        <div class="empty" data-i18n="hist.empty">Click <b>Step</b> to start.</div>
       </div>
     </div>
   </div>
 </div>
 
 <footer>
-  <span>Restart · operator console · physics & advisor run in your browser</span>
-  <span><a href="../pitch/">← pitch</a> · <a href="https://github.com/anastasiiapoliienko/restart-grid-rl">restart-grid-rl</a></span>
+  <span data-i18n="foot.left">Restart · operator console · physics & advisor run in your browser</span>
+  <span><a href="../pitch/" data-i18n="foot.pitch">← pitch</a> · <a href="https://github.com/anastasiiapoliienko/restart-grid-rl">restart-grid-rl</a></span>
 </footer>
 
 </div>
 
 <script>
 "use strict";
+
+/* ──────────────────────────────────────────────────────────────
+ * i18n
+ * ────────────────────────────────────────────────────────────── */
+const i18n = {
+  en: {
+    "brand.sub": "console",
+    "nav.back": "← back to pitch",
+    "eyebrow": "Live operator console",
+    "h1": "Restore a feeder, one decision at a time. <em>You're the operator.</em>",
+    "lede": "An 8-segment 10 kV feeder is in cold blackout. The AI advisor proposes one closure at a time, with a forecast and a one-line \"why\". You accept, wait, or override. The same ETP + CLPU physics that runs in the OpenDSS twin runs here in your browser.",
+    "badge": "browser implementation · safety shield active · scenario presets below",
+    "scn.h3": "Scenario",
+    "scn.sub": "Same physics each time. The harder scenarios stress the policy.",
+    "topo.h3": "Feeder L-114 · live state",
+    "topo.sub": "Click any de-energized segment to override; click an energized one to inspect.",
+    "topo.source": "source",
+    "topo.trunk": "trunk",
+    "chart.trunkCur": "trunk current (A) · trip limit",
+    "chart.elapsed": "elapsed",
+    "chart.restored": "restored",
+    "ms.trunk": "trunk now",
+    "ms.shield": "shield vetoes",
+    "ms.steps": "steps taken",
+    "btn.step": "Step", "btn.auto": "Auto", "btn.pause": "Pause", "btn.reset": "Reset",
+    "rec.title": "Advisor · recommendation",
+    "rec.title.tripped": "Advisor · TRIPPED",
+    "rec.title.done": "Advisor · DONE",
+    "rec.live.ready": "ready",
+    "rec.live.halted": "halted",
+    "rec.live.complete": "complete",
+    "rec.k.action": "recommended action",
+    "rec.k.pred": "predicted trunk after 30 s",
+    "rec.k.shield": "safety shield (95% of trip)",
+    "rec.k.conf": "confidence",
+    "rec.why.lbl": "why this action",
+    "rec.why.loading": "Loading scenario…",
+    "rec.why.tripped": "Trunk current exceeded the trip threshold of 240 A. Reset the scenario to try again.",
+    "rec.why.done": "All 8 segments energized in {steps} steps ({mins} min). Shield vetoed {vetoes} action(s) along the way.",
+    "rec.action.close": "close switch <b>S{n}</b>",
+    "rec.action.wait": "wait <b>30 s</b> (no safe close)",
+    "rec.action.tripped": "<b>upstream breaker opened</b>",
+    "rec.action.done": "<b>restoration complete</b>",
+    "rec.shield.passed": "✓ passed",
+    "rec.shield.vetoed": "✗ vetoed all closes",
+    "rec.shield.late": "did not prevent in time",
+    "rec.pred.headroom": "{n} A · {h} A headroom",
+    "btn.accept": "Accept",
+    "btn.accept.close": "Accept · close S{n}",
+    "btn.accept.wait": "Accept · wait",
+    "btn.wait": "Wait 30 s",
+    "btn.override": "Override",
+    "ov.lbl": "Override: choose a segment to close manually",
+    "hist.h3": "History",
+    "hist.sub": "What you and the advisor did, in order.",
+    "hist.empty": "Click <b>Step</b> to start.",
+    "hist.closed": "Closed S{n}",
+    "hist.waited": "Waited 30 s",
+    "hist.trippedSfx": " — TRIPPED",
+    "hist.badge.accept": "accept",
+    "hist.badge.override": "override",
+    "hist.badge.shield": "shield",
+    "hist.badge.wait": "wait",
+    "seg.cold": "cold",
+    "seg.energized": "energized",
+    "seg.tripped": "tripped",
+    "seg.coldMin": "{n} min cold",
+    "chart.trip": "trip 240 A",
+    "chart.shieldL": "shield 228 A",
+    "foot.left": "Restart · operator console · physics & advisor run in your browser",
+    "foot.pitch": "← pitch",
+    // Scenarios
+    "scn.moderate.label": "Moderate", "scn.moderate.desc": "+1.6 °C · 6 h cold soak",
+    "scn.cold.label": "Deep cold",   "scn.cold.desc":     "−4 °C · 8 h cold soak",
+    "scn.long.label": "Long outage", "scn.long.desc":     "+0 °C · 12 h cold soak",
+    "scn.winter.label": "Worst case","scn.winter.desc":   "−5 °C · 12 h cold soak",
+    // Advisor why-strings
+    "why.allDone": "All eight segments are restored. Restoration complete.",
+    "why.wait": "Every closable segment would push trunk current above the {thr} A safety threshold (best candidate predicts {best} A). Waiting 30 s for active CLPU on already-energized segments to decay.",
+    "why.close": "S{n} is the longest cold of any remaining segment ({cold} min vs mean {mean} min). One-step forecast under closure predicts {amps} A — {head} A headroom under the {thr} A shield. CLPU expected to decay to {dec} A within 2 min."
+  },
+  uk: {
+    "brand.sub": "консоль",
+    "nav.back": "← до аргументів",
+    "eyebrow": "Жива диспетчерська консоль",
+    "h1": "Відновлюй фідер — одне рішення за раз. <em>Ти за пультом.</em>",
+    "lede": "8-сегментний фідер 10 кВ у холодному блекауті. ШІ-радник пропонує одне замикання за раз, з прогнозом і однорядковим «чому». Ти приймаєш, чекаєш або робиш по-своєму. Та сама фізика ETP + CLPU, що крутиться у двійнику OpenDSS, крутиться тут у браузері.",
+    "badge": "браузерна реалізація · щит безпеки активний · набір сценаріїв нижче",
+    "scn.h3": "Сценарій",
+    "scn.sub": "Фізика одна й та сама щоразу. Складніші сценарії тиснуть на політику сильніше.",
+    "topo.h3": "Фідер L-114 · поточний стан",
+    "topo.sub": "Клацніть на знеструмлений сегмент, щоб зробити по-своєму; клацніть на енергізований — щоб поглянути.",
+    "topo.source": "джерело",
+    "topo.trunk": "магістраль",
+    "chart.trunkCur": "струм у магістралі (А) · поріг спрацювання",
+    "chart.elapsed": "минуло",
+    "chart.restored": "відновлено",
+    "ms.trunk": "магістраль зараз",
+    "ms.shield": "вето щита",
+    "ms.steps": "зроблено кроків",
+    "btn.step": "Крок", "btn.auto": "Авто", "btn.pause": "Пауза", "btn.reset": "Скинути",
+    "rec.title": "Радник · рекомендація",
+    "rec.title.tripped": "Радник · СПРАЦЮВАЛО",
+    "rec.title.done": "Радник · ГОТОВО",
+    "rec.live.ready": "готово",
+    "rec.live.halted": "зупинено",
+    "rec.live.complete": "завершено",
+    "rec.k.action": "рекомендована дія",
+    "rec.k.pred": "прогноз струму в магістралі через 30 с",
+    "rec.k.shield": "щит безпеки (95% порога)",
+    "rec.k.conf": "впевненість",
+    "rec.why.lbl": "чому саме ця дія",
+    "rec.why.loading": "Завантаження сценарію…",
+    "rec.why.tripped": "Струм у магістралі перевищив поріг спрацювання 240 А. Скинь сценарій, щоб спробувати знову.",
+    "rec.why.done": "Усі 8 сегментів живі за {steps} кроків ({mins} хв). Щит ветував {vetoes} дій.",
+    "rec.action.close": "замкнути <b>S{n}</b>",
+    "rec.action.wait": "чекати <b>30 с</b> (немає безпечного замикання)",
+    "rec.action.tripped": "<b>головний автомат розімкнувся</b>",
+    "rec.action.done": "<b>відновлення завершено</b>",
+    "rec.shield.passed": "✓ пройдено",
+    "rec.shield.vetoed": "✗ ветовано всі замикання",
+    "rec.shield.late": "не встиг зупинити",
+    "rec.pred.headroom": "{n} А · запас {h} А",
+    "btn.accept": "Прийняти",
+    "btn.accept.close": "Прийняти · замкнути S{n}",
+    "btn.accept.wait": "Прийняти · зачекати",
+    "btn.wait": "Зачекати 30 с",
+    "btn.override": "Власна дія",
+    "ov.lbl": "Власна дія: виберіть сегмент для ручного замикання",
+    "hist.h3": "Історія",
+    "hist.sub": "Що зробили ти й радник, по порядку.",
+    "hist.empty": "Натисни <b>Крок</b>, щоб почати.",
+    "hist.closed": "Замкнено S{n}",
+    "hist.waited": "Зачекав 30 с",
+    "hist.trippedSfx": " — СПРАЦЮВАЛО",
+    "hist.badge.accept": "прийнято",
+    "hist.badge.override": "своя дія",
+    "hist.badge.shield": "щит",
+    "hist.badge.wait": "чекати",
+    "seg.cold": "холодний",
+    "seg.energized": "живий",
+    "seg.tripped": "вибив",
+    "seg.coldMin": "холод {n} хв",
+    "chart.trip": "поріг 240 А",
+    "chart.shieldL": "щит 228 А",
+    "foot.left": "Restart · диспетчерська консоль · фізика та радник працюють у вашому браузері",
+    "foot.pitch": "← аргументи",
+    "scn.moderate.label": "Помірний", "scn.moderate.desc": "+1,6 °C · 6 год холодного простою",
+    "scn.cold.label": "Сильний холод", "scn.cold.desc":    "−4 °C · 8 год холодного простою",
+    "scn.long.label": "Довге відключення", "scn.long.desc": "0 °C · 12 год холодного простою",
+    "scn.winter.label": "Найгірший випадок", "scn.winter.desc": "−5 °C · 12 год холодного простою",
+    "why.allDone": "Усі вісім сегментів відновлено. Готово.",
+    "why.wait": "Будь-яке замикання штовхне струм у магістралі вище порога безпеки {thr} А (найкращий кандидат прогнозує {best} А). Чекаємо 30 с, доки активний CLPU на вже живих сегментах не згасне.",
+    "why.close": "S{n} — найдовше в холоді з решти ({cold} хв проти середніх {mean} хв). Одно-крокове прогнозування під замикання дає {amps} А — запас {head} А під щитом {thr} А. Очікується, що CLPU згасне до {dec} А за 2 хв."
+  }
+};
+
+let LANG = document.documentElement.lang || 'en';
+function t(key, vars){
+  let s = (i18n[LANG] && i18n[LANG][key]) != null ? i18n[LANG][key] : (i18n.en[key] != null ? i18n.en[key] : key);
+  if(vars){ for(const k in vars){ s = s.split('{'+k+'}').join(vars[k]); } }
+  return s;
+}
+function applyLang(lang){
+  if(!i18n[lang]) lang = 'en';
+  LANG = lang;
+  document.documentElement.lang = lang;
+  try{ localStorage.setItem('lang', lang); }catch(e){}
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(i18n[lang][k] != null) el.innerHTML = i18n[lang][k];
+  });
+  document.querySelectorAll('.lang-pill').forEach(b=>{
+    b.setAttribute('aria-current', b.dataset.lang === lang ? 'true' : 'false');
+  });
+  // Re-render dynamic content if the app is up
+  if(typeof env !== 'undefined' && env){
+    if(typeof buildScenarios === 'function') buildScenarios();
+    if(typeof renderAll === 'function') renderAll();
+    if(typeof setHistory === 'function') setHistory(env.history || []);
+    if(typeof stopAuto === 'function' && !auto){
+      const pb = document.getElementById('play-btn');
+      if(pb) pb.innerHTML = '▶ ' + t('btn.auto');
+    }
+  }
+}
+document.querySelectorAll('.lang-pill').forEach(b=>{
+  b.addEventListener('click', ()=> applyLang(b.dataset.lang));
+});
+
 /* ──────────────────────────────────────────────────────────────
  * ETP + CLPU population model (browser port of restart/etp.py)
  * Identical formulas; deterministic per (seed, ambient, outage_h).
@@ -493,7 +701,6 @@ class Env {
  * the trained PPO ensemble (which lives in restart-grid-rl).
  * ────────────────────────────────────────────────────────────── */
 function advisorRecommend(env){
-  // For each de-energized segment, forecast trunk after closing it.
   const candidates = [];
   for(let i=0;i<N_SEGMENTS;i++){
     if(env.energized[i]) continue;
@@ -503,30 +710,33 @@ function advisorRecommend(env){
   }
   if(candidates.length === 0){
     return { action: null, kind: "done", amps: env.trunkAmps(), decayed: env.trunkAmps(),
-             confidence: 1, why: "All eight segments are restored. Restoration complete." };
+             confidence: 1, whyKey: "why.allDone", whyVars: {} };
   }
   const safe = candidates.filter(c => c.amps <= SHIELD_THRESH);
   if(safe.length === 0){
-    // Nothing safe to close — wait for CLPU to decay
     const minPred = Math.min(...candidates.map(c => c.amps));
     return { action: null, kind: "wait",
              amps: env.trunkAmps(), decayed: env.trunkAmps(),
              confidence: 0.7,
-             why: `Every closable segment would push trunk current above the ${SHIELD_THRESH.toFixed(0)} A safety threshold (best candidate predicts ${minPred.toFixed(0)} A). Waiting ${STEP_SECONDS}s for active CLPU on already-energized segments to decay.` };
+             whyKey: "why.wait",
+             whyVars: { thr: SHIELD_THRESH.toFixed(0), best: minPred.toFixed(0) } };
   }
-  // Among safe actions: pick the one with the highest cold-minutes (priority by need),
-  // and tie-break by lowest predicted amps (safer first).
   safe.sort((a, b) => (b.cold - a.cold) || (a.amps - b.amps));
   const pick = safe[0];
-  // Confidence: closer to threshold = lower confidence
   const margin = (SHIELD_THRESH - pick.amps) / SHIELD_THRESH;
   const conf = Math.max(0.55, Math.min(0.99, 0.7 + margin * 0.45));
-  const headroom = (SHIELD_THRESH - pick.amps).toFixed(0);
-  const why = `S${pick.seg+1} is the longest cold of any remaining segment (${pick.cold.toFixed(0)} min vs mean ${
-    (candidates.reduce((s, c) => s + c.cold, 0) / candidates.length).toFixed(0)
-  } min). One-step forecast under closure predicts ${pick.amps.toFixed(0)} A — ${headroom} A headroom under the ${SHIELD_THRESH.toFixed(0)} A shield. CLPU expected to decay to ${pick.decayed.toFixed(0)} A within 2 min.`;
   return { action: pick.seg, kind: "close", amps: pick.amps, decayed: pick.decayed,
-           confidence: conf, why };
+           confidence: conf,
+           whyKey: "why.close",
+           whyVars: {
+             n: pick.seg + 1,
+             cold: pick.cold.toFixed(0),
+             mean: (candidates.reduce((s, c) => s + c.cold, 0) / candidates.length).toFixed(0),
+             amps: pick.amps.toFixed(0),
+             head: (SHIELD_THRESH - pick.amps).toFixed(0),
+             thr: SHIELD_THRESH.toFixed(0),
+             dec: pick.decayed.toFixed(0)
+           } };
 }
 
 /* ──────────────────────────────────────────────────────────────
@@ -596,7 +806,9 @@ function buildScenarios(){
     b.className = "scen-btn";
     b.dataset.id = s.id;
     b.setAttribute("aria-current", s.id === currentScenario.id ? "true" : "false");
-    b.innerHTML = `<span>${s.label}</span><span class="meta">${s.desc}</span>`;
+    const lbl = t(`scn.${s.id}.label`) || s.label;
+    const desc = t(`scn.${s.id}.desc`) || s.desc;
+    b.innerHTML = `<span>${lbl}</span><span class="meta">${desc}</span>`;
     b.addEventListener("click", () => loadScenario(s));
     dom.scenariosEl.appendChild(b);
   }
@@ -610,7 +822,7 @@ function buildFeeders(){
     el.dataset.i = i;
     el.innerHTML = `
       <div class="name">S${i+1}</div>
-      <div class="state">cold</div>
+      <div class="state">${t('seg.cold')}</div>
       <div class="load">0 kW</div>`;
     el.addEventListener("click", () => onSegmentClick(i));
     dom.feeders.appendChild(el);
@@ -638,17 +850,17 @@ function pushTrunk(t){
 
 function setHistory(items){
   if(items.length === 0){
-    dom.history.innerHTML = '<div class="empty">Click <b>Step</b> to start.</div>';
+    dom.history.innerHTML = `<div class="empty">${t('hist.empty')}</div>`;
     return;
   }
   dom.history.innerHTML = items.slice(-50).map(h => {
-    const t = `${Math.floor(h.t / 60)}:${String(Math.floor(h.t % 60)).padStart(2,"0")}`;
-    const badge = h.kind === "accept" ? '<span class="acc">accept</span>'
-                : h.kind === "override" ? '<span class="ovr">override</span>'
-                : h.kind === "veto" ? '<span class="veto">shield</span>'
-                : h.kind === "wait" ? '<span class="veto">wait</span>'
+    const ts = `${Math.floor(h.t / 60)}:${String(Math.floor(h.t % 60)).padStart(2,"0")}`;
+    const badge = h.kind === "accept" ? `<span class="acc">${t('hist.badge.accept')}</span>`
+                : h.kind === "override" ? `<span class="ovr">${t('hist.badge.override')}</span>`
+                : h.kind === "veto" ? `<span class="veto">${t('hist.badge.shield')}</span>`
+                : h.kind === "wait" ? `<span class="veto">${t('hist.badge.wait')}</span>`
                 : "";
-    return `<div class="h-row"><div class="t">${t}</div><div class="desc">${h.desc}${badge}</div><div class="amps">${h.amps.toFixed(0)} A</div></div>`;
+    return `<div class="h-row"><div class="t">${ts}</div><div class="desc">${h.desc}${badge}</div><div class="amps">${h.amps.toFixed(0)} A</div></div>`;
   }).join("");
   dom.history.scrollTop = dom.history.scrollHeight;
 }
@@ -664,19 +876,20 @@ function computeRecommendation(){
 function renderAll(){
   // Segments
   const recSeg = currentRec && currentRec.action != null ? currentRec.action : -1;
+  const kWUnit = LANG === 'uk' ? 'кВт' : 'kW';
   for(let i=0;i<N_SEGMENTS;i++){
     const el = dom.feeders.children[i];
     el.classList.remove("warm", "on", "trip", "recommended");
     el.querySelector(".load").textContent = env.energized[i]
-      ? env.segmentLoadKW(i).toFixed(0) + " kW"
-      : `${env.coldMinutes[i].toFixed(0)} min cold`;
+      ? env.segmentLoadKW(i).toFixed(0) + " " + kWUnit
+      : t('seg.coldMin', { n: env.coldMinutes[i].toFixed(0) });
     if(env.tripped){ el.classList.add("trip"); }
     else if(env.energized[i]){
       const elapsedSinceClose = (env.pops[i].tSince ?? Infinity);
       el.classList.add(elapsedSinceClose < 90 ? "warm" : "on");
     }
-    el.querySelector(".state").textContent = env.tripped ? "tripped"
-      : env.energized[i] ? "energized" : "cold";
+    el.querySelector(".state").textContent = env.tripped ? t('seg.tripped')
+      : env.energized[i] ? t('seg.energized') : t('seg.cold');
     if(i === recSeg && !env.energized[i] && !env.tripped) el.classList.add("recommended");
     // star
     if(el.querySelector(".star")) el.querySelector(".star").remove();
@@ -715,9 +928,9 @@ function drawChart(){
   const yTrip = h - 8 - ((TRIP_AMPS / 300) * 78);
   const yShield = h - 8 - ((SHIELD_THRESH / 300) * 78);
   lines.push(`<line x1="${pad}" y1="${yTrip}" x2="${w - pad}" y2="${yTrip}" stroke="#c0392b" stroke-dasharray="3 3" stroke-width="1"/>`);
-  lines.push(`<text x="${w - 5}" y="${yTrip - 3}" fill="#c0392b" font-size="9" text-anchor="end" font-family="JetBrains Mono,Menlo,monospace">trip 240 A</text>`);
+  lines.push(`<text x="${w - 5}" y="${yTrip - 3}" fill="#c0392b" font-size="9" text-anchor="end" font-family="JetBrains Mono,Menlo,monospace">${t('chart.trip')}</text>`);
   lines.push(`<line x1="${pad}" y1="${yShield}" x2="${w - pad}" y2="${yShield}" stroke="#f5c518" stroke-dasharray="2 2" stroke-width="1"/>`);
-  lines.push(`<text x="${w - 5}" y="${yShield - 3}" fill="#c5651a" font-size="9" text-anchor="end" font-family="JetBrains Mono,Menlo,monospace">shield 228 A</text>`);
+  lines.push(`<text x="${w - 5}" y="${yShield - 3}" fill="#c5651a" font-size="9" text-anchor="end" font-family="JetBrains Mono,Menlo,monospace">${t('chart.shieldL')}</text>`);
   // line
   const maxT = Math.max(20 * 60, trunkHistory.length ? trunkHistory[trunkHistory.length - 1].t : 0) + 60;
   const pts = trunkHistory.map(p => {
@@ -733,16 +946,16 @@ function drawChart(){
 function renderRec(){
   if(env.tripped){
     dom.rec.classList.add("tripped"); dom.rec.classList.remove("done");
-    dom.recTitle.textContent = "Advisor · TRIPPED";
-    dom.recLive.textContent = "halted";
-    dom.recAction.innerHTML = '<b>upstream breaker opened</b>';
+    dom.recTitle.textContent = t('rec.title.tripped');
+    dom.recLive.textContent = t('rec.live.halted');
+    dom.recAction.innerHTML = t('rec.action.tripped');
     dom.recPred.textContent = `${env.trunkAmps().toFixed(0)} A`;
     dom.recPred.className = "v bad";
-    dom.recShield.textContent = "did not prevent in time";
+    dom.recShield.textContent = t('rec.shield.late');
     dom.recShield.className = "v bad";
     dom.recConfText.textContent = "—";
     dom.recConfBar.style.width = "0%";
-    dom.recWhy.textContent = "Trunk current exceeded the trip threshold of 240 A. Reset the scenario to try again.";
+    dom.recWhy.textContent = t('rec.why.tripped');
     [dom.btnAccept, dom.btnWait, dom.btnOverride].forEach(b => b.disabled = true);
     dom.overridePick.classList.remove("show");
     return;
@@ -750,44 +963,48 @@ function renderRec(){
   dom.rec.classList.remove("tripped");
   if(env.allOn()){
     dom.rec.classList.add("done");
-    dom.recTitle.textContent = "Advisor · DONE";
-    dom.recLive.textContent = "complete";
-    dom.recAction.innerHTML = '<b>restoration complete</b>';
+    dom.recTitle.textContent = t('rec.title.done');
+    dom.recLive.textContent = t('rec.live.complete');
+    dom.recAction.innerHTML = t('rec.action.done');
     dom.recPred.textContent = `${env.trunkAmps().toFixed(0)} A`;
     dom.recPred.className = "v ok";
-    dom.recShield.textContent = "passed";
+    dom.recShield.textContent = t('rec.shield.passed');
     dom.recShield.className = "v ok";
     dom.recConfText.textContent = "100%";
     dom.recConfBar.style.width = "100%";
-    dom.recWhy.textContent = `All 8 segments energized in ${env.stepCount} steps (${(env.stepCount * STEP_SECONDS / 60).toFixed(1)} min). Shield vetoed ${shieldVetoes} action(s) along the way.`;
+    dom.recWhy.textContent = t('rec.why.done', {
+      steps: env.stepCount,
+      mins: (env.stepCount * STEP_SECONDS / 60).toFixed(1),
+      vetoes: shieldVetoes
+    });
     [dom.btnAccept, dom.btnWait, dom.btnOverride].forEach(b => b.disabled = true);
     dom.overridePick.classList.remove("show");
     return;
   }
   dom.rec.classList.remove("done");
   const r = currentRec;
-  dom.recTitle.textContent = "Advisor · recommendation";
-  dom.recLive.textContent = "ready";
+  dom.recTitle.textContent = t('rec.title');
+  dom.recLive.textContent = t('rec.live.ready');
   if(r.kind === "close"){
-    dom.recAction.innerHTML = `close switch <b>S${r.action + 1}</b>`;
-    dom.recPred.textContent = `${r.amps.toFixed(0)} A · ${(SHIELD_THRESH - r.amps).toFixed(0)} A headroom`;
+    dom.recAction.innerHTML = t('rec.action.close', { n: r.action + 1 });
+    dom.recPred.textContent = t('rec.pred.headroom', { n: r.amps.toFixed(0), h: (SHIELD_THRESH - r.amps).toFixed(0) });
     dom.recPred.className = r.amps > SHIELD_THRESH * 0.9 ? "v warn" : "v ok";
-    dom.recShield.textContent = "✓ passed";
+    dom.recShield.textContent = t('rec.shield.passed');
     dom.recShield.className = "v ok";
     dom.btnAccept.disabled = false;
-    dom.btnAccept.textContent = `Accept · close S${r.action + 1}`;
+    dom.btnAccept.textContent = t('btn.accept.close', { n: r.action + 1 });
   } else if(r.kind === "wait"){
-    dom.recAction.innerHTML = `wait <b>${STEP_SECONDS} s</b> (no safe close)`;
+    dom.recAction.innerHTML = t('rec.action.wait');
     dom.recPred.textContent = `${env.trunkAmps().toFixed(0)} A`;
     dom.recPred.className = "v warn";
-    dom.recShield.textContent = "✗ vetoed all closes";
+    dom.recShield.textContent = t('rec.shield.vetoed');
     dom.recShield.className = "v warn";
     dom.btnAccept.disabled = false;
-    dom.btnAccept.textContent = "Accept · wait";
+    dom.btnAccept.textContent = t('btn.accept.wait');
   }
   dom.recConfText.textContent = `${(r.confidence * 100).toFixed(0)}%`;
   dom.recConfBar.style.width = `${(r.confidence * 100).toFixed(0)}%`;
-  dom.recWhy.textContent = r.why;
+  dom.recWhy.textContent = r.whyKey ? t(r.whyKey, r.whyVars) : (r.why || "");
   dom.btnWait.disabled = false;
   dom.btnOverride.disabled = false;
 }
@@ -810,9 +1027,9 @@ function doStep(action, kind){
   pushTrunk(env.stepCount * STEP_SECONDS);
   // history
   let desc;
-  if(typeof action === "number") desc = `Closed S${action + 1}`;
-  else desc = "Waited 30 s";
-  if(env.tripped) desc += " — TRIPPED";
+  if(typeof action === "number") desc = t('hist.closed', { n: action + 1 });
+  else desc = t('hist.waited');
+  if(env.tripped) desc += t('hist.trippedSfx');
   appendHistory(desc, kind, env.trunkAmps());
   computeRecommendation();
   renderAll();
@@ -850,7 +1067,7 @@ function doOverride(i){
 
 function startAuto(){
   auto = true;
-  dom.playBtn.textContent = "■ Pause";
+  dom.playBtn.innerHTML = "■ " + t('btn.pause');
   dom.playBtn.classList.add("primary");
   const tick = () => {
     if(!auto || env.tripped || env.allOn()) return stopAuto();
@@ -861,7 +1078,7 @@ function startAuto(){
 }
 function stopAuto(){
   auto = false;
-  dom.playBtn.textContent = "▶ Auto";
+  dom.playBtn.innerHTML = "▶ " + t('btn.auto');
   dom.playBtn.classList.remove("primary");
   if(autoTimer){ clearTimeout(autoTimer); autoTimer = null; }
 }
@@ -885,6 +1102,7 @@ document.querySelectorAll(".speed button").forEach(b => {
 buildScenarios();
 buildFeeders();
 loadScenario(currentScenario);
+applyLang(LANG);
 </script>
 </body>
 </html>
