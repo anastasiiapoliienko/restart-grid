@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="An AI advisor that learns the safest sequence to re-energize feeders after a blackout — trained on a digital twin of Ukraine's grid." />
+<title>Restart the grid, correctly · a case for learned grid restoration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf8f3;
+    --bg2:#f3efe5;
+    --paper:#ffffff;
+    --ink:#0b1320;
+    --ink2:#46546a;
+    --mute:#8a94a6;
+    --line:#e6e1d5;
+    --line2:#efeadd;
+    --navy:#0b3a78;
+    --navy-2:#1a56ad;
+    --yel:#f5c518;
+    --yel-2:#fff3b8;
+    --grn:#0f9d6b;
+    --red:#c0392b;
+    --radius:14px;
+    --radius-lg:20px;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+    --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --shadow-sm:0 1px 2px rgba(15,23,42,.04),0 1px 1px rgba(15,23,42,.03);
+    --shadow:0 4px 14px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+    --shadow-lg:0 20px 50px -20px rgba(11,58,120,.25),0 6px 16px rgba(15,23,42,.06);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:80px}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{overflow-x:hidden}
+  a{color:var(--navy);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s,color .15s}
+  a:hover{color:var(--navy-2);border-bottom-color:var(--navy-2)}
+
+  /* ── Progress bar ─────────────────────────────────────── */
+  .progress{position:fixed;top:0;left:0;right:0;height:2px;background:transparent;z-index:60}
+  .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy) 0%,var(--yel) 100%);transition:width .08s linear}
+
+  /* ── Top nav ─────────────────────────────────────────── */
+  nav.top{position:sticky;top:0;background:rgba(250,248,243,.82);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--line);z-index:50}
+  nav.top .row{max-width:1100px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:24px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--yel);box-shadow:0 0 0 3px var(--yel-2),0 0 14px rgba(245,197,24,.5)}
+  .brand .slash{color:var(--mute);font-weight:400;margin:0 2px}
+  .brand .sub{color:var(--ink2);font-weight:500}
+  nav.top ul{display:flex;gap:4px;list-style:none;margin:0;padding:0;flex:1;justify-content:center}
+  nav.top ul a{font-family:var(--mono);font-size:12px;color:var(--ink2);padding:6px 10px;border-radius:8px;border-bottom:none;letter-spacing:.02em}
+  nav.top ul a:hover{background:var(--bg2);color:var(--ink)}
+  nav.top .cta{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:var(--mono);font-weight:500;border-bottom:none;transition:transform .15s,background .15s}
+  nav.top .cta:hover{background:var(--navy);transform:translateY(-1px);color:#fff}
+  nav.top .cta svg{width:12px;height:12px}
+  @media (max-width:840px){nav.top ul{display:none}}
+
+  /* ── Layout ──────────────────────────────────────────── */
+  .wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+  .narrow{max-width:780px;margin:0 auto}
+  section{padding:72px 0;border-bottom:1px solid var(--line2)}
+  section:last-of-type{border-bottom:none}
+
+  /* ── Section eyebrows ────────────────────────────────── */
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--navy);font-weight:600;display:inline-flex;align-items:center;gap:8px}
+  .eyebrow::before{content:"";display:inline-block;width:18px;height:1px;background:var(--navy);opacity:.5}
+  .section-label{display:flex;align-items:baseline;gap:14px;margin-bottom:24px}
+  .section-label .num{font-family:var(--mono);font-size:13px;color:var(--mute);font-weight:500;letter-spacing:.05em}
+  h2{font-size:32px;line-height:1.12;margin:8px 0 12px;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
+  h2 em{font-style:normal;font-family:var(--serif);font-weight:400;color:var(--navy);letter-spacing:-.01em}
+  h3{font-size:15px;margin:0 0 8px;color:var(--ink);font-weight:600;letter-spacing:-.005em}
+  p{color:var(--ink2);margin:0 0 14px;font-size:15.5px}
+  p.kicker{font-size:17px;color:var(--ink);max-width:680px}
+
+  /* ── Hero ────────────────────────────────────────────── */
+  .hero{position:relative;padding:88px 0 60px;overflow:hidden}
+  .hero .bg-grid{position:absolute;inset:-20% -10% -20% -10%;background-image:
+    linear-gradient(to right,rgba(11,58,120,.06) 1px,transparent 1px),
+    linear-gradient(to bottom,rgba(11,58,120,.06) 1px,transparent 1px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(ellipse 60% 50% at 70% 30%,#000 0%,transparent 75%);
+    -webkit-mask-image:radial-gradient(ellipse 60% 50% at 70% 30%,#000 0%,transparent 75%);
+    pointer-events:none}
+  .hero .glow{position:absolute;top:-100px;right:-80px;width:540px;height:540px;border-radius:50%;background:radial-gradient(circle at center,rgba(245,197,24,.22) 0%,rgba(245,197,24,0) 60%);pointer-events:none;filter:blur(2px)}
+  .hero .inner{position:relative;z-index:2}
+  .hero .badge{display:inline-flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);padding:6px 12px 6px 8px;border-radius:999px;font-family:var(--mono);font-size:12px;color:var(--ink2);box-shadow:var(--shadow-sm);margin-bottom:24px}
+  .hero .badge .pill{display:inline-block;background:var(--yel-2);color:#7a5a00;font-size:10.5px;padding:2px 7px;border-radius:999px;border:1px solid #f0dc8a;font-weight:600;letter-spacing:.04em}
+  h1{font-size:60px;line-height:1.02;margin:0 0 22px;font-weight:600;letter-spacing:-.035em;max-width:920px;color:var(--ink)}
+  h1 em{font-style:normal;font-family:var(--serif);font-weight:400;color:var(--navy);letter-spacing:-.025em}
+  h1 .strike{position:relative;display:inline-block}
+  h1 .strike::after{content:"";position:absolute;left:-2%;right:-2%;top:55%;height:6px;background:var(--yel);border-radius:3px;transform:rotate(-1.2deg);z-index:-1}
+  .hero .lede{font-size:19px;color:var(--ink);max-width:720px;margin:0 0 28px;line-height:1.5}
+  .hero .ctas{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:44px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;font-family:var(--sans);border:1px solid transparent;cursor:pointer;transition:transform .15s,background .15s,border-color .15s;border-bottom:none}
+  .btn.primary{background:var(--ink);color:#fff}
+  .btn.primary:hover{background:var(--navy);color:#fff;transform:translateY(-1px)}
+  .btn.ghost{background:var(--paper);color:var(--ink);border-color:var(--line)}
+  .btn.ghost:hover{border-color:var(--ink);color:var(--ink)}
+  .btn svg{width:14px;height:14px}
+  @media (max-width:740px){h1{font-size:40px}.hero{padding:56px 0 32px}}
+
+  /* ── Stat strip ──────────────────────────────────────── */
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+  .stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px 20px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s,border-color .2s}
+  .stat:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:#d6d0bf}
+  .stat .v{font-size:42px;font-weight:600;color:var(--navy);letter-spacing:-.035em;line-height:1;font-family:var(--sans)}
+  .stat .v em{font-style:normal;font-family:var(--serif);font-weight:400;letter-spacing:-.02em}
+  .stat .k{font-size:13.5px;color:var(--ink2);margin-top:10px;line-height:1.45}
+  .stat .icon{position:absolute;top:18px;right:18px;width:28px;height:28px;color:var(--mute);opacity:.5}
+  @media (max-width:740px){.stat-row{grid-template-columns:1fr}}
+
+  /* ── TL;DR ───────────────────────────────────────────── */
+  .tldr{background:linear-gradient(180deg,var(--paper) 0%,var(--bg2) 100%);border:1px solid var(--line);border-radius:var(--radius-lg);padding:28px 30px;box-shadow:var(--shadow-sm)}
+  .tldr h2{font-size:14px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.18em;color:var(--ink2);margin:0 0 18px;font-weight:600}
+  .tldr ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:14px 28px}
+  .tldr li{display:flex;gap:12px;align-items:flex-start;font-size:15px;color:var(--ink);line-height:1.5}
+  .tldr li .b{flex:0 0 22px;height:22px;border-radius:6px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:600;margin-top:1px}
+  @media (max-width:740px){.tldr ul{grid-template-columns:1fr}}
+
+  /* ── Grids & cards ───────────────────────────────────── */
+  .grid{display:grid;gap:14px}
+  .grid.cols-2{grid-template-columns:1fr 1fr}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr)}
+  @media (max-width:880px){.grid.cols-3,.grid.cols-4{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative}
+  .card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:#d6d0bf}
+  .card .tag{margin-bottom:10px}
+  .card h3{margin-top:0}
+  .card p{font-size:14.5px;margin:0}
+
+  /* alt-card with mark */
+  .alt-card{position:relative;padding-left:24px}
+  .alt-card::before{content:"";position:absolute;left:0;top:24px;bottom:24px;width:3px;border-radius:3px;background:var(--line)}
+  .alt-card.fail::before{background:linear-gradient(180deg,var(--red),#e98570)}
+  .alt-card.win::before{background:linear-gradient(180deg,var(--grn),#5fc99f)}
+  .alt-card .verdict{position:absolute;top:18px;right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--mute);text-transform:uppercase}
+  .alt-card.fail .verdict{color:var(--red)}
+  .alt-card.win .verdict{color:var(--grn)}
+
+  /* ── Tags ────────────────────────────────────────────── */
+  .tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:999px;background:#eef2f9;color:var(--navy);border:1px solid #d9e1f0;font-weight:500;letter-spacing:.03em;text-transform:uppercase}
+  .tag.y{background:#fff7d6;color:#7a5a00;border-color:#f0dc8a}
+  .tag.g{background:#e6f7ef;color:#0f6c4a;border-color:#bfe6d3}
+  .tag.r{background:#fde8e4;color:#8a2418;border-color:#f3c5be}
+  .tag.k{background:#0b1320;color:#fff;border-color:#0b1320}
+  .tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+  /* ── Steps (How it works) ────────────────────────────── */
+  ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;position:relative}
+  ol.steps::before{content:"";position:absolute;left:18px;top:22px;bottom:22px;width:1px;background:linear-gradient(180deg,var(--line),var(--line) 50%,transparent 100%);z-index:0}
+  ol.steps>li{counter-increment:s;position:relative;padding:18px 22px 18px 64px;background:var(--paper);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;transition:border-color .15s,transform .15s;z-index:1}
+  ol.steps>li:hover{border-color:#cfc8b3;transform:translateX(2px)}
+  ol.steps>li::before{content:counter(s,decimal-leading-zero);position:absolute;left:14px;top:18px;width:36px;height:36px;border-radius:10px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:13px;display:flex;align-items:center;justify-content:center;font-weight:600;letter-spacing:.02em;box-shadow:var(--shadow-sm)}
+  ol.steps>li b{color:var(--ink);font-weight:600}
+  ol.steps>li p{margin:4px 0 0;font-size:14.5px}
+  ol.steps>li .meta{display:inline-flex;gap:6px;margin-top:10px}
+  code{font-family:var(--mono);font-size:12.5px;background:#f1f3f8;padding:1.5px 7px;border-radius:6px;color:var(--ink);border:1px solid var(--line)}
+
+  /* ── Pull quote ──────────────────────────────────────── */
+  .quote{position:relative;padding:18px 0 18px 28px;color:var(--ink);max-width:760px;margin:20px 0 0;font-family:var(--serif);font-size:24px;line-height:1.35;letter-spacing:-.01em;font-style:italic}
+  .quote::before{content:"";position:absolute;left:0;top:24px;bottom:24px;width:4px;background:linear-gradient(180deg,var(--yel) 0%,#e0a400 100%);border-radius:4px}
+
+  /* ── Roadmap (Stages) ────────────────────────────────── */
+  .road{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px}
+  .stage{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s,border-color .2s}
+  .stage:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#d6d0bf}
+  .stage .top-bar{position:absolute;top:0;left:0;right:0;height:3px;background:var(--line)}
+  .stage[data-status="done"] .top-bar{background:var(--grn)}
+  .stage[data-status="now"] .top-bar{background:linear-gradient(90deg,var(--yel),#e0a400);animation:pulse 2.4s ease-in-out infinite}
+  .stage[data-status="next"] .top-bar{background:linear-gradient(90deg,var(--navy),var(--navy-2))}
+  .stage[data-status="future"] .top-bar{background:repeating-linear-gradient(90deg,var(--line),var(--line) 4px,transparent 4px,transparent 8px)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .stage .step-no{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+  .stage .step-no .status{font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--ink2);background:var(--bg2)}
+  .stage[data-status="done"] .status{color:var(--grn);border-color:#bfe6d3;background:#e6f7ef}
+  .stage[data-status="now"] .status{color:#7a5a00;border-color:#f0dc8a;background:#fff7d6}
+  .stage[data-status="next"] .status{color:var(--navy);border-color:#d9e1f0;background:#eef2f9}
+  .stage h3{margin:6px 0 8px;font-size:16px}
+  .stage p{font-size:14px;margin:0;color:var(--ink2)}
+  @media (max-width:920px){.road{grid-template-columns:1fr 1fr}}
+  @media (max-width:520px){.road{grid-template-columns:1fr}}
+
+  /* ── Risks ───────────────────────────────────────────── */
+  .risk{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;display:grid;grid-template-columns:auto 1fr;gap:14px 16px;align-items:start;transition:border-color .15s,transform .15s}
+  .risk:hover{border-color:#cfc8b3;transform:translateY(-1px)}
+  .risk .ic{width:38px;height:38px;border-radius:10px;background:#fde8e4;color:var(--red);display:flex;align-items:center;justify-content:center;flex:0 0 38px}
+  .risk .ic svg{width:18px;height:18px}
+  .risk h3{margin:6px 0 0;font-size:15.5px}
+  .risk .mit{grid-column:1/-1;padding:14px 16px;background:var(--bg2);border-radius:10px;border:1px dashed #d6d0bf;color:var(--ink);font-size:14px;line-height:1.5}
+  .risk .mit b{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grn);font-weight:600;margin-right:8px;padding:2px 8px;background:#e6f7ef;border-radius:999px;border:1px solid #bfe6d3}
+
+  /* ── Quote/prevent moment ────────────────────────────── */
+  .prevent{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:32px 36px;box-shadow:var(--shadow-sm)}
+  .prevent p{font-size:17.5px;line-height:1.55;color:var(--ink);margin:0;max-width:760px}
+  .prevent p em{font-style:normal;font-family:var(--serif);color:var(--navy);font-size:1.05em;font-weight:400}
+  @media (max-width:740px){.prevent{padding:24px}.prevent p{font-size:16px}}
+
+  /* ── Closing ─────────────────────────────────────────── */
+  .close{background:linear-gradient(135deg,var(--ink) 0%,#152540 60%,var(--navy) 100%);color:#fff;border-radius:var(--radius-lg);padding:42px 44px;margin-top:18px;position:relative;overflow:hidden;box-shadow:var(--shadow-lg)}
+  .close::before{content:"";position:absolute;top:-50%;right:-10%;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle at center,rgba(245,197,24,.18) 0%,rgba(245,197,24,0) 60%);pointer-events:none}
+  .close .label{position:relative;color:var(--yel);font-size:12px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.22em;margin:0 0 14px;font-weight:600;display:inline-flex;align-items:center;gap:10px}
+  .close .label::before{content:"";display:inline-block;width:18px;height:1px;background:var(--yel);opacity:.7}
+  .close .big{position:relative;font-size:28px;font-weight:500;letter-spacing:-.015em;line-height:1.3;color:#fff;max-width:820px;margin:0}
+  .close .big em{font-style:normal;font-family:var(--serif);font-weight:400;color:var(--yel-2);letter-spacing:-.005em}
+  .close .footer-row{position:relative;display:flex;flex-wrap:wrap;gap:14px;margin-top:30px;padding-top:22px;border-top:1px solid rgba(255,255,255,.12)}
+  .close .footer-row a{color:#cdd6e8;font-family:var(--mono);font-size:12.5px;border-bottom:none;display:inline-flex;align-items:center;gap:6px}
+  .close .footer-row a:hover{color:var(--yel)}
+  .close .footer-row a svg{width:13px;height:13px}
+  .close .footer-row .sep{color:rgba(255,255,255,.2)}
+  @media (max-width:740px){.close{padding:30px 26px}.close .big{font-size:22px}}
+
+  /* ── Footer ──────────────────────────────────────────── */
+  footer{padding:36px 0 60px;color:var(--mute);font-family:var(--mono);font-size:12px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+  footer a{color:var(--ink2);border-bottom:none}
+  footer a:hover{color:var(--ink)}
+
+  /* ── Reveal on scroll ────────────────────────────────── */
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .55s ease, transform .55s ease}
+  .reveal.in{opacity:1;transform:translateY(0)}
+
+  /* ── Print ───────────────────────────────────────────── */
+  @media print{
+    nav.top,.progress,.hero .glow,.hero .bg-grid{display:none}
+    body{background:#fff}
+    section{padding:24px 0;break-inside:avoid}
+    .card,.stat,.stage,.risk,.tldr,.prevent{break-inside:avoid;box-shadow:none}
+    .close{background:#0b1320 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+
+<nav class="top">
+  <div class="row">
+    <a href="#top" class="brand">
+      <span class="dot"></span>
+      <span>restart</span>
+      <span class="slash">/</span>
+      <span class="sub">the case</span>
+    </a>
+    <ul>
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#idea">Idea</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#stages">Stages</a></li>
+      <li><a href="#risks">Risks</a></li>
+    </ul>
+    <a class="cta" href="https://github.com/anastasiiapoliienko/restart-grid" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.5c-2.23.49-2.7-.95-2.7-.95-.36-.93-.89-1.18-.89-1.18-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 8 .2z"/></svg>
+      View repo
+    </a>
+  </div>
+</nav>
+
+<a id="top"></a>
+
+<header class="hero">
+  <div class="bg-grid"></div>
+  <div class="glow"></div>
+  <div class="wrap inner">
+    <span class="badge">
+      <span class="pill">v0.1</span>
+      Restart · a case for learned grid restoration
+    </span>
+    <h1>Ukraine restarts its grid <span class="strike">wrong</span> every week. <em>There is a way to do it right.</em></h1>
+    <p class="lede">An AI advisor that learns the safest sequence to re-energize feeders after a blackout — trained on a digital twin of Ukraine's actual network, and presented to operators with a one-line explanation for every recommendation.</p>
+    <div class="ctas">
+      <a class="btn primary" href="#problem">
+        Read the case
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12 L12 4 M6 4 H12 V10"/></svg>
+      </a>
+      <a class="btn ghost" href="https://github.com/anastasiiapoliienko/restart-grid" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.5c-2.23.49-2.7-.95-2.7-.95-.36-.93-.89-1.18-.89-1.18-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 8 .2z"/></svg>
+        Code &amp; experiments
+      </a>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat reveal">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 L4 13 H11 L10 22 L20 11 H13 Z"/></svg>
+        <div class="v">3–8<em>×</em></div>
+        <div class="k">cold-load inrush vs steady-state, the moment power returns</div>
+      </div>
+      <div class="stat reveal">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3 V12 L19 16"/></svg>
+        <div class="v">~50<em>%</em></div>
+        <div class="k">of Ukraine's thermal generation lost or degraded since 2022</div>
+      </div>
+      <div class="stat reveal">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12 H21 M3 6 H21 M3 18 H21"/><path d="M7 3 V21 M17 3 V21"/></svg>
+        <div class="v">weekly</div>
+        <div class="k">topology changes from strikes and repairs — paper procedures go stale</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section id="tldr" style="padding-top:48px;padding-bottom:48px;border:none">
+  <div class="tldr reveal">
+    <h2>In 30 seconds</h2>
+    <ul>
+      <li><span class="b">A</span><span><b>Problem.</b> Every restart cascades a trip. Paper procedures assume a grid Ukraine no longer has.</span></li>
+      <li><span class="b">B</span><span><b>Idea.</b> An RL policy recommends <i>which feeder, what ramp, what dwell time</i> — with a one-line explanation.</span></li>
+      <li><span class="b">C</span><span><b>Twin.</b> Trained on a calibrated OpenDSS model of a real oblast, validated on Typhoon HIL hardware.</span></li>
+      <li><span class="b">D</span><span><b>Human-in-the-loop.</b> Shadow mode → advisory → one-click accept with two-person confirmation. Never autonomous.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="section-label"><span class="num">01</span><span class="eyebrow">The problem</span></div>
+  <h2>The current playbook was <em>written for a grid that no longer exists</em>.</h2>
+  <p class="kicker">After every blackout, an operator must re-energize a feeder. With every thermostat, fridge, and heater off, demand snaps back all at once and trips the upstream breaker — blackout again. Operators perform the restart under air-raid sirens, with degraded telemetry, sometimes from candlelight.</p>
+</section>
+
+<section id="idea">
+  <div class="section-label"><span class="num">02</span><span class="eyebrow">The idea</span></div>
+  <h2>A learned policy for the question: <em>what do I energize next?</em></h2>
+  <p class="kicker">A reinforcement-learning policy that recommends <i>which segment to energize next</i>, <i>at what voltage ramp</i>, <i>after what dwell time</i>. Trained against millions of synthetic blackout scenarios on a calibrated digital twin of Ukrainian topology. Every recommendation is shown to a human operator with an explanation. Never autonomous.</p>
+  <p class="quote reveal">Restoration is the one grid problem where seconds of delay cost megawatt-hours, and where the right action depends on weather, time, and damage. That is exactly the regime where RL beats both human procedures and classical optimization.</p>
+</section>
+
+<section id="how">
+  <div class="section-label"><span class="num">03</span><span class="eyebrow">How it works</span></div>
+  <h2>Six concrete steps from <em>synthetic data</em> to <em>operator console</em>.</h2>
+  <ol class="steps">
+    <li class="reveal">
+      <b>Build a twin of a real Ukrainian sub-region.</b>
+      <p>One oblast's 35 / 10 kV network modeled in <code>OpenDSS</code>. Calibrated against ≥18 months of historical SCADA traces. Loads modeled as a population of equivalent-thermal-parameter houses, so cold-load behavior <i>emerges</i> rather than being hard-coded.</p>
+      <div class="meta"><span class="tag k"><span class="dot"></span>foundation</span></div>
+    </li>
+    <li class="reveal">
+      <b>Generate scenarios.</b>
+      <p>Synthesize millions of blackout starting states across season, ambient temperature, outage duration, and damage pattern. This dataset — restoration under realistic adversarial damage — exists nowhere else.</p>
+      <div class="meta"><span class="tag"><span class="dot"></span>data</span></div>
+    </li>
+    <li class="reveal">
+      <b>Train a policy.</b>
+      <p>PPO with action masking in <code>Stable-Baselines3</code>. Curriculum from single feeder to full regional topology. Reward = load restored, penalized for trips, voltage violations, and time. An explainer is attached at training time, not bolted on after.</p>
+      <div class="meta"><span class="tag"><span class="dot"></span>training</span></div>
+    </li>
+    <li class="reveal">
+      <b>Validate in hardware.</b>
+      <p>Replay the policy on <code>Typhoon HIL</code> in real time. This is the sim-to-real check: does it still beat the baseline when load parameters drift and measurement noise is added?</p>
+      <div class="meta"><span class="tag y"><span class="dot"></span>hardware in the loop</span></div>
+    </li>
+    <li class="reveal">
+      <b>Shadow-mode beside the operator.</b>
+      <p>The console shows the agent's recommendation next to the operator's intended action. The operator decides. Every disagreement becomes a training example.</p>
+      <div class="meta"><span class="tag y"><span class="dot"></span>deploy · shadow</span></div>
+    </li>
+    <li class="reveal">
+      <b>Promote to advisory.</b>
+      <p>After months of high agreement, the operator can <i>accept</i> a recommendation with one click. Two-person confirmation above a learned risk threshold. The system never becomes fully closed-loop.</p>
+      <div class="meta"><span class="tag g"><span class="dot"></span>advisory</span></div>
+    </li>
+  </ol>
+</section>
+
+<section id="why">
+  <div class="section-label"><span class="num">04</span><span class="eyebrow">Why this works where the alternatives don't</span></div>
+  <h2>Two old approaches are <em>structurally wrong</em> for this regime.</h2>
+  <div class="grid cols-3">
+    <div class="card alt-card fail reveal">
+      <span class="verdict">stale</span>
+      <span class="tag r"><span class="dot"></span>option a</span>
+      <h3>Paper procedures</h3>
+      <p>Assume seasonal averages and stable topology. Ukraine in 2026 has neither.</p>
+    </div>
+    <div class="card alt-card fail reveal">
+      <span class="verdict">brittle</span>
+      <span class="tag r"><span class="dot"></span>option b</span>
+      <h3>Classical optimization</h3>
+      <p>Requires re-formulating every time the grid changes shape. The grid changes shape every week.</p>
+    </div>
+    <div class="card alt-card win reveal">
+      <span class="verdict">adapts</span>
+      <span class="tag g"><span class="dot"></span>proposal</span>
+      <h3>Learned policy</h3>
+      <p>Maps state → next action. Topology and damage are inputs, not assumptions. Retrains on its own disagreements.</p>
+    </div>
+  </div>
+</section>
+
+<section id="stages">
+  <div class="section-label"><span class="num">05</span><span class="eyebrow">Stages</span></div>
+  <h2>A staged path that <em>never goes autonomous</em>.</h2>
+  <div class="road">
+    <div class="stage reveal" data-status="done">
+      <div class="top-bar"></div>
+      <div class="step-no"><span>Stage 01</span><span class="status">scoped</span></div>
+      <h3>Single-feeder proof</h3>
+      <p>One 10 kV feeder in OpenDSS. The trained policy beats both the greedy baseline and the paper procedure on time-to-99% restoration and on cascading trips.</p>
+    </div>
+    <div class="stage reveal" data-status="now">
+      <div class="top-bar"></div>
+      <div class="step-no"><span>Stage 02</span><span class="status">in progress</span></div>
+      <h3>Regional twin</h3>
+      <p>An entire oblast modeled and calibrated to historical SCADA. Policy curriculum-trained across seasons and damage patterns. Operator-facing explainer working.</p>
+    </div>
+    <div class="stage reveal" data-status="next">
+      <div class="top-bar"></div>
+      <div class="step-no"><span>Stage 03</span><span class="status">next</span></div>
+      <h3>HIL &amp; shadow</h3>
+      <p>Real-time validation on Typhoon HIL. The console runs live in a control room. Operators see recommendations, decide, and the disagreement log feeds the next training run.</p>
+    </div>
+    <div class="stage reveal" data-status="future">
+      <div class="top-bar"></div>
+      <div class="step-no"><span>Stage 04</span><span class="status">future</span></div>
+      <h3>Advisory with approval</h3>
+      <p>One-click accept becomes available where the agent's risk score is low and the operator agrees. Two-person confirmation above the threshold. Always a human in the loop.</p>
+    </div>
+  </div>
+</section>
+
+<section id="prevent">
+  <div class="section-label"><span class="num">06</span><span class="eyebrow">What this prevents</span></div>
+  <div class="prevent reveal">
+    <p>Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — <em>it is hours of heat returned to people in February.</em></p>
+  </div>
+</section>
+
+<section id="risks">
+  <div class="section-label"><span class="num">07</span><span class="eyebrow">Risks owned up to</span></div>
+  <h2>The four ways this could fail — and how each is <em>handled</em>.</h2>
+  <div class="grid cols-2">
+    <div class="risk reveal">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4 M12 17h.01"/><path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+      </div>
+      <div>
+        <span class="tag r"><span class="dot"></span>risk 01</span>
+        <h3>Sim-to-real gap</h3>
+        <p style="font-size:14.5px;margin-top:6px">Field load won't perfectly match the population we sampled.</p>
+      </div>
+      <div class="mit"><b>handled</b> Domain randomization during training and online fine-tuning from real disagreements.</div>
+    </div>
+    <div class="risk reveal">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+      </div>
+      <div>
+        <span class="tag r"><span class="dot"></span>risk 02</span>
+        <h3>Operator trust</h3>
+        <p style="font-size:14.5px;margin-top:6px">One visibly wrong recommendation costs a year of credibility.</p>
+      </div>
+      <div class="mit"><b>handled</b> A long shadow period, an explanation attached to every recommendation, and no autonomous mode.</div>
+    </div>
+    <div class="risk reveal">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <div>
+        <span class="tag r"><span class="dot"></span>risk 03</span>
+        <h3>Data access</h3>
+        <p style="font-size:14.5px;margin-top:6px">SCADA history is sensitive.</p>
+      </div>
+      <div class="mit"><b>handled</b> Training on-prem inside the utility perimeter; no data leaves the building.</div>
+    </div>
+    <div class="risk reveal">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+      </div>
+      <div>
+        <span class="tag r"><span class="dot"></span>risk 04</span>
+        <h3>Topology drift</h3>
+        <p style="font-size:14.5px;margin-top:6px">A re-routed substation is a new problem.</p>
+      </div>
+      <div class="mit"><b>handled</b> Conditioning the policy on a topology hash, plus meta-training across a distribution of topologies, so adaptation is fast.</div>
+    </div>
+  </div>
+</section>
+
+<section id="case" style="border:none">
+  <div class="close reveal">
+    <div class="label">The case in one line</div>
+    <div class="big">Ukraine has the world's most demanding grid-restoration problem, the world's <em>richest dataset</em> for solving it, and tooling that didn't exist five years ago. The question is no longer whether this works — <em>only whether someone builds it before the next winter.</em></div>
+    <div class="footer-row">
+      <a href="https://github.com/anastasiiapoliienko/restart-grid" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 .2a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.5c-2.23.49-2.7-.95-2.7-.95-.36-.93-.89-1.18-.89-1.18-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 8 .2z"/></svg>
+        github.com/anastasiiapoliienko/restart-grid
+      </a>
+      <span class="sep">·</span>
+      <a href="#top">↑ back to top</a>
+      <span class="sep">·</span>
+      <a href="javascript:window.print()">print / PDF</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Restart · the case for learned grid restoration</span>
+  <span>v0.1 · last updated 2026-05</span>
+</footer>
+
+</div><!-- /.wrap -->
+
+<script>
+  // Scroll progress bar
+  const bar = document.getElementById('bar');
+  function onScroll(){
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    bar.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  }, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>
