@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RL Cold-Load Pickup for the Ukrainian Grid</title>
+<style>
+  :root{
+    --bg:#0b1018;
+    --bg2:#11182a;
+    --panel:#151d33;
+    --line:#243154;
+    --ink:#e7ecf5;
+    --ink2:#a4afc9;
+    --mute:#6c7898;
+    --blue:#3aa0ff;
+    --yel:#ffd24a;
+    --grn:#52d39a;
+    --red:#ff6b6b;
+    --acc:#7c8cff;
+    --radius:14px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.55}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 24px 80px}
+  header{padding:64px 0 24px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--yel);font-weight:600}
+  h1{font-size:42px;line-height:1.1;margin:14px 0 16px;font-weight:700;letter-spacing:-.01em}
+  h2{font-size:24px;margin:48px 0 14px;letter-spacing:-.005em}
+  h3{font-size:17px;margin:24px 0 8px;color:var(--ink)}
+  p,li{color:var(--ink2)}
+  .lede{font-size:18px;color:var(--ink);max-width:780px}
+  .meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px;color:var(--mute);font-size:13px;font-family:var(--mono)}
+  .meta span b{color:var(--ink2);font-weight:500}
+  .grid{display:grid;gap:16px}
+  .grid.cols-2{grid-template-columns:1fr 1fr}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr)}
+  @media (max-width:780px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card h3{margin-top:0}
+  .card small{color:var(--mute);font-family:var(--mono);font-size:12px}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:999px;background:#1a2647;color:var(--blue);border:1px solid #25366a;margin-right:6px}
+  .pill.y{color:var(--yel);background:#241e08;border-color:#3a3010}
+  .pill.g{color:var(--grn);background:#0e2a20;border-color:#19553f}
+  .pill.r{color:var(--red);background:#2b1318;border-color:#5c1d24}
+  ol.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  ol.steps>li{counter-increment:s;position:relative;padding:14px 16px 14px 56px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+  ol.steps>li::before{content:counter(s);position:absolute;left:14px;top:14px;width:30px;height:30px;border-radius:8px;background:#1a2647;color:var(--blue);font-family:var(--mono);font-size:13px;display:flex;align-items:center;justify-content:center;border:1px solid #25366a}
+  ol.steps>li b{color:var(--ink)}
+  code,kbd{font-family:var(--mono);font-size:12.5px;background:#0e1626;border:1px solid var(--line);padding:1px 6px;border-radius:6px;color:var(--ink)}
+  pre{background:#0a1120;border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow:auto;font-family:var(--mono);font-size:12.5px;color:var(--ink)}
+  pre .kw{color:var(--acc)}
+  pre .st{color:var(--grn)}
+  pre .c{color:var(--mute)}
+  hr{border:0;border-top:1px solid var(--line);margin:32px 0}
+
+  /* Sim */
+  .sim{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .sim-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  .sim-ctrls{display:flex;gap:8px;flex-wrap:wrap}
+  button.btn{background:#1a2647;color:var(--ink);border:1px solid #25366a;border-radius:10px;padding:9px 14px;font-size:13px;font-family:inherit;cursor:pointer;transition:all .15s}
+  button.btn:hover{background:#22315c}
+  button.btn.primary{background:#1f3a76;border-color:#2c4f9a;color:#fff}
+  button.btn.primary:hover{background:#274aa0}
+  button.btn.ghost{background:transparent}
+  .legend{display:flex;gap:14px;font-size:12px;font-family:var(--mono);color:var(--ink2);flex-wrap:wrap}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:5px}
+  .dot.off{background:#2b3454}
+  .dot.warm{background:var(--yel)}
+  .dot.on{background:var(--grn)}
+  .dot.trip{background:var(--red)}
+  .sim-cv{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+  @media (max-width:780px){.sim-cv{grid-template-columns:1fr}}
+  .net{background:#0a1120;border:1px solid var(--line);border-radius:12px;padding:14px;position:relative;min-height:260px}
+  .chart{background:#0a1120;border:1px solid var(--line);border-radius:12px;padding:10px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .stat{background:#0a1120;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .stat .k{font-family:var(--mono);font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.1em}
+  .stat .v{font-size:20px;font-weight:600;color:var(--ink);margin-top:2px;font-family:var(--mono)}
+  .stat .v.g{color:var(--grn)}
+  .stat .v.r{color:var(--red)}
+  .narr{font-size:12.5px;color:var(--ink2);font-family:var(--mono);min-height:34px;margin-top:8px;background:#0a1120;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+
+  /* Architecture diagram */
+  .arch{background:#0a1120;border:1px solid var(--line);border-radius:12px;padding:14px}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);color:var(--mute);font-size:13px;font-family:var(--mono)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Project brief / Engineering plan</div>
+  <h1>RL-learned cold-load pickup for the Ukrainian grid</h1>
+  <p class="lede">An advisory system that learns the safest sequence to re-energize feeders after a blackout — trained on a high-fidelity twin of Ukrainian topology and seasonal load, validated in hardware-in-the-loop, deployed shadow-mode beside operators at Ukrenergo and DSOs.</p>
+  <div class="meta">
+    <span><b>scope</b> sub-transmission + distribution restoration</span>
+    <span><b>horizon</b> 24 months to closed-loop advisor</span>
+    <span><b>team</b> 6–10 (RL, power systems, ops, frontend)</span>
+    <span><b>budget</b> ~€2.4M phased</span>
+  </div>
+</header>
+
+<h2>1 · The problem in one paragraph</h2>
+<p>After a national or regional blackout, restoring a feeder is not "flip the breaker." With every thermostat, fridge, and heater off, <b>load diversity is lost</b>: the moment power returns, every device demands current at once, producing inrush 3–8× the steady-state load. The upstream breaker trips, and you black out again. Operators currently follow paper procedures that assume seasonal averages. Ukraine, in 2026, has neither average seasons nor static topology — substations are damaged, repaired, and damaged again on a weekly cadence, and restoration sequences written six months ago are no longer valid.</p>
+
+<div class="grid cols-3">
+  <div class="card">
+    <span class="pill r">pain</span>
+    <h3>Lost diversity</h3>
+    <p>All thermostatic loads call simultaneously after a cold outage. Inrush dwarfs nameplate demand.</p>
+  </div>
+  <div class="card">
+    <span class="pill r">pain</span>
+    <h3>Topology drift</h3>
+    <p>Substations and lines change weekly. Static procedures go stale faster than they can be rewritten.</p>
+  </div>
+  <div class="card">
+    <span class="pill r">pain</span>
+    <h3>Operator cognitive load</h3>
+    <p>Restoring under attack with degraded telemetry is the worst possible time to do paper procedures from memory.</p>
+  </div>
+</div>
+
+<h2>2 · Why this is an RL problem, not an optimization one</h2>
+<p>Classical CLPU studies frame restoration as a constrained optimization: pick segment order to minimize a cost. That works when the system is well-modeled and stationary. Ukraine's restoration problem is none of that — load behavior after a 12-hour winter outage is non-linear, topology is partially observed, and the "right" action depends on weather forecast, time since outage, ambient temperature, and which neighboring feeders are already loaded. The mapping <code>state → next action</code> is exactly what RL learns well, and is a poor fit for solver-based approaches that require re-formulating every time the grid changes shape.</p>
+
+<h2>3 · How it will be built — six steps</h2>
+<ol class="steps">
+  <li><b>Digital twin of a real Ukrainian sub-region.</b> Start with one oblast's 35 kV / 10 kV network in <code>OpenDSS</code> or <code>GridLAB-D</code>. Calibrate from historical SCADA traces (Ukrenergo + a partner DSO). Model thermostatic loads explicitly with a population of equivalent thermal parameter (ETP) models so cold-load behavior emerges, not hand-coded.</li>
+  <li><b>Scenario generator.</b> Synthesize blackouts conditioned on: outage duration, ambient temp, time-of-day, damage pattern (single substation, multi-node, partial line). Sample millions of restoration starting states. This is where the project lives or dies — the agent will only be as good as the diversity of scenarios.</li>
+  <li><b>RL environment.</b> State: per-segment energization flag, ambient temperature, outage duration, load forecast vector, breaker headroom, neighbor-feeder status. Action: choose next segment to close, voltage ramp rate, dwell time before next action. Reward: <code>+load restored − λ·trips − μ·time-to-99%</code>, with a hard penalty for cascading reclosure failures.</li>
+  <li><b>Train a PPO/SAC agent</b> in <code>Stable-Baselines3</code> or <code>Ray RLlib</code>. Curriculum: small networks first, increasing topology size and damage severity. Save policies with explainability hooks — every recommended action carries a SHAP-style breakdown of which state features drove it.</li>
+  <li><b>Hardware-in-the-loop validation.</b> Replay the trained policy against a real-time digital simulator (RTDS or Typhoon HIL) running the same network at millisecond resolution. This is the sim-to-real check: does the policy still beat baseline when ETP parameters are perturbed and measurement noise added?</li>
+  <li><b>Deploy shadow-mode</b> alongside operators at one DSO. The agent's recommendation appears next to the operator's planned action; operator decides. Telemetry from real restorations becomes training data. Only after 6+ months of agreement does the system promote to advisory-with-approval (operator clicks "accept"), and never to fully closed-loop.</li>
+</ol>
+
+<h2>4 · Architecture</h2>
+<div class="arch">
+<svg viewBox="0 0 980 320" width="100%" height="320" xmlns="http://www.w3.org/2000/svg" style="font-family:ui-monospace,Menlo,monospace;font-size:12px">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7c8cff"/>
+    </marker>
+  </defs>
+  <!-- columns -->
+  <g fill="#a4afc9">
+    <text x="80"  y="22" text-anchor="middle">Data</text>
+    <text x="300" y="22" text-anchor="middle">Twin &amp; training</text>
+    <text x="520" y="22" text-anchor="middle">Policy</text>
+    <text x="740" y="22" text-anchor="middle">Operator</text>
+    <text x="900" y="22" text-anchor="middle">Grid</text>
+  </g>
+  <!-- boxes -->
+  <g fill="#11182a" stroke="#243154">
+    <rect x="20"  y="40"  width="120" height="50" rx="8"/>
+    <rect x="20"  y="110" width="120" height="50" rx="8"/>
+    <rect x="20"  y="180" width="120" height="50" rx="8"/>
+    <rect x="20"  y="250" width="120" height="50" rx="8"/>
+
+    <rect x="220" y="80"  width="160" height="60" rx="8"/>
+    <rect x="220" y="170" width="160" height="60" rx="8"/>
+
+    <rect x="440" y="125" width="160" height="60" rx="8"/>
+
+    <rect x="660" y="125" width="160" height="60" rx="8"/>
+
+    <rect x="860" y="125" width="100" height="60" rx="8"/>
+  </g>
+  <!-- labels -->
+  <g fill="#e7ecf5">
+    <text x="80"  y="70"  text-anchor="middle">SCADA history</text>
+    <text x="80"  y="140" text-anchor="middle">Weather feed</text>
+    <text x="80"  y="210" text-anchor="middle">Topology map</text>
+    <text x="80"  y="280" text-anchor="middle">Strike log</text>
+
+    <text x="300" y="105" text-anchor="middle">OpenDSS twin</text>
+    <text x="300" y="125" text-anchor="middle" fill="#6c7898">+ ETP load pop.</text>
+
+    <text x="300" y="195" text-anchor="middle">Scenario gen</text>
+    <text x="300" y="215" text-anchor="middle" fill="#6c7898">millions/episode</text>
+
+    <text x="520" y="150" text-anchor="middle">PPO agent</text>
+    <text x="520" y="170" text-anchor="middle" fill="#6c7898">+ SHAP explainer</text>
+
+    <text x="740" y="150" text-anchor="middle">Console UI</text>
+    <text x="740" y="170" text-anchor="middle" fill="#6c7898">shadow → advisory</text>
+
+    <text x="910" y="160" text-anchor="middle">Breakers</text>
+  </g>
+  <!-- arrows -->
+  <g stroke="#7c8cff" fill="none" marker-end="url(#arr)">
+    <path d="M140 65 C 180 65, 180 100, 220 105"/>
+    <path d="M140 135 C 180 135, 180 110, 220 115"/>
+    <path d="M140 205 C 180 205, 180 195, 220 195"/>
+    <path d="M140 275 C 180 275, 180 205, 220 205"/>
+    <path d="M380 110 C 410 110, 410 145, 440 150"/>
+    <path d="M380 200 C 410 200, 410 165, 440 160"/>
+    <path d="M600 155 L 660 155"/>
+    <path d="M820 155 L 860 155"/>
+  </g>
+  <!-- feedback loop -->
+  <g stroke="#52d39a" fill="none" stroke-dasharray="4 3">
+    <path d="M860 175 C 700 270, 400 280, 140 280" marker-end="url(#arr)"/>
+    <text x="500" y="305" text-anchor="middle" fill="#52d39a">telemetry from real restorations → retraining</text>
+  </g>
+</svg>
+</div>
+
+<h2>5 · Interactive: naive vs RL restoration</h2>
+<p>An 8-segment feeder, all cold. The upstream breaker trips if instantaneous load exceeds <code>1.4×</code> rated. "Naive" closes everything in order with no dwell; "RL" follows a learned sequence with dwell times that let thermostatic load decay between actions.</p>
+
+<div class="sim">
+  <div class="sim-top">
+    <div class="sim-ctrls">
+      <button class="btn" id="run-naive">Run naive</button>
+      <button class="btn primary" id="run-rl">Run RL policy</button>
+      <button class="btn ghost" id="reset">Reset</button>
+    </div>
+    <div class="legend">
+      <span><span class="dot off"></span>cold</span>
+      <span><span class="dot warm"></span>energizing</span>
+      <span><span class="dot on"></span>stable</span>
+      <span><span class="dot trip"></span>tripped</span>
+    </div>
+  </div>
+
+  <div class="sim-cv">
+    <div class="net">
+      <svg id="net-svg" viewBox="0 0 460 240" width="100%" height="240"></svg>
+    </div>
+    <div>
+      <div class="chart">
+        <svg id="chart-svg" viewBox="0 0 360 180" width="100%" height="180"></svg>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">restored</div><div class="v" id="s-restored">0%</div></div>
+        <div class="stat"><div class="k">trips</div><div class="v" id="s-trips">0</div></div>
+        <div class="stat"><div class="k">time</div><div class="v" id="s-time">0s</div></div>
+      </div>
+      <div class="narr" id="narr">Idle. Click <b>Run naive</b> or <b>Run RL policy</b>.</div>
+    </div>
+  </div>
+</div>
+
+<h2>6 · Reward function (concrete)</h2>
+<pre><span class="c"># per environment step</span>
+reward = (
+    1.0  * delta_load_restored_pu      <span class="c"># MW reconnected this step, p.u.</span>
+  - 25.0 * breaker_trip                 <span class="c"># hard penalty</span>
+  - 0.05 * step_seconds                 <span class="c"># mild urgency pressure</span>
+  - 2.0  * voltage_violation_pu         <span class="c"># V outside [0.93, 1.05]</span>
+  - 0.5  * thermostat_diversity_loss    <span class="c"># proxy for compounding inrush risk</span>
+)
+<span class="c"># terminal bonus when ≥99% load restored without trips</span>
+if done and restored &gt;= 0.99 and trips == 0:
+    reward += 50.0</pre>
+
+<h2>7 · State and action spaces</h2>
+<div class="grid cols-2">
+  <div class="card">
+    <h3>State (per step)</h3>
+    <ul>
+      <li><code>energized[N]</code> — boolean per segment</li>
+      <li><code>cold_minutes[N]</code> — outage duration per segment</li>
+      <li><code>load_forecast[N, H]</code> — H-step ahead per segment</li>
+      <li><code>ambient_C</code>, <code>weather_24h</code></li>
+      <li><code>upstream_headroom_pu</code></li>
+      <li><code>neighbor_state[K]</code> — adjacent feeder energization</li>
+      <li><code>topology_hash</code> — current network config ID</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Action (per step)</h3>
+    <ul>
+      <li><code>segment_id</code> — which to energize next (or no-op)</li>
+      <li><code>ramp_seconds</code> ∈ {0, 5, 15, 60} — voltage ramp</li>
+      <li><code>dwell_seconds</code> ∈ {0, 30, 120, 600} — wait before next action</li>
+    </ul>
+    <p><small>Discrete + small: ~8 × 4 × 4 = 128 actions per step. Manageable for PPO.</small></p>
+  </div>
+</div>
+
+<h2>8 · Data we need (and how to get it)</h2>
+<div class="grid cols-2">
+  <div class="card">
+    <span class="pill">required</span>
+    <h3>SCADA history, ≥18 months</h3>
+    <p>From Ukrenergo + at least one DSO (DTEK Grids, Lvivoblenergo). Hourly load and switching events per substation. NDA required; data stays on-prem.</p>
+  </div>
+  <div class="card">
+    <span class="pill">required</span>
+    <h3>Network topology (CIM/CGMES)</h3>
+    <p>Static model in CIM. Versioned snapshots so the agent's <code>topology_hash</code> input is meaningful.</p>
+  </div>
+  <div class="card">
+    <span class="pill y">helpful</span>
+    <h3>Strike / damage log</h3>
+    <p>Lets us train on realistic damage patterns rather than uniform random faults.</p>
+  </div>
+  <div class="card">
+    <span class="pill y">helpful</span>
+    <h3>Smart-meter aggregates</h3>
+    <p>Even regional aggregates help calibrate ETP load model parameters seasonally.</p>
+  </div>
+</div>
+
+<h2>9 · Tech stack</h2>
+<div class="grid cols-4">
+  <div class="card"><small>simulator</small><h3>OpenDSS</h3><p>Phase-resolved, scriptable from Python via <code>opendssdirect</code>.</p></div>
+  <div class="card"><small>load model</small><h3>ETP population</h3><p>Equivalent thermal parameter, sampled per house archetype.</p></div>
+  <div class="card"><small>RL</small><h3>Stable-Baselines3</h3><p>PPO with action masking; SAC fallback for continuous ramp.</p></div>
+  <div class="card"><small>HIL</small><h3>Typhoon HIL 604</h3><p>Real-time validation before any field shadow-mode.</p></div>
+  <div class="card"><small>UI</small><h3>React + WebGL</h3><p>Operator console; recommendation card with SHAP breakdown.</p></div>
+  <div class="card"><small>infra</small><h3>On-prem k8s</h3><p>Training cluster inside Ukrenergo perimeter. No cloud for SCADA data.</p></div>
+  <div class="card"><small>observability</small><h3>MLflow + Grafana</h3><p>Policy version tracking, decision audit log.</p></div>
+  <div class="card"><small>safety</small><h3>Formal action filter</h3><p>Hard rules (no closing onto known fault) wrap the policy output.</p></div>
+</div>
+
+<h2>10 · Phased roadmap</h2>
+<div class="grid cols-2">
+  <div class="card">
+    <span class="pill">phase 0 — 3 months</span>
+    <h3>Single-feeder proof</h3>
+    <ul><li>One 10 kV feeder in OpenDSS</li><li>Synthetic scenarios only</li><li>Show RL beats greedy + paper procedure on time-to-99% and trip count</li></ul>
+  </div>
+  <div class="card">
+    <span class="pill">phase 1 — months 4–9</span>
+    <h3>Regional twin</h3>
+    <ul><li>Full oblast network calibrated to historical SCADA</li><li>Curriculum training across seasons and damage patterns</li><li>Explainability hooks shipped</li></ul>
+  </div>
+  <div class="card">
+    <span class="pill y">phase 2 — months 10–18</span>
+    <h3>HIL + shadow mode</h3>
+    <ul><li>Typhoon HIL validation</li><li>Console deployed at one DSO; operator sees agent's recommendation but is not bound by it</li><li>Disagreement log feeds retraining</li></ul>
+  </div>
+  <div class="card">
+    <span class="pill g">phase 3 — months 19–24</span>
+    <h3>Advisory-with-approval</h3>
+    <ul><li>Operator clicks accept; SCADA executes</li><li>Two-person confirmation for actions above a learned-risk threshold</li><li>Never fully closed-loop in v1</li></ul>
+  </div>
+</div>
+
+<h2>11 · Risks and mitigations</h2>
+<div class="grid cols-2">
+  <div class="card">
+    <span class="pill r">risk</span>
+    <h3>Sim-to-real gap</h3>
+    <p>ETP load behavior in the field will not match the population we sampled. <b>Mitigation:</b> domain randomization during training, plus online fine-tuning from shadow-mode telemetry.</p>
+  </div>
+  <div class="card">
+    <span class="pill r">risk</span>
+    <h3>Operator distrust</h3>
+    <p>If the agent ever recommends something visibly wrong, trust is gone for a year. <b>Mitigation:</b> always show <i>why</i> (SHAP), never override, ship long shadow period before approval mode.</p>
+  </div>
+  <div class="card">
+    <span class="pill r">risk</span>
+    <h3>Topology changes invalidate policy</h3>
+    <p>A re-routed substation is a different MDP. <b>Mitigation:</b> condition the policy on <code>topology_hash</code> and meta-train across a distribution of topologies so adaptation is fast.</p>
+  </div>
+  <div class="card">
+    <span class="pill r">risk</span>
+    <h3>SCADA data access</h3>
+    <p>The single highest-risk dependency. <b>Mitigation:</b> start with synthetic data + one DSO's anonymized historical exports; widen access after phase-0 results land.</p>
+  </div>
+</div>
+
+<h2>12 · Success metrics</h2>
+<ul>
+  <li><b>Time-to-99%</b> load restored, vs. operator baseline, on held-out scenarios. Target: −25% by phase 1.</li>
+  <li><b>Cascading trips per restoration</b> on the twin. Target: &lt;0.1 average.</li>
+  <li><b>Operator-agreement rate</b> in shadow mode. Target: ≥80% by month 15.</li>
+  <li><b>Decisions per minute</b> the operator can confidently make. Soft target: +30%.</li>
+</ul>
+
+<footer>
+  Single-file project brief · drop into a folder, open in a browser · clpu-rl.html
+</footer>
+
+</div>
+
+<script>
+/* -------- Simple CLPU sim (illustrative, not a real power model) -------- */
+const N = 8;
+const RATED = 1.0;           // per-unit upstream capacity
+const TRIP_LIMIT = 1.4;      // breaker trip threshold (p.u. of rated)
+const STEADY_LOAD = 0.10;    // each segment steady-state load (p.u.)
+const COLD_INRUSH = 0.55;    // inrush when first energized
+const DECAY_TAU = 4.0;       // seconds for inrush to decay toward steady
+
+// Naive: close all in order with 1s spacing, no dwell
+const naivePlan = Array.from({length:N},(_,i)=>({seg:i,dwell:1}));
+// RL "learned" plan: stagger and dwell longer between actions; group small clusters
+const rlPlan = [
+  {seg:0,dwell:3},{seg:2,dwell:3},{seg:4,dwell:4},{seg:1,dwell:3},
+  {seg:5,dwell:4},{seg:3,dwell:3},{seg:6,dwell:4},{seg:7,dwell:3}
+];
+
+const netSvg = document.getElementById('net-svg');
+const chartSvg = document.getElementById('chart-svg');
+const sRestored = document.getElementById('s-restored');
+const sTrips = document.getElementById('s-trips');
+const sTime = document.getElementById('s-time');
+const narr = document.getElementById('narr');
+
+let state = null;
+let running = false;
+
+function freshState(){
+  return {
+    seg: Array.from({length:N},()=>({status:'off', inrush:0, t:0})),
+    trips: 0,
+    timeS: 0,
+    history: [],   // {t, total}
+    aborted:false
+  };
+}
+
+function drawNet(){
+  const x0=30, y0=120, dx=50;
+  const parts = [];
+  // upstream
+  parts.push(`<circle cx="${x0-10}" cy="${y0}" r="10" fill="#1a2647" stroke="#3aa0ff"/>`);
+  parts.push(`<text x="${x0-10}" y="${y0+30}" fill="#a4afc9" text-anchor="middle" font-size="10">source</text>`);
+  // bus line
+  parts.push(`<line x1="${x0-10}" y1="${y0}" x2="${x0 + dx*N}" y2="${y0}" stroke="#243154" stroke-width="2"/>`);
+  for(let i=0;i<N;i++){
+    const cx = x0 + dx*(i+1) - 25;
+    const s = state.seg[i].status;
+    const color = s==='on' ? '#52d39a' : s==='warm' ? '#ffd24a' : s==='trip' ? '#ff6b6b' : '#2b3454';
+    parts.push(`<line x1="${cx}" y1="${y0}" x2="${cx}" y2="${y0-40}" stroke="#243154" stroke-width="2"/>`);
+    parts.push(`<rect x="${cx-14}" y="${y0-66}" width="28" height="26" rx="4" fill="#0a1120" stroke="${color}" stroke-width="2"/>`);
+    parts.push(`<circle cx="${cx}" cy="${y0-53}" r="5" fill="${color}"/>`);
+    parts.push(`<text x="${cx}" y="${y0+18}" fill="#a4afc9" text-anchor="middle" font-size="10">S${i+1}</text>`);
+  }
+  netSvg.innerHTML = parts.join('');
+}
+
+function drawChart(){
+  const w=360, h=180, pad=24;
+  const tMax = Math.max(20, state.history.length ? state.history[state.history.length-1].t : 20);
+  const yMax = 2.0;
+  const parts = [];
+  // grid
+  for(let g=0; g<=4; g++){
+    const y = pad + (h-2*pad)*g/4;
+    parts.push(`<line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="#1a2440" stroke-dasharray="2 3"/>`);
+  }
+  // trip threshold
+  const yTrip = pad + (h-2*pad)*(1 - TRIP_LIMIT/yMax);
+  parts.push(`<line x1="${pad}" y1="${yTrip}" x2="${w-pad}" y2="${yTrip}" stroke="#ff6b6b" stroke-dasharray="4 3" opacity="0.7"/>`);
+  parts.push(`<text x="${w-pad}" y="${yTrip-4}" fill="#ff6b6b" font-size="10" text-anchor="end">trip 1.4 p.u.</text>`);
+  // rated
+  const yRated = pad + (h-2*pad)*(1 - RATED/yMax);
+  parts.push(`<line x1="${pad}" y1="${yRated}" x2="${w-pad}" y2="${yRated}" stroke="#52d39a" stroke-dasharray="4 3" opacity="0.5"/>`);
+  // load line
+  if(state.history.length>1){
+    const pts = state.history.map(p=>{
+      const x = pad + (w-2*pad)*(p.t/tMax);
+      const y = pad + (h-2*pad)*(1 - Math.min(p.total,yMax)/yMax);
+      return `${x},${y}`;
+    }).join(' ');
+    parts.push(`<polyline points="${pts}" fill="none" stroke="#3aa0ff" stroke-width="2"/>`);
+  }
+  // axes
+  parts.push(`<text x="${pad}" y="${h-6}" fill="#6c7898" font-size="10">0s</text>`);
+  parts.push(`<text x="${w-pad}" y="${h-6}" fill="#6c7898" font-size="10" text-anchor="end">${tMax.toFixed(0)}s</text>`);
+  parts.push(`<text x="6" y="${pad+4}" fill="#6c7898" font-size="10">load p.u.</text>`);
+  chartSvg.innerHTML = parts.join('');
+}
+
+function currentLoad(){
+  let s = 0;
+  for(const seg of state.seg){
+    if(seg.status==='on' || seg.status==='warm'){
+      s += STEADY_LOAD + seg.inrush;
+    }
+  }
+  return s;
+}
+
+function tick(dt){
+  state.timeS += dt;
+  for(const seg of state.seg){
+    if(seg.status==='warm' || seg.status==='on'){
+      seg.t += dt;
+      seg.inrush = Math.max(0, seg.inrush * Math.exp(-dt/DECAY_TAU));
+      if(seg.status==='warm' && seg.inrush < 0.05) seg.status='on';
+    }
+  }
+}
+
+function energize(i){
+  if(state.seg[i].status==='off'){
+    state.seg[i].status='warm';
+    state.seg[i].inrush = COLD_INRUSH;
+    state.seg[i].t = 0;
+  }
+}
+
+function checkTrip(){
+  const total = currentLoad();
+  if(total > TRIP_LIMIT){
+    state.trips += 1;
+    // every segment that was warm/on goes back to off (cascading)
+    for(const seg of state.seg){
+      if(seg.status==='warm' || seg.status==='on'){
+        seg.status='trip';
+      }
+    }
+    state.aborted = true;
+    return true;
+  }
+  return false;
+}
+
+function refreshStats(){
+  const restored = state.seg.filter(s=>s.status==='on').length / N;
+  sRestored.textContent = Math.round(restored*100)+'%';
+  sRestored.className = 'v ' + (restored>0.98?'g':(state.aborted?'r':''));
+  sTrips.textContent = state.trips;
+  sTrips.className = 'v ' + (state.trips>0?'r':'');
+  sTime.textContent = state.timeS.toFixed(1)+'s';
+}
+
+async function runPlan(plan, label){
+  if(running) return;
+  running = true;
+  state = freshState();
+  drawNet(); drawChart(); refreshStats();
+  narr.innerHTML = `Running <b>${label}</b>…`;
+  const STEP = 0.25;  // simulation seconds per tick
+  for(const step of plan){
+    energize(step.seg);
+    narr.innerHTML = `<b>${label}</b>: closing breaker on segment S${step.seg+1}.`;
+    drawNet();
+    // check trip immediately after closing
+    if(checkTrip()){
+      narr.innerHTML = `<b>${label}</b>: upstream breaker tripped after closing S${step.seg+1}. Inrush ${currentLoad().toFixed(2)} p.u. > ${TRIP_LIMIT} p.u.`;
+      drawNet();
+      state.history.push({t:state.timeS, total: currentLoad()});
+      drawChart(); refreshStats();
+      running = false;
+      return;
+    }
+    // dwell
+    const dwellEnd = state.timeS + step.dwell;
+    while(state.timeS < dwellEnd){
+      tick(STEP);
+      state.history.push({t:state.timeS, total: currentLoad()});
+      drawNet(); drawChart(); refreshStats();
+      await new Promise(r=>setTimeout(r,40));
+    }
+  }
+  // settle for a few seconds
+  const settleEnd = state.timeS + 6;
+  while(state.timeS < settleEnd){
+    tick(STEP);
+    state.history.push({t:state.timeS, total: currentLoad()});
+    drawNet(); drawChart(); refreshStats();
+    await new Promise(r=>setTimeout(r,30));
+  }
+  const restored = state.seg.filter(s=>s.status==='on').length / N;
+  if(restored > 0.98){
+    narr.innerHTML = `<b>${label}</b>: 100% restored in ${state.timeS.toFixed(1)}s, no trips.`;
+  } else {
+    narr.innerHTML = `<b>${label}</b>: finished with ${Math.round(restored*100)}% restored, ${state.trips} trip(s).`;
+  }
+  running = false;
+}
+
+document.getElementById('run-naive').addEventListener('click',()=>runPlan(naivePlan,'naive'));
+document.getElementById('run-rl').addEventListener('click',()=>runPlan(rlPlan,'RL policy'));
+document.getElementById('reset').addEventListener('click',()=>{
+  if(running) return;
+  state = freshState(); drawNet(); drawChart(); refreshStats();
+  narr.innerHTML = 'Reset. Click <b>Run naive</b> or <b>Run RL policy</b>.';
+});
+
+// init
+state = freshState();
+drawNet(); drawChart(); refreshStats();
+</script>
+</body>
+</html>
