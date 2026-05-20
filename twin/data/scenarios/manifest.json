@@ -1,0 +1,62 @@
+[
+  {
+    "id": "baseline-day",
+    "label": "Normal winter day",
+    "description": "All feeders energized through a full day. No outage. Shows the diurnal demand pattern and how it tracks outdoor temperature.",
+    "metrics": {
+      "peak_kw": 18442.7,
+      "settled_kw": 17006.9,
+      "n_trips": 0,
+      "restoration_minutes": 0.0,
+      "frac_restored_final": 1.0
+    },
+    "weather": "Open-Meteo ERA5, Vinnytsia 2024-01-06..14",
+    "duration_min": 1439.0,
+    "n_trips": 0
+  },
+  {
+    "id": "outage-naive",
+    "label": "Outage + naive close-all",
+    "description": "3-hour substation outage, then every feeder closed simultaneously. Cold-load pickup exceeds the per-feeder trip threshold; the urban feeders trip immediately.",
+    "metrics": {
+      "peak_kw": 26308.1,
+      "settled_kw": 0.0,
+      "n_trips": 1,
+      "restoration_minutes": 0.0,
+      "frac_restored_final": 0.0
+    },
+    "weather": "Open-Meteo ERA5, Vinnytsia 2024-01-06..14",
+    "duration_min": 479.0,
+    "n_trips": 1
+  },
+  {
+    "id": "outage-smart",
+    "label": "Outage + smart restoration",
+    "description": "3-hour substation outage, then feeders closed rural-first with a 12-minute settle window between each. CLPU is sequenced; no trips.",
+    "metrics": {
+      "peak_kw": 18788.3,
+      "settled_kw": 17735.3,
+      "n_trips": 0,
+      "restoration_minutes": 0.0,
+      "frac_restored_final": 0.833
+    },
+    "weather": "Open-Meteo ERA5, Vinnytsia 2024-01-06..14",
+    "duration_min": 479.0,
+    "n_trips": 0
+  },
+  {
+    "id": "cold-snap",
+    "label": "Cold snap day",
+    "description": "Synthetic deep-cold day (~-15 degC). Steady-state demand is much higher; the CLPU headroom shrinks because per-house duty is near 1.",
+    "metrics": {
+      "peak_kw": 24653.7,
+      "settled_kw": 23355.7,
+      "n_trips": 0,
+      "restoration_minutes": 0.0,
+      "frac_restored_final": 1.0
+    },
+    "weather": "synthetic cold snap (~-15 degC)",
+    "duration_min": 1439.0,
+    "n_trips": 0
+  }
+]

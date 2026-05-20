@@ -136,6 +136,15 @@
   </div>
 </div>
 
+<h2 data-i18n="proof.h2">What it actually does, on 1000 blackouts</h2>
+<div class="grid cols-3">
+  <div class="stat"><div class="v">11.5</div><div class="k" data-i18n="proof.s1">PPO mean steps to 99% restored — identical across 3 random seeds</div></div>
+  <div class="stat"><div class="v">79</div><div class="k" data-i18n="proof.s2">steps the safest fixed-dwell baseline needs for the same outcome — 6.9× slower</div></div>
+  <div class="stat"><div class="v" style="color:var(--red)">9.2%</div><div class="k" data-i18n="proof.s3">honest gap: PPO trip rate on the long tail. Phase 1's safety shield closes this</div></div>
+</div>
+<p style="margin-top:14px" data-i18n="proof.p">Numbers from actually running the Phase-0 agent against 1000 scenarios it never saw during training, with three independently trained policies. The next page shows the side-by-side restoration animation, the full per-policy distribution, and a heatmap of where the 9% trip rate lives.</p>
+<p style="margin-top:6px"><a href="results/" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;background:var(--ink);color:#fff;border-radius:999px;font-size:14px;font-weight:500;border-bottom:none" data-i18n="proof.cta">See the live results →</a></p>
+
 <h2 data-i18n="prevent.h2">What this prevents</h2>
 <p data-i18n="prevent.p">Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — it is hours of heat returned to people in February.</p>
 
@@ -195,6 +204,13 @@
       "stage.4.tag": "stage four", "stage.4.h3": "Advisory with approval",
       "stage.4.p": "One-click accept becomes available where the agent's risk score is low and the operator agrees. Two-person confirmation above the threshold. Always a human in the loop.",
 
+      "proof.h2": "What it actually does, on 1000 blackouts",
+      "proof.s1": "PPO mean steps to 99% restored — identical across 3 random seeds",
+      "proof.s2": "steps the safest fixed-dwell baseline needs for the same outcome — 6.9× slower",
+      "proof.s3": "honest gap: PPO trip rate on the long tail. Phase 1's safety shield closes this",
+      "proof.p": "Numbers from actually running the Phase-0 agent against 1000 scenarios it never saw during training, with three independently trained policies. The next page shows the side-by-side restoration animation, the full per-policy distribution, and a heatmap of where the 9% trip rate lives.",
+      "proof.cta": "See the live results →",
+
       "prevent.h2": "What this prevents",
       "prevent.p": "Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — it is hours of heat returned to people in February.",
 
@@ -245,6 +261,13 @@
       "stage.3.p": "Перевірка в реальному часі на Typhoon HIL. Консоль працює наживо в диспетчерській. Диспетчери бачать рекомендації, приймають рішення, а журнал розбіжностей живить наступний цикл навчання.",
       "stage.4.tag": "етап четвертий", "stage.4.h3": "Дорадчий режим з підтвердженням",
       "stage.4.p": "Прийняття одним кліком доступне там, де оцінка ризику агента низька і диспетчер з нею згоден. Над порогом — підтвердження двох операторів. Завжди людина в контурі.",
+
+      "proof.h2": "Що це справді робить — на 1000 блекаутах",
+      "proof.s1": "Середня кількість кроків PPO до 99% відновлення — однаково на трьох випадкових сідах",
+      "proof.s2": "кроків потрібно найбезпечнішому фіксованому графіку, щоб досягти того ж результату — у 6,9 рази повільніше",
+      "proof.s3": "чесна прогалина: частота спрацювань PPO на довгому хвості. Захисний щит Phase 1 її закриває",
+      "proof.p": "Цифри — від реального запуску агента Phase 0 на 1000 сценаріях, яких він не бачив під час навчання, з трьома незалежно натренованими політиками. Наступна сторінка показує анімацію відновлення трьома стратегіями поруч, повний розподіл по політиках і теплову карту того, де живуть ті 9% спрацювань.",
+      "proof.cta": "Побачити живі результати →",
 
       "prevent.h2": "Чому це має значення",
       "prevent.p": "Кожне каскадне спрацювання захисту під час відновлення — це ще одна година без електрики. Українською зимою це означає опалення, вимкнене в лікарнях, зупинені водяні насоси, перерваний діаліз, котли в багатоквартирних будинках, які не запускаються, і вуличні генератори, що виснажують дизельний запас міста, який воно вже не може поповнити. Відчутне скорочення каскадних спрацювань під час відновлення — це не метрика; це години тепла, поверненого людям у лютому.",

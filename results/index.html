@@ -1,0 +1,2165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Restart · results from running the model</title>
+<style>
+  :root{
+    --bg:#fafaf7;
+    --paper:#ffffff;
+    --ink:#0f172a;
+    --ink2:#475569;
+    --mute:#94a3b8;
+    --line:#e6e8ee;
+    --line2:#eef1f6;
+    --navy:#0b3a78;
+    --navy2:#1a56ad;
+    --yel:#f5c518;
+    --grn:#0f9d6b;
+    --red:#c0392b;
+    --radius:14px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px;margin:0 auto;padding:36px 28px 80px}
+  a{color:var(--navy);text-decoration:none;border-bottom:1px solid transparent}
+  a:hover{border-bottom-color:var(--navy)}
+  header{padding:24px 0 28px;border-bottom:1px solid var(--line)}
+  .backlink{font-family:var(--mono);font-size:12px;color:var(--ink2);display:inline-flex;gap:6px;margin-bottom:18px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--navy);font-weight:600}
+  h1{font-size:38px;line-height:1.08;margin:12px 0 14px;font-weight:700;letter-spacing:-.02em;max-width:780px}
+  h2{font-size:22px;margin:48px 0 14px;letter-spacing:-.005em;font-weight:600}
+  h3{font-size:15px;margin:14px 0 6px;color:var(--ink);font-weight:600}
+  p,li{color:var(--ink2)}
+  p{margin:0 0 12px}
+  .lede{font-size:17px;color:var(--ink);max-width:720px;margin-top:6px}
+  .grid{display:grid;gap:14px}
+  .grid.cols-2{grid-template-columns:1fr 1fr}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  @media (max-width:740px){.grid.cols-2,.grid.cols-3{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card h3{margin-top:0}
+  .stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .stat .v{font-size:34px;font-weight:700;color:var(--navy);letter-spacing:-.02em;line-height:1}
+  .stat .v.r{color:var(--red)}
+  .stat .v.g{color:var(--grn)}
+  .stat .k{font-size:13px;color:var(--ink2);margin-top:6px}
+  code{font-family:var(--mono);font-size:12.5px;background:#f1f3f8;padding:1px 6px;border-radius:6px;color:var(--ink);border:1px solid var(--line)}
+  .tag{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:999px;background:#eef2f9;color:var(--navy);border:1px solid #d9e1f0}
+  .tag.y{background:#fff7d6;color:#7a5a00;border-color:#f0dc8a}
+  .tag.r{background:#fbe9e7;color:#a02516;border-color:#f3c2bd}
+  .tag.g{background:#e6f7ef;color:#0f6c4a;border-color:#bfe6d3}
+  table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;font-size:14px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line2);vertical-align:middle}
+  th{font-weight:600;color:var(--ink);background:#f4f6fa;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  td.num{font-family:var(--mono);text-align:right}
+  tr:last-child td{border-bottom:none}
+  tr.highlight td{background:#fbfaf3}
+  tr.highlight td:first-child{color:var(--navy);font-weight:600}
+
+  /* ------- Live animation section ------- */
+  .anim-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .anim-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .anim-meta .info{font-family:var(--mono);font-size:12px;color:var(--ink2)}
+  .anim-meta .info b{color:var(--ink)}
+  .anim-ctrls{display:flex;gap:8px;align-items:center}
+  .btn{font-family:Inter,system-ui,sans-serif;font-size:13px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s}
+  .btn:hover{border-color:var(--ink)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{background:var(--navy)}
+  .speeds{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px;gap:2px}
+  .speeds button{font-family:var(--mono);font-size:11px;padding:5px 9px;border:none;background:transparent;color:var(--ink2);border-radius:999px;cursor:pointer;font-weight:600}
+  .speeds button[aria-current="true"]{background:var(--ink);color:#fff}
+  .panels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media (max-width:880px){.panels{grid-template-columns:1fr}}
+  .panel{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fcfcfa}
+  .panel .pname{font-family:var(--mono);font-size:12px;color:var(--ink2);display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .panel .pname b{color:var(--ink);font-weight:600}
+  .feeder{display:flex;gap:6px;justify-content:center;padding:8px 0 12px}
+  .seg{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);background:#f1f3f8;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--mute);transition:background .15s,border-color .15s,color .15s}
+  .seg.warm{background:#fff7d6;border-color:#e7c03c;color:#7a5a00}
+  .seg.on{background:#dff4ea;border-color:#0f9d6b;color:#0f6c4a}
+  .seg.trip{background:#fbe9e7;border-color:#c0392b;color:#a02516;animation:pulse 0.5s ease-in-out 3}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+  .chart{height:120px;background:#f9faf8;border:1px solid var(--line);border-radius:8px;padding:6px}
+  .stats-row{display:flex;justify-content:space-around;font-family:var(--mono);font-size:11px;color:var(--ink2);margin-top:8px}
+  .stats-row b{display:block;font-size:14px;color:var(--ink);font-family:var(--mono)}
+  .panel.tripped .pname b{color:var(--red)}
+  .panel.done .pname b{color:var(--grn)}
+
+  /* ------- Heatmap ------- */
+  .heatmap-wrap{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .heatmap-grid{display:grid;gap:3px;background:var(--paper)}
+  .heat-cell{padding:18px 10px;font-family:var(--mono);font-size:12px;color:#fff;font-weight:600;border-radius:4px;text-align:center;min-width:78px}
+  .heatmap-axes{font-family:var(--mono);font-size:11px;color:var(--ink2)}
+  .heatmap-legend{display:flex;gap:14px;align-items:center;font-family:var(--mono);font-size:11px;color:var(--ink2);margin-top:14px}
+  .legend-gradient{width:200px;height:10px;border-radius:5px;background:linear-gradient(to right,#dff4ea,#fff7d6,#fbe9e7,#c0392b)}
+
+  /* ------- Operator console mockup ------- */
+  .console{background:#0f172a;color:#e7ecf5;border-radius:var(--radius);padding:22px;font-family:var(--mono);font-size:13px;line-height:1.55;border:1px solid #1f2a45;box-shadow:0 14px 40px rgba(11,58,120,.25)}
+  .console .hd{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1f2a45;padding-bottom:10px;margin-bottom:14px}
+  .console .hd .ttl{font-weight:600;color:#fff}
+  .console .hd .live{color:var(--yel);font-size:11px;letter-spacing:.15em}
+  .console .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dotted #1f2a45}
+  .console .row:last-of-type{border-bottom:none}
+  .console .k{color:#9aa5c2}
+  .console .v{color:#fff}
+  .console .v.ok{color:var(--grn)}
+  .console .v.warn{color:var(--yel)}
+  .console .why{margin-top:14px;padding:12px;background:#101b35;border-radius:8px;font-family:Inter,sans-serif;color:#cbd3ea;font-size:12.5px;line-height:1.5}
+  .console .why b{color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px}
+  .console .actions{display:flex;gap:8px;margin-top:14px}
+  .console .actions button{font-family:Inter,sans-serif;font-size:13px;padding:9px 16px;border-radius:8px;border:1px solid #2a3a5e;background:#1a2647;color:#cbd3ea;cursor:pointer;font-weight:500}
+  .console .actions button.accept{background:var(--grn);border-color:var(--grn);color:#fff}
+  .console .actions button.wait{background:#1a2647;border-color:#2a3a5e}
+  .console .actions button.override{background:transparent;color:#9aa5c2}
+  .console .conf-bar{height:4px;background:#1f2a45;border-radius:2px;overflow:hidden;margin-top:10px}
+  .console .conf-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--grn),var(--yel));width:0%;transition:width .8s ease}
+
+  footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:12.5px;font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <a class="backlink" href="../">← back to the case</a>
+  <div class="eyebrow">Restart · live results</div>
+  <h1>What the model learned, on 1000 held-out blackouts.</h1>
+  <p class="lede">Every number on this page comes from actually running the Phase-0 single-feeder RL agent against scenarios it never saw during training. The animation, the comparison, and the failure-mode heatmap are all driven by the JSON files the program emitted; the operator console is the mockup of what we'd actually ship.</p>
+</header>
+
+<!-- ────────────── Hero stats ────────────── -->
+<h2>Headline</h2>
+<div class="grid cols-3">
+  <div class="stat"><div class="v">11.5</div><div class="k">PPO mean steps to 99% restored (±0.0 across 3 seeds)</div></div>
+  <div class="stat"><div class="v">79</div><div class="k">safest fixed-dwell baseline, for the same outcome — 6.9× slower</div></div>
+  <div class="stat"><div class="v r">9.2%</div><div class="k">honest gap: PPO trip rate on 1000 long-tail scenarios — Phase 1's job to close</div></div>
+</div>
+
+<!-- ────────────── A · Live restoration animation ────────────── -->
+<h2>A · One blackout, three strategies, real telemetry</h2>
+<p>Same scenario (ambient <span id="anim-amb">+1.6 °C</span>, 6 h cold soak) given to three policies. Each panel runs the actual telemetry captured from <code>scripts/capture_trace.py</code> — segment colors and trunk current are the real values OpenDSS produced.</p>
+<div class="anim-card">
+  <div class="anim-meta">
+    <div class="info">scenario seed <b id="anim-seed">10042</b> · trip limit <b id="anim-trip">240 A</b></div>
+    <div class="anim-ctrls">
+      <button class="btn primary" id="play-btn">Play</button>
+      <button class="btn" id="reset-btn">Reset</button>
+      <span class="speeds" role="group" aria-label="Playback speed">
+        <button data-speed="1" aria-current="false">1×</button>
+        <button data-speed="2" aria-current="true">2×</button>
+        <button data-speed="4" aria-current="false">4×</button>
+        <button data-speed="8" aria-current="false">8×</button>
+      </span>
+    </div>
+  </div>
+  <div class="panels" id="panels"></div>
+</div>
+<p style="margin-top:14px;color:var(--ink2);font-size:13px">
+  <b style="color:var(--red)">Greedy</b> trips at step 6 — closing every breaker as fast as possible pushes the trunk over 240 A.
+  <b style="color:var(--ink2)">Sequential-d8</b> spaces closures with a fixed 4-min dwell; safe but takes ~32 min.
+  <b style="color:var(--navy)">PPO</b> learns when to bunch closures and when to wait — finishes in ~10 min, no trip.
+</p>
+
+<!-- ────────────── C · 1000-scenario comparison ────────────── -->
+<h2>C · 1000 held-out scenarios, four policies</h2>
+<p>Every policy was evaluated on the <i>same</i> 1000 seeds. PPO numbers are the mean of three independently trained policies; the ± figure is the standard deviation across those seeds.</p>
+<table>
+  <thead>
+    <tr><th>policy</th><th>trip%</th><th>restore%</th><th>steps to 99%</th><th>peak trunk A</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>greedy</td><td class="num">100%</td><td class="num">0%</td><td class="num">—</td><td class="num">256</td></tr>
+    <tr><td>sequential, dwell 4</td><td class="num">17.5%</td><td class="num">82.5%</td><td class="num">31</td><td class="num">232</td></tr>
+    <tr><td>sequential, dwell 8</td><td class="num">0.3%</td><td class="num">99.7%</td><td class="num">55</td><td class="num">224</td></tr>
+    <tr><td>sequential, dwell 12</td><td class="num">0.0%</td><td class="num">100.0%</td><td class="num">79</td><td class="num">222</td></tr>
+    <tr class="highlight"><td>PPO (3-seed ensemble)</td><td class="num">9.2% ± 1.6</td><td class="num">90.8% ± 1.6</td><td class="num">11.5 ± 0.0</td><td class="num">232 ± 0.3</td></tr>
+  </tbody>
+</table>
+<p style="margin-top:14px;color:var(--ink2);font-size:13.5px">The trained policy finishes restoration <b>~5–7× faster</b> than the safest fixed-dwell baseline. It also currently trips on ~9% of the long tail. The chart below shows the full per-scenario distribution behind those means.</p>
+<div style="background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-top:6px">
+  <img src="comparison.png" alt="Policy comparison: peak trunk current, steps to 99% restored, trip vs restore rate" style="width:100%;height:auto;display:block;border-radius:8px"/>
+</div>
+
+<!-- ────────────── D · Failure-mode heatmap ────────────── -->
+<h2>D · Where does the 9% live?</h2>
+<p>800 scenarios × 3 trained policies, binned by outage duration (rows) and ambient temperature (columns). Each cell shows the PPO trip rate for scenarios falling in that bin. The honest finding: failures are dispersed across the parameter space rather than concentrated in one corner — there's no single "easy fix," which is why <b>Phase 1's safety shield</b> is the right next attack rather than just more training data.</p>
+<div class="heatmap-wrap">
+  <div>
+    <div class="heatmap-axes" style="margin-bottom:6px;text-align:right">ambient temperature (°C) →</div>
+    <div id="heatmap-grid" class="heatmap-grid"></div>
+    <div class="heatmap-axes" style="margin-top:6px;text-align:right">↑ outage duration (h)</div>
+  </div>
+  <div style="flex:1;min-width:200px">
+    <h3 style="margin-top:0">What this says</h3>
+    <p style="font-size:13.5px">No clean failure corner. The worst column is +1 to +3 °C — slightly counter-intuitive (the policy actually handles deep cold better than mild ambient, because deep cold produces more uniformly heavy CLPU it has already seen, while mild ambient gives variable inrush the policy guesses wrong on).</p>
+    <p style="font-size:13.5px">The path to 0% trip isn't "train more on the worst column." It's a <b>safety shield</b>: a forecasting head that vetoes any closure expected to cross 240 A. PPO chooses, the shield checks.</p>
+    <div class="heatmap-legend">
+      <span>0%</span>
+      <div class="legend-gradient"></div>
+      <span>20%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ────────────── F · Operator console mockup ────────────── -->
+<h2>F · What the operator sees</h2>
+<p>The product isn't the policy — it's this card. Every recommendation arrives with a forecast, a one-line "why," and a confidence score. Never closed-loop; the operator always decides.</p>
+<div class="console">
+  <div class="hd">
+    <div class="ttl">Restart · feeder L-114 · recommendation</div>
+    <div class="live">● LIVE · updated 2 s ago</div>
+  </div>
+  <div class="row">
+    <span class="k">recommended action</span>
+    <span class="v">close switch <b>S4</b></span>
+  </div>
+  <div class="row">
+    <span class="k">predicted trunk current after action (30 s)</span>
+    <span class="v ok">218 A · 22 A headroom under trip</span>
+  </div>
+  <div class="row">
+    <span class="k">predicted trunk current at +120 s</span>
+    <span class="v ok">181 A · CLPU decayed</span>
+  </div>
+  <div class="row">
+    <span class="k">suggested dwell before next action</span>
+    <span class="v">60 s</span>
+  </div>
+  <div class="row">
+    <span class="k">confidence</span>
+    <span class="v warn">94%</span>
+  </div>
+  <div class="conf-bar"><i id="conf-i" style="width:94%"></i></div>
+  <div class="why">
+    <b>why this segment, this moment</b>
+    Cold-minutes on S4 are highest of remaining (482 min, vs. mean 410). Trunk headroom is 53 A — safe for one moderate-CLPU close. S1/S2/S3 already restored and at decayed inrush, so the bus baseline is steady. Closing S4 now puts you 4 actions from completion at projected total time 9 min — faster than the d=8 procedure by 12 min.
+  </div>
+  <div class="actions">
+    <button class="accept">Accept</button>
+    <button class="wait">Wait 30 s</button>
+    <button class="override">Override</button>
+  </div>
+</div>
+
+<footer>
+  <span>Restart · live results · driven by JSON from <a href="https://github.com/anastasiiapoliienko/restart-grid-rl">restart-grid-rl</a></span>
+  <span><a href="../">← back to the case</a></span>
+</footer>
+
+</div>
+
+<!-- ============================ DATA ============================ -->
+<script id="trace-data" type="application/json">{
+ "seed": 10042,
+ "ambient_C": 1.6443628623098006,
+ "n_segments": 8,
+ "trip_amps": 240.0,
+ "step_seconds": 30.0,
+ "runs": [
+  {
+   "name": "greedy",
+   "trip": true,
+   "restored": false,
+   "final_t": 180.0,
+   "steps": [
+    {
+     "t": 0.0,
+     "action": null,
+     "trunk_a": 0.0,
+     "energized": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 0,
+     "trip": false
+    },
+    {
+     "t": 30.0,
+     "action": 0,
+     "trunk_a": 54.467823234028266,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 60.0,
+     "action": 1,
+     "trunk_a": 109.07477763929322,
+     "energized": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 90.0,
+     "action": 2,
+     "trunk_a": 155.44829467552236,
+     "energized": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 120.0,
+     "action": 3,
+     "trunk_a": 187.03044309297655,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 150.0,
+     "action": 4,
+     "trunk_a": 219.1890084916795,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 180.0,
+     "action": 5,
+     "trunk_a": 255.11734144622045,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+     ],
+     "n_energized": 6,
+     "trip": true
+    }
+   ]
+  },
+  {
+   "name": "sequential-d8",
+   "trip": false,
+   "restored": true,
+   "final_t": 1920.0,
+   "steps": [
+    {
+     "t": 0.0,
+     "action": null,
+     "trunk_a": 0.0,
+     "energized": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 0,
+     "trip": false
+    },
+    {
+     "t": 30.0,
+     "action": 0,
+     "trunk_a": 54.467823234028266,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 60.0,
+     "action": null,
+     "trunk_a": 48.230410824008814,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 90.0,
+     "action": null,
+     "trunk_a": 43.273234553986384,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 120.0,
+     "action": null,
+     "trunk_a": 39.33436051986937,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 150.0,
+     "action": null,
+     "trunk_a": 36.20425295476737,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 180.0,
+     "action": null,
+     "trunk_a": 33.71669858303248,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 210.0,
+     "action": null,
+     "trunk_a": 31.739682308466502,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 240.0,
+     "action": null,
+     "trunk_a": 30.168299568802635,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 270.0,
+     "action": null,
+     "trunk_a": 28.9192620046076,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 300.0,
+     "action": 1,
+     "trunk_a": 88.63850306115775,
+     "energized": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 330.0,
+     "action": null,
+     "trunk_a": 81.25315921390563,
+     "energized": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 360.0,
+     "action": null,
+     "trunk_a": 75.22946846184021,
+     "energized": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 390.0,
+     "action": null,
+     "trunk_a": 70.32072686258145,
+     "energized": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 420.0,
+     "action": null,
+     "trunk_a": 66.31990826023312,
+     "energized": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 450.0,
+     "action": null,
+     "trunk_a": 63.05843167475692,
+     "energized": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 480.0,
+     "action": null,
+     "trunk_a": 60.39933080877254,
+     "energized": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 510.0,
+     "action": null,
+     "trunk_a": 58.231099892614736,
+     "energized": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 540.0,
+     "action": null,
+     "trunk_a": 56.4629381892382,
+     "energized": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 570.0,
+     "action": 2,
+     "trunk_a": 112.72068608319088,
+     "energized": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 600.0,
+     "action": null,
+     "trunk_a": 104.54365953845398,
+     "energized": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 630.0,
+     "action": null,
+     "trunk_a": 98.01379124506512,
+     "energized": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 660.0,
+     "action": null,
+     "trunk_a": 92.80715863891518,
+     "energized": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 690.0,
+     "action": null,
+     "trunk_a": 88.65445494836054,
+     "energized": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 720.0,
+     "action": null,
+     "trunk_a": 85.34189275067129,
+     "energized": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 750.0,
+     "action": null,
+     "trunk_a": 82.69882613400344,
+     "energized": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 780.0,
+     "action": null,
+     "trunk_a": 80.58964851197334,
+     "energized": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 810.0,
+     "action": null,
+     "trunk_a": 78.9063023548031,
+     "energized": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 840.0,
+     "action": 3,
+     "trunk_a": 125.26151773927037,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 870.0,
+     "action": null,
+     "trunk_a": 119.54943350482876,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 900.0,
+     "action": null,
+     "trunk_a": 114.96451247080694,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 930.0,
+     "action": null,
+     "trunk_a": 111.2939792470473,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 960.0,
+     "action": null,
+     "trunk_a": 108.3551017325132,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 990.0,
+     "action": null,
+     "trunk_a": 106.00175216078726,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 1020.0,
+     "action": null,
+     "trunk_a": 104.11710811322637,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 1050.0,
+     "action": null,
+     "trunk_a": 102.60780472320825,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 1080.0,
+     "action": null,
+     "trunk_a": 101.39896329644064,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 1110.0,
+     "action": 4,
+     "trunk_a": 150.1222710774149,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 1140.0,
+     "action": null,
+     "trunk_a": 141.10215303010784,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 1170.0,
+     "action": null,
+     "trunk_a": 134.81861146751564,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 1200.0,
+     "action": null,
+     "trunk_a": 130.44315930549473,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 1230.0,
+     "action": null,
+     "trunk_a": 127.38824252798695,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 1260.0,
+     "action": null,
+     "trunk_a": 125.24899898745646,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 1290.0,
+     "action": null,
+     "trunk_a": 123.74628677951199,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 1320.0,
+     "action": null,
+     "trunk_a": 122.68688681121013,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 1350.0,
+     "action": null,
+     "trunk_a": 121.93715513315152,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 1380.0,
+     "action": 5,
+     "trunk_a": 179.5483453402723,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 1410.0,
+     "action": null,
+     "trunk_a": 171.806940341851,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 1440.0,
+     "action": null,
+     "trunk_a": 165.7447289880217,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 1470.0,
+     "action": null,
+     "trunk_a": 160.99651023040823,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 1500.0,
+     "action": null,
+     "trunk_a": 157.2750985486544,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 1530.0,
+     "action": null,
+     "trunk_a": 154.35699533663697,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 1560.0,
+     "action": null,
+     "trunk_a": 152.0674440844075,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 1590.0,
+     "action": null,
+     "trunk_a": 150.27048414918366,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 1620.0,
+     "action": null,
+     "trunk_a": 148.85958641564767,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 1650.0,
+     "action": 6,
+     "trunk_a": 203.74560501595982,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 1680.0,
+     "action": null,
+     "trunk_a": 194.10572946681253,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 1710.0,
+     "action": null,
+     "trunk_a": 187.09201862300054,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 1740.0,
+     "action": null,
+     "trunk_a": 181.98852355005045,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 1770.0,
+     "action": null,
+     "trunk_a": 178.27165679392402,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 1800.0,
+     "action": null,
+     "trunk_a": 175.5622774717924,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 1830.0,
+     "action": null,
+     "trunk_a": 173.5854134300478,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 1860.0,
+     "action": null,
+     "trunk_a": 172.1417380634724,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 1890.0,
+     "action": null,
+     "trunk_a": 171.0864596702605,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 1920.0,
+     "action": 7,
+     "trunk_a": 226.49426513925735,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+     ],
+     "n_energized": 8,
+     "trip": false
+    }
+   ]
+  },
+  {
+   "name": "ppo",
+   "trip": false,
+   "restored": true,
+   "final_t": 600.0,
+   "steps": [
+    {
+     "t": 0.0,
+     "action": null,
+     "trunk_a": 0.0,
+     "energized": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+     ],
+     "n_energized": 0,
+     "trip": false
+    },
+    {
+     "t": 30.0,
+     "action": 6,
+     "trunk_a": 55.075154074633225,
+     "energized": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+     ],
+     "n_energized": 1,
+     "trip": false
+    },
+    {
+     "t": 60.0,
+     "action": 0,
+     "trunk_a": 101.19344018456526,
+     "energized": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+     ],
+     "n_energized": 2,
+     "trip": false
+    },
+    {
+     "t": 90.0,
+     "action": 3,
+     "trunk_a": 136.43374187841974,
+     "energized": [
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false
+     ],
+     "n_energized": 3,
+     "trip": false
+    },
+    {
+     "t": 120.0,
+     "action": 1,
+     "trunk_a": 183.59269553826857,
+     "energized": [
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false
+     ],
+     "n_energized": 4,
+     "trip": false
+    },
+    {
+     "t": 150.0,
+     "action": 5,
+     "trunk_a": 224.3194009216953,
+     "energized": [
+      true,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 180.0,
+     "action": null,
+     "trunk_a": 202.90596850010132,
+     "energized": [
+      true,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 210.0,
+     "action": null,
+     "trunk_a": 185.96637951795108,
+     "energized": [
+      true,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 5,
+     "trip": false
+    },
+    {
+     "t": 240.0,
+     "action": 4,
+     "trunk_a": 222.6616623468342,
+     "energized": [
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 270.0,
+     "action": null,
+     "trunk_a": 203.7294238269062,
+     "energized": [
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 300.0,
+     "action": null,
+     "trunk_a": 189.59684728228356,
+     "energized": [
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 330.0,
+     "action": null,
+     "trunk_a": 179.00928440052087,
+     "energized": [
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 6,
+     "trip": false
+    },
+    {
+     "t": 360.0,
+     "action": 2,
+     "trunk_a": 229.4562568062996,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 390.0,
+     "action": null,
+     "trunk_a": 216.32276797067883,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 420.0,
+     "action": null,
+     "trunk_a": 206.05004175031695,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 450.0,
+     "action": null,
+     "trunk_a": 198.02465135187023,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 480.0,
+     "action": null,
+     "trunk_a": 191.73862462301358,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 510.0,
+     "action": null,
+     "trunk_a": 186.8034964480815,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 540.0,
+     "action": null,
+     "trunk_a": 182.92078352305816,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 570.0,
+     "action": null,
+     "trunk_a": 179.86077690789764,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "n_energized": 7,
+     "trip": false
+    },
+    {
+     "t": 600.0,
+     "action": 7,
+     "trunk_a": 233.67013483063047,
+     "energized": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+     ],
+     "n_energized": 8,
+     "trip": false
+    }
+   ]
+  }
+ ]
+}</script>
+<script id="heatmap-data" type="application/json">{
+ "outage_edges_h": [
+  4.0,
+  6.0,
+  8.0,
+  10.0,
+  12.0
+ ],
+ "ambient_edges_C": [
+  -5.0,
+  -3.0,
+  -1.0,
+  1.0,
+  3.0,
+  5.0
+ ],
+ "trip_rate": [
+  [
+   0.07971014492753623,
+   0.020833333333333332,
+   0.12403100775193798,
+   0.13821138211382114,
+   0.10476190476190476
+  ],
+  [
+   0.12318840579710146,
+   0.07575757575757576,
+   0.08888888888888889,
+   0.15151515151515152,
+   0.12195121951219512
+  ],
+  [
+   0.1111111111111111,
+   0.07936507936507936,
+   0.07936507936507936,
+   0.09848484848484848,
+   0.031746031746031744
+  ],
+  [
+   0.07407407407407407,
+   0.07894736842105263,
+   0.1111111111111111,
+   0.0990990990990991,
+   0.027777777777777776
+  ]
+ ],
+ "count": [
+  [
+   138,
+   96,
+   129,
+   123,
+   105
+  ],
+  [
+   138,
+   132,
+   135,
+   132,
+   123
+  ],
+  [
+   99,
+   126,
+   126,
+   132,
+   126
+  ],
+  [
+   81,
+   114,
+   126,
+   111,
+   108
+  ]
+ ],
+ "n_scenarios": 800,
+ "n_policies": 3
+}</script>
+
+<script>
+/* ============================ HEATMAP ============================ */
+(function(){
+  const hm = JSON.parse(document.getElementById('heatmap-data').textContent);
+  const grid = document.getElementById('heatmap-grid');
+  const outBins = hm.trip_rate.length;
+  const ambBins = hm.trip_rate[0].length;
+  // Add corner cell + column headers
+  grid.style.gridTemplateColumns = `60px repeat(${ambBins},1fr)`;
+  grid.innerHTML = '';
+  // header row
+  const corner = document.createElement('div'); corner.textContent = ''; grid.appendChild(corner);
+  for(let j=0;j<ambBins;j++){
+    const h = document.createElement('div');
+    h.className='heatmap-axes';
+    h.style.fontSize='10.5px';
+    h.style.textAlign='center';
+    h.style.padding='2px';
+    h.textContent = `${hm.ambient_edges_C[j].toFixed(0)} … ${hm.ambient_edges_C[j+1].toFixed(0)}`;
+    grid.appendChild(h);
+  }
+  // data rows (display in reverse so highest outage is top)
+  for(let i=outBins-1;i>=0;i--){
+    const rowLabel = document.createElement('div');
+    rowLabel.className='heatmap-axes';
+    rowLabel.style.fontSize='10.5px';
+    rowLabel.style.textAlign='right';
+    rowLabel.style.padding='18px 6px 0 0';
+    rowLabel.textContent = `${hm.outage_edges_h[i].toFixed(0)}–${hm.outage_edges_h[i+1].toFixed(0)} h`;
+    grid.appendChild(rowLabel);
+    for(let j=0;j<ambBins;j++){
+      const v = hm.trip_rate[i][j];
+      const c = document.createElement('div');
+      c.className='heat-cell';
+      // color from green to yellow to red
+      const t = Math.min(1, v / 0.20);
+      let r,g,b;
+      if(t < 0.5){
+        const x = t*2;
+        r = Math.round(223 + (255-223)*x);
+        g = Math.round(244 + (247-244)*x);
+        b = Math.round(234 + (214-234)*x);
+      } else {
+        const x = (t-0.5)*2;
+        r = Math.round(255 + (192-255)*x);
+        g = Math.round(247 + (57-247)*x);
+        b = Math.round(214 + (43-214)*x);
+      }
+      c.style.background = `rgb(${r},${g},${b})`;
+      c.style.color = t > 0.55 ? '#fff' : '#0f172a';
+      c.textContent = (v*100).toFixed(1) + '%';
+      grid.appendChild(c);
+    }
+  }
+})();
+
+/* ============================ ANIMATION ============================ */
+(function(){
+  const trace = JSON.parse(document.getElementById('trace-data').textContent);
+  document.getElementById('anim-seed').textContent = trace.seed;
+  document.getElementById('anim-amb').textContent = (trace.ambient_C >= 0 ? '+' : '') + trace.ambient_C.toFixed(1) + ' °C';
+  document.getElementById('anim-trip').textContent = trace.trip_amps.toFixed(0) + ' A';
+
+  const panelsEl = document.getElementById('panels');
+  const N = trace.n_segments;
+  const TRIP = trace.trip_amps;
+
+  // Build panel DOM
+  const panels = trace.runs.map((run, idx) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'panel';
+    wrap.dataset.idx = idx;
+    wrap.innerHTML = `
+      <div class="pname"><b>${run.name}</b><span class="status">cold</span></div>
+      <div class="feeder">${Array.from({length:N},(_,i)=>`<div class="seg" data-i="${i}">S${i+1}</div>`).join('')}</div>
+      <div class="chart"><svg viewBox="0 0 320 110" width="100%" height="110">
+        <line x1="20" y1="${110 - (TRIP/300)*100 - 5}" x2="320" y2="${110 - (TRIP/300)*100 - 5}" stroke="#c0392b" stroke-dasharray="3 3" stroke-width="1"/>
+        <text x="316" y="${110 - (TRIP/300)*100 - 8}" fill="#c0392b" font-size="9" text-anchor="end" font-family="ui-monospace,Menlo,monospace">trip ${TRIP.toFixed(0)} A</text>
+        <polyline points="" fill="none" stroke="#0b3a78" stroke-width="2"/>
+      </svg></div>
+      <div class="stats-row">
+        <div><span class="lbl">trunk</span><b class="trunk">0 A</b></div>
+        <div><span class="lbl">on</span><b class="onct">0/${N}</b></div>
+        <div><span class="lbl">t</span><b class="timer">0:00</b></div>
+      </div>`;
+    panelsEl.appendChild(wrap);
+    return {
+      wrap,
+      run,
+      poly: wrap.querySelector('polyline'),
+      status: wrap.querySelector('.status'),
+      segs: Array.from(wrap.querySelectorAll('.seg')),
+      trunk: wrap.querySelector('.trunk'),
+      onct: wrap.querySelector('.onct'),
+      timer: wrap.querySelector('.timer'),
+    };
+  });
+
+  // Animation state
+  let t = 0;
+  let playing = false;
+  let speed = 2;
+  let lastFrame = 0;
+  const maxT = Math.max(...trace.runs.map(r => r.final_t)) + 30;
+
+  function findStep(run, t){
+    // find latest step where step.t <= t
+    let idx = 0;
+    for(let i=0;i<run.steps.length;i++){
+      if(run.steps[i].t <= t) idx = i; else break;
+    }
+    return run.steps[idx];
+  }
+
+  function fmtTime(s){
+    s = Math.floor(s);
+    const m = Math.floor(s/60), ss = s%60;
+    return `${m}:${ss.toString().padStart(2,'0')}`;
+  }
+
+  function render(){
+    for(const p of panels){
+      const step = findStep(p.run, t);
+      // Update segments
+      p.segs.forEach((el, i) => {
+        el.className = 'seg';
+        if(step.energized[i]){
+          // warm if just closed in last 60 s, else on
+          // find most recent step where this seg first turned on
+          let firstOnT = null;
+          for(const s of p.run.steps){
+            if(s.energized[i]){ firstOnT = s.t; break; }
+          }
+          if(step.trip) el.classList.add('trip');
+          else if(firstOnT !== null && (t - firstOnT) < 90) el.classList.add('warm');
+          else el.classList.add('on');
+        } else if(step.trip){
+          el.classList.add('trip');
+        }
+      });
+      // Status
+      if(t >= p.run.final_t){
+        if(p.run.trip){ p.wrap.classList.add('tripped'); p.wrap.classList.remove('done'); p.status.textContent = 'TRIPPED'; p.status.style.color = 'var(--red)'; }
+        else if(p.run.restored){ p.wrap.classList.add('done'); p.wrap.classList.remove('tripped'); p.status.textContent = 'RESTORED'; p.status.style.color = 'var(--grn)'; }
+      } else {
+        p.wrap.classList.remove('tripped','done');
+        p.status.textContent = step.n_energized > 0 ? 'restoring' : 'cold';
+        p.status.style.color = 'var(--ink2)';
+      }
+      // Stats
+      p.trunk.textContent = step.trunk_a.toFixed(0) + ' A';
+      p.trunk.style.color = step.trip ? 'var(--red)' : (step.trunk_a > 0.9*TRIP ? '#c5651a' : 'var(--ink)');
+      p.onct.textContent = `${step.n_energized}/${N}`;
+      p.timer.textContent = fmtTime(Math.min(t, p.run.final_t));
+      // Polyline
+      const pts = [];
+      for(const s of p.run.steps){
+        if(s.t > t) break;
+        const x = 20 + (s.t / maxT) * 300;
+        const y = 105 - (Math.min(s.trunk_a, 300) / 300) * 100;
+        pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+      }
+      p.poly.setAttribute('points', pts.join(' '));
+      p.poly.setAttribute('stroke', p.run.trip && t >= p.run.final_t ? '#c0392b' : '#0b3a78');
+    }
+  }
+
+  function frame(ts){
+    if(!playing) return;
+    if(!lastFrame) lastFrame = ts;
+    const dt = (ts - lastFrame) / 1000;
+    lastFrame = ts;
+    t += dt * speed * 30;  // 30 sim-seconds per real-second baseline
+    if(t >= maxT){
+      t = maxT;
+      playing = false;
+      document.getElementById('play-btn').textContent = 'Play';
+    }
+    render();
+    if(playing) requestAnimationFrame(frame);
+  }
+
+  function play(){
+    if(t >= maxT) t = 0;
+    playing = true;
+    lastFrame = 0;
+    document.getElementById('play-btn').textContent = 'Pause';
+    requestAnimationFrame(frame);
+  }
+  function pause(){
+    playing = false;
+    document.getElementById('play-btn').textContent = 'Play';
+  }
+  function reset(){
+    t = 0;
+    playing = false;
+    lastFrame = 0;
+    document.getElementById('play-btn').textContent = 'Play';
+    render();
+  }
+
+  document.getElementById('play-btn').addEventListener('click', () => playing ? pause() : play());
+  document.getElementById('reset-btn').addEventListener('click', reset);
+
+  document.querySelectorAll('.speeds button').forEach(b => {
+    b.addEventListener('click', () => {
+      speed = parseInt(b.dataset.speed, 10);
+      document.querySelectorAll('.speeds button').forEach(x => x.setAttribute('aria-current', x === b ? 'true' : 'false'));
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
