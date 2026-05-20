@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Restart the grid, correctly</title>
+<style>
+  :root{
+    --bg:#fafaf7;
+    --paper:#ffffff;
+    --ink:#0f172a;
+    --ink2:#475569;
+    --mute:#94a3b8;
+    --line:#e6e8ee;
+    --navy:#0b3a78;
+    --yel:#f5c518;
+    --grn:#0f9d6b;
+    --red:#c0392b;
+    --radius:14px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:48px 28px 80px}
+  header{padding:40px 0 28px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--navy);font-weight:600}
+  h1{font-size:40px;line-height:1.08;margin:12px 0 14px;font-weight:700;letter-spacing:-.02em;max-width:780px}
+  h2{font-size:22px;margin:44px 0 14px;letter-spacing:-.005em;font-weight:600}
+  h3{font-size:15px;margin:14px 0 6px;color:var(--ink);font-weight:600}
+  p,li{color:var(--ink2)}
+  p{margin:0 0 12px}
+  .lede{font-size:18px;color:var(--ink);max-width:720px;margin-top:6px}
+  .grid{display:grid;gap:14px}
+  .grid.cols-2{grid-template-columns:1fr 1fr}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  @media (max-width:740px){.grid.cols-2,.grid.cols-3{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card h3{margin-top:0}
+  .stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .stat .v{font-size:32px;font-weight:700;color:var(--navy);letter-spacing:-.02em;line-height:1}
+  .stat .k{font-size:13px;color:var(--ink2);margin-top:6px}
+  .tag{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:999px;background:#eef2f9;color:var(--navy);border:1px solid #d9e1f0}
+  .tag.y{background:#fff7d6;color:#7a5a00;border-color:#f0dc8a}
+  .tag.g{background:#e6f7ef;color:#0f6c4a;border-color:#bfe6d3}
+  ol.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  ol.steps>li{counter-increment:s;position:relative;padding:14px 18px 14px 56px;background:var(--paper);border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+  ol.steps>li::before{content:counter(s);position:absolute;left:14px;top:14px;width:30px;height:30px;border-radius:8px;background:var(--navy);color:#fff;font-family:var(--mono);font-size:13px;display:flex;align-items:center;justify-content:center;font-weight:600}
+  ol.steps>li b{color:var(--ink)}
+  code{font-family:var(--mono);font-size:12.5px;background:#f1f3f8;padding:1px 6px;border-radius:6px;color:var(--ink);border:1px solid var(--line)}
+  .quote{border-left:3px solid var(--yel);padding:6px 0 6px 14px;color:var(--ink);font-style:italic;max-width:680px;margin:6px 0 0}
+  .close{background:var(--navy);color:#fff;border-radius:var(--radius);padding:24px 26px;margin-top:18px}
+  .close h3{color:#fff;font-size:13px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.18em;margin:0 0 6px;font-weight:600;opacity:.85}
+  .close .big{font-size:26px;font-weight:600;letter-spacing:-.01em;line-height:1.25}
+  .close p{color:#cdd6e8;margin:10px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Restart · a case for learned grid restoration</div>
+  <h1>Ukraine restarts its grid wrong every week. There is a way to do it right.</h1>
+  <p class="lede">An AI advisor that learns the safest sequence to re-energize feeders after a blackout — trained on a digital twin of Ukraine's actual network, and presented to operators with a one-line explanation for every recommendation.</p>
+</header>
+
+<h2>The problem</h2>
+<div class="grid cols-3">
+  <div class="stat"><div class="v">3–8×</div><div class="k">cold-load inrush vs steady-state, the moment power returns</div></div>
+  <div class="stat"><div class="v">~50%</div><div class="k">of Ukraine's thermal generation lost or degraded since 2022</div></div>
+  <div class="stat"><div class="v">weekly</div><div class="k">topology changes from strikes and repairs — paper procedures go stale</div></div>
+</div>
+<p style="margin-top:14px">After every blackout, an operator must re-energize a feeder. With every thermostat, fridge, and heater off, demand snaps back all at once and trips the upstream breaker — blackout again. The current playbook is a paper procedure written for a grid that no longer exists. Operators perform it under air-raid sirens, with degraded telemetry, sometimes from candlelight.</p>
+
+<h2>The idea</h2>
+<p>A reinforcement-learning policy that recommends <i>which segment to energize next</i>, <i>at what voltage ramp</i>, <i>after what dwell time</i>. The policy is trained against millions of synthetic blackout scenarios on a calibrated digital twin of Ukrainian topology. Every recommendation is shown to a human operator with an explanation. Never autonomous.</p>
+<div class="quote">Restoration is the one grid problem where seconds of delay cost megawatt-hours, and where the right action depends on weather, time, and damage. That is exactly the regime where RL beats both human procedures and classical optimization.</div>
+
+<h2>How it works</h2>
+<ol class="steps">
+  <li><b>Build a twin of a real Ukrainian sub-region.</b> One oblast's 35 / 10 kV network modeled in <code>OpenDSS</code>. Calibrated against ≥18 months of historical SCADA traces. Loads modeled as a population of equivalent-thermal-parameter houses, so cold-load behavior <i>emerges</i> rather than being hard-coded.</li>
+  <li><b>Generate scenarios.</b> Synthesize millions of blackout starting states across season, ambient temperature, outage duration, and damage pattern. This dataset — restoration under realistic adversarial damage — exists nowhere else.</li>
+  <li><b>Train a policy.</b> PPO with action masking in <code>Stable-Baselines3</code>. Curriculum from single feeder to full regional topology. Reward = load restored, penalized for trips, voltage violations, and time. An explainer is attached at training time, not bolted on after.</li>
+  <li><b>Validate in hardware.</b> Replay the policy on <code>Typhoon HIL</code> in real time. This is the sim-to-real check: does it still beat the baseline when load parameters drift and measurement noise is added?</li>
+  <li><b>Shadow-mode beside the operator.</b> The console shows the agent's recommendation next to the operator's intended action. The operator decides. Every disagreement becomes a training example.</li>
+  <li><b>Promote to advisory.</b> After months of high agreement, the operator can <i>accept</i> a recommendation with one click. Two-person confirmation above a learned risk threshold. The system never becomes fully closed-loop.</li>
+</ol>
+
+<h2>Why this works where the alternatives don't</h2>
+<div class="grid cols-3">
+  <div class="card"><h3>Paper procedures</h3><p>Assume seasonal averages and stable topology. Ukraine in 2026 has neither.</p></div>
+  <div class="card"><h3>Classical optimization</h3><p>Requires re-formulating every time the grid changes shape. The grid changes shape every week.</p></div>
+  <div class="card"><h3>Learned policy</h3><p>Maps state → next action. Topology and damage are inputs, not assumptions. Retrains on its own disagreements.</p></div>
+</div>
+
+<h2>Stages</h2>
+<div class="grid cols-2">
+  <div class="card">
+    <span class="tag">stage one</span>
+    <h3>Single-feeder proof</h3>
+    <p>One 10 kV feeder in OpenDSS. The trained policy beats both the greedy baseline and the paper procedure on time-to-99% restoration and on cascading trips.</p>
+  </div>
+  <div class="card">
+    <span class="tag">stage two</span>
+    <h3>Regional twin</h3>
+    <p>An entire oblast modeled and calibrated to historical SCADA. Policy curriculum-trained across seasons and damage patterns. Operator-facing explainer working.</p>
+  </div>
+  <div class="card">
+    <span class="tag y">stage three</span>
+    <h3>Hardware-in-the-loop and shadow</h3>
+    <p>Real-time validation on Typhoon HIL. The console runs live in a control room. Operators see recommendations, decide, and the disagreement log feeds the next training run.</p>
+  </div>
+  <div class="card">
+    <span class="tag g">stage four</span>
+    <h3>Advisory with approval</h3>
+    <p>One-click accept becomes available where the agent's risk score is low and the operator agrees. Two-person confirmation above the threshold. Always a human in the loop.</p>
+  </div>
+</div>
+
+<h2>What this prevents</h2>
+<p>Every cascading trip during restoration is another hour without power. In a Ukrainian winter that is heating off for hospitals, water pumps stopped, dialysis interrupted, apartment-block boilers refusing to restart, and street-corner generators bleeding diesel reserves the city cannot replace. A measurable cut in cascading trips during restoration is not a metric — it is hours of heat returned to people in February.</p>
+
+<h2>Risks owned up to</h2>
+<div class="grid cols-2">
+  <div class="card"><h3>Sim-to-real gap</h3><p>Field load won't perfectly match the population we sampled. Handled with domain randomization during training and online fine-tuning from real disagreements.</p></div>
+  <div class="card"><h3>Operator trust</h3><p>One visibly wrong recommendation costs a year of credibility. Handled by a long shadow period, an explanation attached to every recommendation, and no autonomous mode.</p></div>
+  <div class="card"><h3>Data access</h3><p>SCADA history is sensitive. Handled by training on-prem inside the utility perimeter; no data leaves the building.</p></div>
+  <div class="card"><h3>Topology drift</h3><p>A re-routed substation is a new problem. Handled by conditioning the policy on a topology hash and meta-training across a distribution of topologies, so adaptation is fast.</p></div>
+</div>
+
+<div class="close">
+  <h3>The case in one line</h3>
+  <div class="big">Ukraine has the world's most demanding grid-restoration problem, the world's richest dataset for solving it, and tooling that didn't exist five years ago. The question is no longer whether this works — only whether someone builds it before the next winter.</div>
+</div>
+
+</div>
+</body>
+</html>
