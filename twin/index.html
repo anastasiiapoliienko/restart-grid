@@ -4,7 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="description" content="Interactive digital twin of a Vinnytsia 35/10 kV substation — watch cold-load pickup emerge and see how restoration sequencing avoids transformer overload." />
-<title>Twin · Vinnytsia 35/10 kV substation</title>
+<title>Restart · twin · Vinnytsia 35/10 kV substation</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='10' fill='%23f5c518'/%3E%3C/svg%3E">
+<meta property="og:title" content="Restart · digital twin" />
+<meta property="og:description" content="Watch cold-load pickup emerge on a Vinnytsia 35/10 kV substation twin." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://anastasiiapoliienko.github.io/restart-grid/twin/" />
+<meta name="twitter:card" content="summary" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -43,18 +49,28 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+  body{overflow-x:hidden}
 
   nav.top{position:sticky;top:0;background:rgba(250,248,243,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:50}
-  nav.top .row{max-width:1200px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:18px}
-  .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink)}
+  nav.top .row{max-width:1200px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;gap:14px}
+  .brand{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink)}
   .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--yel);box-shadow:0 0 0 3px var(--yel-2),0 0 14px rgba(245,197,24,.5)}
   .brand .slash{color:var(--mute);font-weight:400;margin:0 2px}
   .brand a{color:inherit;text-decoration:none}
   .brand .sub{color:var(--ink2);font-weight:500}
-  nav.top ul{display:flex;gap:4px;list-style:none;margin:0;padding:0;flex:1;justify-content:center}
+  nav.top ul{display:flex;gap:2px;list-style:none;margin:0;padding:0;flex:1;justify-content:center}
   nav.top ul a{font-family:var(--mono);font-size:12px;color:var(--ink2);padding:6px 10px;border-radius:8px;text-decoration:none;letter-spacing:.02em}
   nav.top ul a:hover{background:var(--bg2);color:var(--ink)}
   nav.top ul a[aria-current="page"]{background:var(--ink);color:#fff}
+  nav.top .nav-toggle{display:none;background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--ink2);cursor:pointer;align-items:center;justify-content:center}
+  nav.top .nav-toggle:hover{color:var(--ink);border-color:var(--ink2)}
+  nav.top .mobile-menu{display:none;border-top:1px solid var(--line);background:var(--bg);padding:8px 16px 12px}
+  nav.top .mobile-menu.open{display:flex;flex-direction:column;gap:2px}
+  nav.top .mobile-menu a{font-family:var(--mono);font-size:13px;color:var(--ink2);padding:10px 14px;border-radius:8px;text-decoration:none}
+  nav.top .mobile-menu a:hover{background:var(--bg2);color:var(--ink)}
+  nav.top .mobile-menu a[aria-current="page"]{background:var(--ink);color:#fff}
+  @media (max-width:900px){nav.top ul{display:none}nav.top .nav-toggle{display:inline-flex}}
+  @media (max-width:520px){nav.top .brand .sub{display:none}}
 
   main{max-width:1200px;margin:0 auto;padding:28px}
   h1{font-family:var(--serif);font-size:42px;line-height:1.1;margin:14px 0 6px;letter-spacing:-.01em}
@@ -154,20 +170,36 @@
   <div class="row">
     <span class="brand">
       <span class="dot"></span>
-      <a href="/restart-grid/">restart</a>
+      <a href="../pitch/">restart</a>
       <span class="slash">/</span>
       <span class="sub" data-i18n="brand.sub">twin</span>
     </span>
     <ul>
-      <li><a href="/restart-grid/pitch/" data-i18n="nav.pitch">Pitch</a></li>
-      <li><a href="/restart-grid/technical/" data-i18n="nav.technical">Technical</a></li>
-      <li><a href="/restart-grid/twin/" aria-current="page" data-i18n="nav.twin">Twin</a></li>
+      <li><a href="../pitch/" data-i18n="nav.pitch">Pitch</a></li>
+      <li><a href="../results/" data-i18n="nav.results">Results</a></li>
+      <li><a href="../twin/" aria-current="page" data-i18n="nav.twin">Twin</a></li>
+      <li><a href="../priority/" data-i18n="nav.priority">Priority</a></li>
+      <li><a href="../technical/" data-i18n="nav.technical">Technical</a></li>
+      <li><a href="../console/" data-i18n="nav.console">Console</a></li>
     </ul>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu" onclick="var m=document.getElementById('mobile-menu');var o=m.classList.toggle('open');this.setAttribute('aria-expanded',o);">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
     <div class="lang-toggle" role="group" aria-label="Language">
       <button type="button" class="lang-pill" data-lang="en" aria-current="true">EN</button>
       <button type="button" class="lang-pill" data-lang="uk" aria-current="false">UA</button>
     </div>
     <a class="btn primary" href="https://github.com/anastasiiapoliienko/vinnytsia-twin" target="_blank" rel="noopener" data-i18n="nav.source">Source ↗</a>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="../pitch/">Pitch</a>
+    <a href="../results/">Results</a>
+    <a href="../twin/" aria-current="page">Twin</a>
+    <a href="../priority/">Priority</a>
+    <a href="../technical/">Technical</a>
+    <a href="../console/">Console</a>
+    <a href="../manual.pdf" target="_blank">Manual ↓</a>
+    <a href="https://github.com/anastasiiapoliienko/vinnytsia-twin" target="_blank" rel="noopener">Source ↗</a>
   </div>
 </nav>
 
