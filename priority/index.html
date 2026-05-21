@@ -115,9 +115,9 @@
   .speeds{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px;gap:2px}
   .speeds button{font-family:var(--mono);font-size:11px;padding:5px 9px;border:none;background:transparent;color:var(--ink2);border-radius:999px;cursor:pointer;font-weight:600}
   .speeds button[aria-current="true"]{background:var(--ink);color:#fff}
-  .panels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  @media (max-width:880px){.panels{grid-template-columns:1fr}}
+  .panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
   .panel{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbf8ef}
+  .panel.warn{box-shadow:0 0 0 2px rgba(245,197,24,.35)}
   .panel .pname{font-family:var(--mono);font-size:12px;color:var(--ink2);display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
   .panel .pname b{color:var(--ink);font-weight:600}
   .feeder{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 0 10px}
@@ -211,9 +211,9 @@
   <!-- populated from ARCHETYPES list -->
 </div>
 
-<!-- Animation: three policies side-by-side, across four conditions -->
-<h2>Same blackout, three orderings. <em>Pick the weather.</em></h2>
-<p>Four scenarios with different ambient temperature and outage duration. Each one is replayed with the same three policies (greedy, sequential, priority PPO). The priority policy almost always closes the hospital first or second — except in long-outage cases, where the trunk needs a small warm-up before adding the hospital's load. The trace shown is real, captured by <code>scripts/capture_trace_priority.py</code> on each scenario seed.</p>
+<!-- Animation: four policies side-by-side, across four conditions -->
+<h2>Same blackout, four orderings. <em>Pick the weather.</em></h2>
+<p>Four scenarios; each replayed by greedy, sequential-d8, the priority PPO, and a <b>panic-close</b> simulation that energizes every breaker in a single step (worst-case operator transient). On this archetype mix the panic-close doesn't trip the upstream breaker — but it does eat ~85% of trip capacity in 30 seconds, vs the priority PPO's ~62%. The story isn't "shield prevents trips here"; it's <i>headroom</i>. The priority PPO restores everything with two and a half times the safety margin of a panic close, and gets the hospital online first.</p>
 
 <div class="scen-pick" id="scen-pick">
   <!-- populated from scenarios -->
@@ -2252,7 +2252,7 @@
     const TRIP = trace.trip_amps;
     panels = trace.runs.map(run => {
       const wrap = document.createElement('div');
-      wrap.className = 'panel';
+      wrap.className = 'panel' + (run.name && run.name.toLowerCase().includes('panic') ? ' warn' : '');
       wrap.innerHTML = `
         <div class="pname"><b>${run.name}</b><span class="status">cold</span></div>
         <div class="feeder">${run.icons.map((ic, i) => `
