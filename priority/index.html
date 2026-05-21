@@ -132,9 +132,9 @@
   .speeds{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px;gap:2px}
   .speeds button{font-family:var(--mono);font-size:11px;padding:5px 9px;border:none;background:transparent;color:var(--ink2);border-radius:999px;cursor:pointer;font-weight:600}
   .speeds button[aria-current="true"]{background:var(--ink);color:#fff}
-  .panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .panels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media (max-width:880px){.panels{grid-template-columns:1fr}}
   .panel{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbf8ef}
-  .panel.warn{box-shadow:0 0 0 2px rgba(245,197,24,.35)}
   .panel .pname{font-family:var(--mono);font-size:12px;color:var(--ink2);display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
   .panel .pname b{color:var(--ink);font-weight:600}
   .feeder{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 0 10px}
@@ -245,8 +245,8 @@
 </div>
 
 <!-- Animation: four policies side-by-side, across four conditions -->
-<h2>Same blackout, four orderings. <em>Pick the weather.</em></h2>
-<p>Four scenarios; each replayed by greedy, sequential-d8, the priority PPO, and a <b>panic-close</b> simulation that energizes every breaker in a single step. <b>Greedy and panic-close both trip the upstream breaker</b> on every scenario — closing eight breakers in eight (or one) 30-second steps stacks enough CLPU to exceed the 240 A trip. Sequential-d8 is safe but slow (~32 min). Priority PPO is the only policy that's both <i>safe</i> and <i>hospital-first</i>: zero trips, hospital online in ~1 min.</p>
+<h2>Same blackout, three orderings. <em>Pick the weather.</em></h2>
+<p>Four scenarios with different ambient temperature and outage duration. Each one is replayed with the same three policies. <b>Greedy trips the upstream breaker on every scenario</b> — closing eight breakers in eight 30-second steps stacks enough CLPU to exceed the 240 A trip limit. Sequential-d8 is safe but slow (~32 min). Priority PPO is the only policy that's both <i>safe on most scenarios</i> and <i>hospital-first</i>: hospital online in ~1.4 min, full restoration in ~7 min.</p>
 
 <div class="scen-pick" id="scen-pick">
   <!-- populated from scenarios -->
@@ -2283,9 +2283,13 @@
     panelsEl.innerHTML = "";
     const N = trace.n_segments;
     const TRIP = trace.trip_amps;
-    panels = trace.runs.map(run => {
+    // Render only greedy / sequential / priority PPO; panic-close is in the
+    // trace data for analysis but not shown in the animation (greedy already
+    // plays the worst-case role visually).
+    const visibleRuns = trace.runs.filter(r => !(r.name && r.name.toLowerCase().includes('panic')));
+    panels = visibleRuns.map(run => {
       const wrap = document.createElement('div');
-      wrap.className = 'panel' + (run.name && run.name.toLowerCase().includes('panic') ? ' warn' : '');
+      wrap.className = 'panel';
       wrap.innerHTML = `
         <div class="pname"><b>${run.name}</b><span class="status">cold</span></div>
         <div class="feeder">${run.icons.map((ic, i) => `
@@ -2316,7 +2320,7 @@
         timer: wrap.querySelector('.timer'),
       };
     });
-    maxT = Math.max(...trace.runs.map(r => r.final_t)) + 30;
+    maxT = Math.max(...visibleRuns.map(r => r.final_t)) + 30;
   }
 
   function render(){
