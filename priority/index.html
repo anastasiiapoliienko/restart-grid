@@ -230,9 +230,9 @@
 
 <!-- Hero stats -->
 <div class="stat-row">
-  <div class="stat"><span class="icon">🏥</span><div class="v">0.6</div><div class="k">minutes from blackout to <b>hospital online</b> under the priority policy (avg across held-out scenarios)</div></div>
-  <div class="stat"><span class="icon">💧</span><div class="v">2.5</div><div class="k">minutes until <b>every critical segment</b> (hospital, water, bakery, elderly) is restored</div></div>
-  <div class="stat"><span class="icon">⏱</span><div class="v g">27.5×</div><div class="k">faster to hospital online than the safest fixed-dwell baseline (sequential dwell 8)</div></div>
+  <div class="stat"><span class="icon">🏥</span><div class="v">1.4</div><div class="k">minutes from blackout to <b>hospital online</b> under the priority policy (avg across held-out scenarios)</div></div>
+  <div class="stat"><span class="icon">💧</span><div class="v">4.8</div><div class="k">minutes until <b>every critical segment</b> (hospital, water, bakery, elderly) is restored</div></div>
+  <div class="stat"><span class="icon">⏱</span><div class="v g">11.5×</div><div class="k">faster to hospital online than the safest fixed-dwell baseline (sequential dwell 8)</div></div>
 </div>
 
 <div class="quote">"What changed is not the speed. What changed is what we measure speed against."</div>
@@ -277,9 +277,9 @@
     <tr><th>policy</th><th>min → hospital</th><th>min → all critical</th><th>steps to 99%</th><th>trip%</th></tr>
   </thead>
   <tbody id="results-tbody">
-    <tr><td>greedy (segment order)</td><td class="num" data-filled="g.hosp">2.3 min</td><td class="num" data-filled="g.crit">3.7 min</td><td class="num" data-filled="g.steps">8.0</td><td class="num" data-filled="g.trip">0.0%</td></tr>
+    <tr><td>greedy (segment order)</td><td class="num" data-filled="g.hosp">2.2 min</td><td class="num" data-filled="g.crit">3.7 min</td><td class="num" data-filled="g.steps">7.5</td><td class="num" data-filled="g.trip">97.8%</td></tr>
     <tr><td>sequential, dwell 8</td><td class="num" data-filled="s.hosp">16.5 min</td><td class="num" data-filled="s.crit">29.7 min</td><td class="num" data-filled="s.steps">64.0</td><td class="num" data-filled="s.trip">0.0%</td></tr>
-    <tr class="win"><td>priority PPO (3-seed)</td><td class="num" data-filled="p.hosp">0.6 ± 0.0 min</td><td class="num" data-filled="p.crit">2.5 ± 0.0 min</td><td class="num" data-filled="p.steps">8.0 ± 0.0</td><td class="num" data-filled="p.trip">0.0%</td></tr>
+    <tr class="win"><td>priority PPO (3-seed)</td><td class="num" data-filled="p.hosp">1.4 ± 0.0 min</td><td class="num" data-filled="p.crit">4.8 ± 0.3 min</td><td class="num" data-filled="p.steps">14.2 ± 1.0</td><td class="num" data-filled="p.trip">5.6%</td></tr>
   </tbody>
 </table>
 <p style="margin-top:10px;color:var(--mute);font-size:12.5px"><i>Numbers will be filled in by <code>scripts/evaluate_priority.py</code> after training completes — until then the dashes are honest placeholders.</i></p>
