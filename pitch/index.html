@@ -55,6 +55,7 @@
   body{overflow-x:hidden}
   a{color:var(--navy);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s,color .15s}
   a:hover{color:var(--navy-2);border-bottom-color:var(--navy-2)}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--navy);outline-offset:2px;border-radius:3px}
 
   /* ── Progress bar ─────────────────────────────────────── */
   .progress{position:fixed;top:0;left:0;right:0;height:2px;background:transparent;z-index:60}
@@ -94,6 +95,7 @@
   .wrap{max-width:1100px;margin:0 auto;padding:0 28px}
   .narrow{max-width:780px;margin:0 auto}
   section{padding:72px 0;border-bottom:1px solid var(--line2)}
+  @media (max-width:600px){section{padding:48px 0}}
   section:last-of-type{border-bottom:none}
 
   /* ── Section eyebrows ────────────────────────────────── */
@@ -129,7 +131,7 @@
   .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;font-family:var(--sans);border:1px solid transparent;cursor:pointer;transition:transform .15s,background .15s,border-color .15s;border-bottom:none}
   .btn.primary{background:var(--ink);color:#fff}
   .btn.primary:hover{background:var(--navy);color:#fff;transform:translateY(-1px)}
-  .btn.ghost{background:var(--paper);color:var(--ink);border-color:var(--line)}
+  .btn.ghost{background:var(--paper);color:var(--ink);border-color:var(--ink2)}
   .btn.ghost:hover{border-color:var(--ink);color:var(--ink)}
   .btn svg{width:14px;height:14px}
   @media (max-width:740px){h1{font-size:40px}.hero{padding:56px 0 32px}}
@@ -493,17 +495,17 @@
 
     <div class="stat-row">
       <div class="stat reveal">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 L4 13 H11 L10 22 L20 11 H13 Z"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M13 2 L4 13 H11 L10 22 L20 11 H13 Z"/></svg>
         <div class="v">3–8<em>×</em></div>
         <div class="k" data-i18n="stat.1.k">cold-load inrush vs steady-state, the moment power returns</div>
       </div>
       <div class="stat reveal">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3 V12 L19 16"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3 V12 L19 16"/></svg>
         <div class="v">~50<em>%</em></div>
         <div class="k" data-i18n="stat.2.k">of Ukraine's thermal generation lost or degraded since 2022</div>
       </div>
       <div class="stat reveal">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12 H21 M3 6 H21 M3 18 H21"/><path d="M7 3 V21 M17 3 V21"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 12 H21 M3 6 H21 M3 18 H21"/><path d="M7 3 V21 M17 3 V21"/></svg>
         <div class="v" data-i18n="stat.3.v">weekly</div>
         <div class="k" data-i18n="stat.3.k">topology changes from strikes and repairs — paper procedures go stale</div>
       </div>

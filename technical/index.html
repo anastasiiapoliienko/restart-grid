@@ -27,7 +27,7 @@
     --panel:#151d33;
     --line:#243154;
     --ink:#e7ecf5;
-    --ink2:#a4afc9;
+    --ink2:#b8c0d4;
     --mute:#6c7898;
     --blue:#3aa0ff;
     --yel:#ffd24a;
@@ -56,7 +56,8 @@
   .grid.cols-3{grid-template-columns:repeat(3,1fr)}
   .grid.cols-4{grid-template-columns:repeat(4,1fr)}
   @media (max-width:780px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;transition:border-color .15s}
+  .card:hover{border-color:#3a4a78}
   .card h3{margin-top:0}
   .card small{color:var(--mute);font-family:var(--mono);font-size:12px}
   .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:999px;background:#1a2647;color:var(--blue);border:1px solid #25366a;margin-right:6px}
@@ -104,6 +105,8 @@
   /* Architecture diagram */
   .arch{background:#0a1120;border:1px solid var(--line);border-radius:12px;padding:14px}
 
+  a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  @media (max-width:600px){header{padding:36px 0 16px}}
   footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);color:var(--mute);font-size:13px;font-family:var(--mono)}
 
   /* Language toggle */
@@ -222,7 +225,7 @@
 
 <h2 data-i18n="s4.h2">4 · Architecture</h2>
 <div class="arch">
-<svg viewBox="0 0 980 320" width="100%" height="320" xmlns="http://www.w3.org/2000/svg" style="font-family:ui-monospace,Menlo,monospace;font-size:12px">
+<svg viewBox="0 0 980 320" width="100%" height="320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="System architecture: data sources (SCADA, weather, topology, strike log) feed an OpenDSS twin and scenario generator, which train a PPO RL agent with SHAP explainer; the agent advises operators via a console UI in shadow then advisory mode, with telemetry fed back for retraining." style="font-family:ui-monospace,Menlo,monospace;font-size:12px">
   <defs>
     <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#7c8cff"/>

@@ -162,6 +162,22 @@
   .lang-pill{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2);background:transparent;border:none;border-radius:999px;padding:5px 10px;cursor:pointer;font-weight:600;transition:background .15s,color .15s}
   .lang-pill:hover{color:var(--ink)}
   .lang-pill[aria-current="true"]{background:var(--ink);color:#fff}
+
+  /* Accessibility: keyboard focus */
+  a:focus-visible,button:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+
+  /* Chart legend */
+  .chart-legend{display:flex;gap:14px;align-items:center;margin-top:6px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--ink2)}
+  .chart-legend .swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:4px}
+  .chart-legend .swatch.load{background:var(--navy)}
+  .chart-legend .swatch.temp{background:var(--ink2)}
+
+  /* Mobile spacing */
+  @media (max-width:740px){
+    .panel{padding:14px}
+    .layout > div > .panel + .panel{margin-top:14px !important}
+    main{padding:16px}
+  }
 </style>
 </head>
 <body>
@@ -233,6 +249,10 @@
         </div>
         <svg id="chart" viewBox="0 0 800 230" xmlns="http://www.w3.org/2000/svg"></svg>
         <svg id="temp-chart" viewBox="0 0 800 120" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="chart-legend" aria-label="Chart legend">
+          <span><span class="swatch load"></span>Substation load (MW)</span>
+          <span><span class="swatch temp"></span>Outdoor temperature (°C)</span>
+        </div>
       </div>
     </div>
 
@@ -290,7 +310,7 @@ const i18n = {
     "be.connecting": "connecting…",
     "be.live": "live backend",
     "be.asleep": "backend asleep · replay mode",
-    "be.replay": "replay mode",
+    "be.replay": "replay (pre-computed)",
     "be.notset": "(not configured)",
     "time.label": "t = {n} min",
     "time.hour":  "{n}h",
@@ -340,7 +360,7 @@ const i18n = {
     "be.connecting": "з'єднуємо…",
     "be.live": "живий бекенд",
     "be.asleep": "бекенд спить · режим повтору",
-    "be.replay": "режим повтору",
+    "be.replay": "попередньо пораховано",
     "be.notset": "(не налаштовано)",
     "time.label": "t = {n} хв",
     "time.hour":  "{n} год",

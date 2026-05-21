@@ -67,7 +67,7 @@
   nav.top .right a[aria-current="page"]{background:var(--ink);color:#fff}
   nav.top .cta{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:var(--mono);font-weight:500}
   nav.top .cta:hover{background:var(--navy);color:#fff;border-bottom-color:transparent}
-  nav.top .nav-toggle{display:none;background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--ink2);cursor:pointer;align-items:center;justify-content:center;position:absolute;top:12px;right:22px}
+  nav.top .nav-toggle{display:none;background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--ink2);cursor:pointer;align-items:center;justify-content:center;margin-left:auto}
   nav.top .nav-toggle:hover{color:var(--ink);border-color:var(--ink2)}
   nav.top .mobile-menu{display:none;border-top:1px solid var(--line);background:var(--bg);padding:8px 16px 12px}
   nav.top .mobile-menu.open{display:flex;flex-direction:column;gap:2px}
@@ -147,12 +147,15 @@
   .rec .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
   .rec .actions button{font-family:var(--sans);font-size:13px;padding:9px 16px;border-radius:8px;border:1px solid #2a3a5e;background:#1a2647;color:#cbd3ea;cursor:pointer;font-weight:500;flex:1;min-width:90px}
   .rec .actions button:hover{filter:brightness(1.15)}
-  .rec .actions button.accept{background:var(--grn);border-color:var(--grn);color:#fff}
+  .rec .actions button.accept{background:var(--grn);border-color:var(--grn);color:#fff;font-weight:700;font-size:14px;padding:11px 18px;box-shadow:0 0 0 3px rgba(15,157,107,.25)}
   .rec .actions button.wait{background:#1a2647;border-color:#2a3a5e}
-  .rec .actions button.override{background:transparent;color:#9aa5c2}
+  .rec .actions button.override{background:transparent;border-color:#2a3a5e;color:#6b7a96;font-size:12px}
+  .rec .actions button.override:hover{color:#9aa5c2;border-color:#4a5a82;filter:none}
   .rec .actions button:disabled{opacity:.4;cursor:not-allowed}
-  .rec .conf-bar{height:4px;background:#1f2a45;border-radius:2px;overflow:hidden;margin-top:8px}
+  .rec .conf-bar-wrap{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .rec .conf-bar{height:4px;background:#1f2a45;border-radius:2px;overflow:hidden;flex:1}
   .rec .conf-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--grn),var(--yel));transition:width .5s ease}
+  .rec .conf-pct{font-family:var(--mono);font-size:11px;color:#9aa5c2;white-space:nowrap;min-width:30px;text-align:right}
   .rec.done{background:#0a2c20}
   .rec.done .hd{border-color:#1d4a39}
   .rec.tripped{background:#2b1318}
@@ -205,6 +208,20 @@
   .scen-btn[aria-current="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
   .scen-btn .meta{font-family:var(--mono);font-size:10.5px;color:var(--mute);display:block;margin-top:1px;font-weight:400}
   .scen-btn[aria-current="true"] .meta{color:#cbd3ea}
+
+  /* ── Accept wrapper + kbd hint ─────────────────────────────────────── */
+  .accept-wrap{display:flex;flex-direction:column;align-items:stretch;flex:1;min-width:90px;gap:4px}
+  .accept-wrap .accept{width:100%}
+  .kbd-hint{font-family:var(--mono);font-size:10px;color:#6b7a96;text-align:center;letter-spacing:.04em}
+
+  /* ── Focus-visible ─────────────────────────────────────── */
+  a:focus-visible,button:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+
+  /* ── Mobile segment sizing ─────────────────────────────────────── */
+  @media (max-width:600px){
+    .feeders{grid-template-columns:repeat(4,minmax(68px,1fr))}
+    .seg{min-height:72px;padding:10px 6px 9px}
+  }
 
   footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:12.5px;font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
   footer a{color:var(--ink2)}
@@ -334,13 +351,13 @@
         <span class="k" data-i18n="rec.k.conf">confidence</span>
         <span class="v" id="rec-conf-text">—</span>
       </div>
-      <div class="conf-bar"><i id="rec-conf-bar" style="width:0%"></i></div>
+      <div class="conf-bar-wrap"><div class="conf-bar"><i id="rec-conf-bar" style="width:0%"></i></div><span class="conf-pct" id="rec-conf-pct">—</span></div>
       <div class="why">
         <b data-i18n="rec.why.lbl">why this action</b>
         <span id="rec-why" data-i18n="rec.why.loading">Loading scenario…</span>
       </div>
       <div class="actions" id="rec-actions">
-        <button class="accept" id="btn-accept" data-i18n="btn.accept">Accept</button>
+        <div class="accept-wrap"><button class="accept" id="btn-accept" data-i18n="btn.accept">Accept</button><span class="kbd-hint">↵ Enter</span></div>
         <button class="wait" id="btn-wait" data-i18n="btn.wait">Wait 30 s</button>
         <button class="override" id="btn-override" data-i18n="btn.override">Override</button>
       </div>
@@ -810,6 +827,7 @@ const dom = {
   recShield: document.getElementById("rec-shield"),
   recConfText: document.getElementById("rec-conf-text"),
   recConfBar: document.getElementById("rec-conf-bar"),
+  recConfPct: document.getElementById("rec-conf-pct"),
   recWhy: document.getElementById("rec-why"),
   recActions: document.getElementById("rec-actions"),
   btnAccept: document.getElementById("btn-accept"),
@@ -990,6 +1008,7 @@ function renderRec(){
     dom.recShield.className = "v bad";
     dom.recConfText.textContent = "—";
     dom.recConfBar.style.width = "0%";
+    if(dom.recConfPct) dom.recConfPct.textContent = "—";
     dom.recWhy.textContent = t('rec.why.tripped');
     [dom.btnAccept, dom.btnWait, dom.btnOverride].forEach(b => b.disabled = true);
     dom.overridePick.classList.remove("show");
@@ -1007,6 +1026,7 @@ function renderRec(){
     dom.recShield.className = "v ok";
     dom.recConfText.textContent = "100%";
     dom.recConfBar.style.width = "100%";
+    if(dom.recConfPct) dom.recConfPct.textContent = "100%";
     dom.recWhy.textContent = t('rec.why.done', {
       steps: env.stepCount,
       mins: (env.stepCount * STEP_SECONDS / 60).toFixed(1),
@@ -1039,6 +1059,7 @@ function renderRec(){
   }
   dom.recConfText.textContent = `${(r.confidence * 100).toFixed(0)}%`;
   dom.recConfBar.style.width = `${(r.confidence * 100).toFixed(0)}%`;
+  if(dom.recConfPct) dom.recConfPct.textContent = `${(r.confidence * 100).toFixed(0)}%`;
   dom.recWhy.textContent = r.whyKey ? t(r.whyKey, r.whyVars) : (r.why || "");
   dom.btnWait.disabled = false;
   dom.btnOverride.disabled = false;
