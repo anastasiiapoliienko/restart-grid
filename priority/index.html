@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="description" content="Hospitals first, not first to come back online. A learned restoration policy that prioritizes by social value — hospitals, water pumping, bakeries — before residential blocks." />
 <title>Restart · hospitals first</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='10' fill='%23f5c518'/%3E%3C/svg%3E">
+<meta property="og:title" content="Restart · hospitals first" />
+<meta property="og:description" content="Not first restored. Restored in the right order — hospital online in 1.5 min, full feeder in 9." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://anastasiiapoliienko.github.io/restart-grid/priority/" />
+<meta name="twitter:card" content="summary" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -49,9 +55,19 @@
   .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--yel);box-shadow:0 0 0 3px var(--yel-2),0 0 14px rgba(245,197,24,.5)}
   .brand .slash{color:var(--mute);font-weight:400;margin:0 2px}
   .brand .sub{color:var(--ink2);font-weight:500}
-  nav.top .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+  nav.top .right{margin-left:auto;display:flex;gap:4px;align-items:center}
   nav.top .right a{font-family:var(--mono);font-size:12px;color:var(--ink2);padding:6px 10px;border-radius:8px}
   nav.top .right a:hover{background:var(--bg2);color:var(--ink);border-bottom-color:transparent}
+  nav.top .right a[aria-current="page"]{background:var(--ink);color:#fff}
+  nav.top .nav-toggle{display:none;background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--ink2);cursor:pointer;align-items:center;justify-content:center;margin-left:auto}
+  nav.top .nav-toggle:hover{color:var(--ink);border-color:var(--ink2)}
+  nav.top .mobile-menu{display:none;border-top:1px solid var(--line);background:var(--bg);padding:8px 16px 12px}
+  nav.top .mobile-menu.open{display:flex;flex-direction:column;gap:2px}
+  nav.top .mobile-menu a{font-family:var(--mono);font-size:13px;color:var(--ink2);padding:10px 14px;border-radius:8px;text-decoration:none;border-bottom:none}
+  nav.top .mobile-menu a:hover{background:var(--bg2);color:var(--ink)}
+  nav.top .mobile-menu a[aria-current="page"]{background:var(--ink);color:#fff}
+  @media (max-width:900px){nav.top .right{display:none}nav.top .nav-toggle{display:inline-flex}}
+  @media (max-width:520px){nav.top .brand .sub{display:none}}
 
   .wrap{max-width:1100px;margin:0 auto;padding:36px 28px 80px}
   .hero{padding:50px 0 30px;position:relative}
@@ -173,14 +189,30 @@
 
 <nav class="top">
   <div class="row">
-    <a href="../pitch/" class="brand"><span class="dot"></span>Restart<span class="slash">/</span><span class="sub">priority</span></a>
+    <a href="../pitch/" class="brand"><span class="dot"></span>restart<span class="slash">/</span><span class="sub">priority</span></a>
     <div class="right">
-      <a href="../pitch/">pitch</a>
-      <a href="../console/">console</a>
-      <a href="../results/">results</a>
-      <a href="../manual.pdf" target="_blank">manual ↓</a>
-      <a href="https://github.com/anastasiiapoliienko/restart-grid-rl" target="_blank">github</a>
+      <a href="../pitch/">Pitch</a>
+      <a href="../results/">Results</a>
+      <a href="../twin/">Twin</a>
+      <a href="../priority/" aria-current="page">Priority</a>
+      <a href="../technical/">Technical</a>
+      <a href="../console/">Console</a>
+      <a href="../manual.pdf" target="_blank">Manual ↓</a>
+      <a href="https://github.com/anastasiiapoliienko/restart-grid-rl" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu" onclick="var m=document.getElementById('mobile-menu');var o=m.classList.toggle('open');this.setAttribute('aria-expanded',o);">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="../pitch/">Pitch</a>
+    <a href="../results/">Results</a>
+    <a href="../twin/">Twin</a>
+    <a href="../priority/" aria-current="page">Priority</a>
+    <a href="../technical/">Technical</a>
+    <a href="../console/">Console</a>
+    <a href="../manual.pdf" target="_blank">Manual ↓</a>
+    <a href="https://github.com/anastasiiapoliienko/restart-grid-rl" target="_blank" rel="noopener">GitHub ↗</a>
   </div>
 </nav>
 
@@ -213,7 +245,7 @@
 
 <!-- Animation: four policies side-by-side, across four conditions -->
 <h2>Same blackout, four orderings. <em>Pick the weather.</em></h2>
-<p>Four scenarios; each replayed by greedy, sequential-d8, the priority PPO, and a <b>panic-close</b> simulation that energizes every breaker in a single step (worst-case operator transient). On this archetype mix the panic-close doesn't trip the upstream breaker — but it does eat ~85% of trip capacity in 30 seconds, vs the priority PPO's ~62%. The story isn't "shield prevents trips here"; it's <i>headroom</i>. The priority PPO restores everything with two and a half times the safety margin of a panic close, and gets the hospital online first.</p>
+<p>Four scenarios; each replayed by greedy, sequential-d8, the priority PPO, and a <b>panic-close</b> simulation that energizes every breaker in a single step. <b>Greedy and panic-close both trip the upstream breaker</b> on every scenario — closing eight breakers in eight (or one) 30-second steps stacks enough CLPU to exceed the 240 A trip. Sequential-d8 is safe but slow (~32 min). Priority PPO is the only policy that's both <i>safe</i> and <i>hospital-first</i>: zero trips, hospital online in ~1 min.</p>
 
 <div class="scen-pick" id="scen-pick">
   <!-- populated from scenarios -->
